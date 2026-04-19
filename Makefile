@@ -19,7 +19,7 @@ SRC := logic-interp.c
 POLYLOG := polylog
 POLYLOG_SRC := prolog/polylog.c
 
-.PHONY: all clean test test-polylog test-polylog-bootstrap test-rule-source bitboards deterministic
+.PHONY: all clean test test-polylog test-polylog-bootstrap test-rule-source bitboards graph-bitboards deterministic
 
 all: $(TARGET)
 
@@ -56,8 +56,12 @@ bitboards: $(POLYLOG) test-rule-source
 	chmod +x ./prolog/export_polyform_bitboards.sh
 	./prolog/export_polyform_bitboards.sh
 
+graph-bitboards: $(POLYLOG) test-rule-source
+	chmod +x ./prolog/export_control_graph_bitboards.sh
+	./prolog/export_control_graph_bitboards.sh
+
 deterministic: $(POLYLOG)
-	chmod +x ./prolog/run_rule_source.sh ./prolog/export_polyform_bitboards.sh ./prolog/deterministic_replay.sh
+	chmod +x ./prolog/run_rule_source.sh ./prolog/export_polyform_bitboards.sh ./prolog/export_control_graph_bitboards.sh ./prolog/deterministic_replay.sh
 	./prolog/deterministic_replay.sh
 
 clean:

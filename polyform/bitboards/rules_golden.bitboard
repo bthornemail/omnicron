@@ -1,29 +1,29 @@
 # POLYFORM GOLDEN BITBOARD
 # Generated from: /root/omnicron/prolog/omnicron-rule-source.extracted.logic
-# Rule count: 300
+# Rule count: 1019
 # Width bits: 256
-WORD_0=0xB67EBCF7
-WORD_1=0xCFB21F77
-WORD_2=0xE3DDAD0A
-WORD_3=0xFC44F77F
-WORD_4=0xFFDFDFB7
-WORD_5=0xBDFD3DFD
-WORD_6=0x2E7EB2F2
-WORD_7=0xE4BFDFEF
+WORD_0=0xFFFFFFFF
+WORD_1=0xFFFFFFFF
+WORD_2=0xFFFFFFFB
+WORD_3=0xFFFFF7FF
+WORD_4=0xFFFFFFFF
+WORD_5=0xFFFDFFFF
+WORD_6=0xEFFFFFF7
+WORD_7=0xFFFFFFFF
 GRID_16x16:
-###.####..####.#
-.######..##.##.#
-###.###.#####...
-.#..##.#####..##
-.#.#....#.##.#.#
-#.###.####...###
-#######.###.####
-..#...#...######
-###.##.######.##
-#####.##########
-#.#######.####..
-#.#######.####.#
-.#..####.#..##.#
-.######..###.#..
-####.########.##
-######.#..#..###
+################
+################
+################
+################
+##.#############
+################
+###########.####
+################
+################
+################
+################
+#.##############
+###.############
+############.###
+################
+################

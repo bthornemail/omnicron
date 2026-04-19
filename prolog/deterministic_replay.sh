@@ -17,6 +17,7 @@ cd "$ROOT_DIR"
 
 ./prolog/run_rule_source.sh >/dev/null
 ./prolog/export_polyform_bitboards.sh >/dev/null
+./prolog/export_control_graph_bitboards.sh >/dev/null
 
 OUT_FILE="prolog/deterministic_replay.sha256"
 TMP_FILE="/tmp/deterministic_replay.sha256.tmp"
@@ -31,7 +32,10 @@ sha256sum \
   prolog/omnitron_declarations.lx \
   polyform/bitboards/rules_selected.logic \
   polyform/bitboards/rules_golden.bitboard \
-  polyform/bitboards/rules_negative.bitboard > "$TMP_FILE"
+  polyform/bitboards/rules_negative.bitboard \
+  polyform/bitboards/control_graph_golden.bitboard \
+  polyform/bitboards/control_graph_negative.bitboard \
+  polyform/bitboards/control_graph_overlay_aegean.bitboard > "$TMP_FILE"
 
 if [[ "$UPDATE" == "--update" || ! -f "$OUT_FILE" ]]; then
   mv "$TMP_FILE" "$OUT_FILE"

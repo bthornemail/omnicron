@@ -60,6 +60,15 @@ For deterministic replay lock (minimal anti-drift):
 - Verify against baseline: `make deterministic`
 - Baseline file: `prolog/deterministic_replay.sha256`
 
+Control-plane graph artifacts (bitboard-only):
+
+- `polyform/bitboards/control_graph_golden.bitboard`
+- `polyform/bitboards/control_graph_negative.bitboard`
+- `polyform/bitboards/control_graph_overlay_aegean.bitboard`
+
+The executable `.org` layer keeps ASCII aliases for Aegean and DPD table facts;
+Unicode Aegean glyphs live in `.lx` declaration metadata.
+
 ## The Ontology In One Line
 
 ```text

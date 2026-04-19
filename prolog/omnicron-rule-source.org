@@ -1,17 +1,847 @@
-can you write a interpeter for this in c its supposed to be only Character set
+% ============================================================
+% SOURCE BLOCK FRONT MATTER (ASCII ZERO-BASIS INDEX)
+% ============================================================
+%
+% This header is the deterministic in-file bootstrap for relative indexing.
+% It replaces freeform chart prose with parser-safe facts.
+%
+% Ordering law:
+% raw binary -> canonical ASCII -> sexagesimal header -> duodecimal class
+% -> frame sequence resolution.
 
-ASCII (1977/1986)
-0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
-0x	NUL	SOH	STX	ETX	EOT	ENQ	ACK	BEL	 BS 	 HT 	 LF 	 VT 	 FF 	 CR 	 SO 	 SI 
-1x	DLE	DC1	DC2	DC3	DC4	NAK	SYN	ETB	CAN	 EM 	SUB	ESC	 FS 	 GS 	 RS 	 US 
-2x	 SP 	!	"	#	$	%	&	'	(	)	*	+	,	-	.	/
-3x	0	1	2	3	4	5	6	7	8	9	:	;	<	=	>	?
-4x	@	A	B	C	D	E	F	G	H	I	J	K	L	M	N	O
-5x	P	Q	R	S	T	U	V	W	X	Y	Z	[	\	]	^	_
-6x	`	a	b	c	d	e	f	g	h	i	j	k	l	m	n	o
-7x	p	q	r	s	t	u	v	w	x	y	z	{	|	}	~	DEL
-  Changed or added in 1963 version
-  Changed in both 1963 version and 1965 draft
+source_block_header(1, ascii_zero_basis, canonical_order_1977_1986).
+source_block_header(2, interpreter_surface, ascii_only_c_runtime).
+source_block_header(3, indexing_mode, projective_hierarchical_relative).
+
+ascii_basis_row(0, control_plane_0, [nul,soh,stx,etx,eot,enq,ack,bel,bs,ht,lf,vt,ff,cr,so,si]).
+ascii_basis_row(1, control_plane_1, [dle,dc1,dc2,dc3,dc4,nak,syn,etb,can,em,sub,esc,fs,gs,rs,us]).
+ascii_basis_row(2, printable_plane_a, [sp,exclamation,double_quote,hash,dollar,percent,ampersand,single_quote,lparen,rparen,star,plus,comma,minus,dot,slash]).
+ascii_basis_row(3, printable_plane_b, [digit_0,digit_1,digit_2,digit_3,digit_4,digit_5,digit_6,digit_7,digit_8,digit_9,colon,semicolon,lt,eq,gt,question]).
+ascii_basis_row(4, printable_plane_c, [at,a_upper,b_upper,c_upper,d_upper,e_upper,f_upper,g_upper,h_upper,i_upper,j_upper,k_upper,l_upper,m_upper,n_upper,o_upper]).
+ascii_basis_row(5, printable_plane_d, [p_upper,q_upper,r_upper,s_upper,t_upper,u_upper,v_upper,w_upper,x_upper,y_upper,z_upper,lbrack,backslash,rbrack,caret,underscore]).
+ascii_basis_row(6, printable_plane_e, [backtick,a_lower,b_lower,c_lower,d_lower,e_lower,f_lower,g_lower,h_lower,i_lower,j_lower,k_lower,l_lower,m_lower,n_lower,o_lower]).
+ascii_basis_row(7, printable_plane_f, [p_lower,q_lower,r_lower,s_lower,t_lower,u_lower,v_lower,w_lower,x_lower,y_lower,z_lower,lbrace,pipe,rbrace,tilde,del]).
+
+ascii_delimiter_set(control_plane_minimal, [nul,soh,stx,etx,eot,enq,ack,bel,bs,ht,lf,vt,ff,cr,so,si,dle,dc1,dc2,dc3,dc4,nak,syn,etb,can,em,sub,esc,fs,gs,rs,us,sp]).
+ascii_delimiter_set(printable_fallback, [sp,exclamation,double_quote,hash,dollar,percent,ampersand,single_quote,lparen,rparen,star,plus,comma,minus,dot,slash,digit_0,digit_1,digit_2,digit_3,digit_4,digit_5,digit_6,digit_7,digit_8,digit_9,colon,semicolon,lt,eq,gt,question]).
+
+control_hierarchy(0, nul, frame_boundary).
+control_hierarchy(1, soh, header_start).
+control_hierarchy(2, stx, text_start).
+control_hierarchy(3, etx, text_end).
+control_hierarchy(4, eot, transmission_end).
+control_hierarchy(5, enq, query_marker).
+control_hierarchy(6, ack, acknowledge).
+control_hierarchy(7, nak, negative_ack).
+control_hierarchy(8, bel, attention).
+control_hierarchy(9, bs, undo).
+control_hierarchy(10, ht, indent).
+control_hierarchy(11, lf, newline).
+control_hierarchy(12, vt, vertical_tab).
+control_hierarchy(13, ff, form_feed).
+control_hierarchy(14, cr, carriage_return).
+control_hierarchy(15, so, mode_shift_out).
+control_hierarchy(16, si, mode_shift_in).
+control_hierarchy(17, dle, data_link_escape).
+control_hierarchy(18, dc1, xon).
+control_hierarchy(19, dc2, device_control_2).
+control_hierarchy(20, dc3, xoff).
+control_hierarchy(21, dc4, device_control_4).
+control_hierarchy(22, syn, sync_idle).
+control_hierarchy(23, etb, transmission_block_end).
+control_hierarchy(24, can, cancel).
+control_hierarchy(25, em, end_medium).
+control_hierarchy(26, sub, substitute).
+control_hierarchy(27, esc, escape_meta).
+control_hierarchy(28, fs, file_separator).
+control_hierarchy(29, gs, group_separator).
+control_hierarchy(30, rs, record_separator).
+control_hierarchy(31, us, unit_separator).
+control_hierarchy(32, del, delete_marker).
+
+substrate_stage_order(raw_binary_group_ordering, canonical_ascii_ordering).
+substrate_stage_order(canonical_ascii_ordering, sexagesimal_notation_headers).
+substrate_stage_order(sexagesimal_notation_headers, duodecimal_classification).
+substrate_stage_order(duodecimal_classification, frame_sequence_resolution).
+
+control_axis_count(60).
+control_axis_anchor(0, nul).
+control_axis_anchor(1, soh).
+control_axis_anchor(2, stx).
+control_axis_anchor(3, etx).
+control_axis_anchor(4, eot).
+control_axis_anchor(5, enq).
+control_axis_anchor(6, ack).
+control_axis_anchor(7, bel).
+control_axis_anchor(8, bs).
+control_axis_anchor(9, ht).
+control_axis_anchor(10, lf).
+control_axis_anchor(11, vt).
+control_axis_anchor(12, ff).
+control_axis_anchor(13, cr).
+control_axis_anchor(14, so).
+control_axis_anchor(15, si).
+control_axis_anchor(16, dle).
+control_axis_anchor(17, dc1).
+control_axis_anchor(18, dc2).
+control_axis_anchor(19, dc3).
+control_axis_anchor(20, dc4).
+control_axis_anchor(21, nak).
+control_axis_anchor(22, syn).
+control_axis_anchor(23, etb).
+control_axis_anchor(24, can).
+control_axis_anchor(25, em).
+control_axis_anchor(26, sub).
+control_axis_anchor(27, esc).
+control_axis_anchor(28, fs).
+control_axis_anchor(29, gs).
+control_axis_anchor(30, rs).
+control_axis_anchor(31, us).
+control_axis_anchor(32, del).
+control_axis_anchor(33, axis_33).
+control_axis_anchor(34, axis_34).
+control_axis_anchor(35, axis_35).
+control_axis_anchor(36, axis_36).
+control_axis_anchor(37, axis_37).
+control_axis_anchor(38, axis_38).
+control_axis_anchor(39, axis_39).
+control_axis_anchor(40, axis_40).
+control_axis_anchor(41, axis_41).
+control_axis_anchor(42, axis_42).
+control_axis_anchor(43, axis_43).
+control_axis_anchor(44, axis_44).
+control_axis_anchor(45, axis_45).
+control_axis_anchor(46, axis_46).
+control_axis_anchor(47, axis_47).
+control_axis_anchor(48, axis_48).
+control_axis_anchor(49, axis_49).
+control_axis_anchor(50, axis_50).
+control_axis_anchor(51, axis_51).
+control_axis_anchor(52, axis_52).
+control_axis_anchor(53, axis_53).
+control_axis_anchor(54, axis_54).
+control_axis_anchor(55, axis_55).
+control_axis_anchor(56, axis_56).
+control_axis_anchor(57, axis_57).
+control_axis_anchor(58, axis_58).
+control_axis_anchor(59, axis_59).
+
+aegean_alias(aegean_00, tile_u10100).
+aegean_alias(aegean_01, tile_u10101).
+aegean_alias(aegean_02, tile_u10102).
+aegean_alias(aegean_07, tile_u10107).
+aegean_alias(aegean_08, tile_u10108).
+aegean_alias(aegean_09, tile_u10109).
+aegean_alias(aegean_0a, tile_u1010a).
+aegean_alias(aegean_0b, tile_u1010b).
+aegean_alias(aegean_0c, tile_u1010c).
+aegean_alias(aegean_0d, tile_u1010d).
+aegean_alias(aegean_0e, tile_u1010e).
+aegean_alias(aegean_0f, tile_u1010f).
+aegean_alias(aegean_10, tile_u10110).
+aegean_alias(aegean_11, tile_u10111).
+aegean_alias(aegean_12, tile_u10112).
+aegean_alias(aegean_13, tile_u10113).
+aegean_alias(aegean_14, tile_u10114).
+aegean_alias(aegean_15, tile_u10115).
+aegean_alias(aegean_16, tile_u10116).
+aegean_alias(aegean_17, tile_u10117).
+aegean_alias(aegean_18, tile_u10118).
+aegean_alias(aegean_19, tile_u10119).
+aegean_alias(aegean_1a, tile_u1011a).
+aegean_alias(aegean_1b, tile_u1011b).
+aegean_alias(aegean_1c, tile_u1011c).
+aegean_alias(aegean_1d, tile_u1011d).
+aegean_alias(aegean_1e, tile_u1011e).
+aegean_alias(aegean_1f, tile_u1011f).
+aegean_alias(aegean_20, tile_u10120).
+aegean_alias(aegean_21, tile_u10121).
+aegean_alias(aegean_22, tile_u10122).
+aegean_alias(aegean_23, tile_u10123).
+
+aegean_cardinality(aegean_00, 0).
+aegean_cardinality(aegean_01, 1).
+aegean_cardinality(aegean_02, 2).
+aegean_cardinality(aegean_07, 1).
+aegean_cardinality(aegean_08, 2).
+aegean_cardinality(aegean_09, 3).
+aegean_cardinality(aegean_0a, 4).
+aegean_cardinality(aegean_0b, 5).
+aegean_cardinality(aegean_0c, 6).
+aegean_cardinality(aegean_0d, 7).
+aegean_cardinality(aegean_0e, 8).
+aegean_cardinality(aegean_0f, 9).
+
+aegean_chirality(aegean_00, neutral).
+aegean_chirality(aegean_01, left).
+aegean_chirality(aegean_02, right).
+aegean_chirality(aegean_07, left).
+aegean_chirality(aegean_08, right).
+aegean_chirality(aegean_09, left).
+aegean_chirality(aegean_0a, right).
+aegean_chirality(aegean_0b, left).
+aegean_chirality(aegean_0c, right).
+aegean_chirality(aegean_0d, left).
+aegean_chirality(aegean_0e, right).
+aegean_chirality(aegean_0f, left).
+
+dpd_bucket(0, small_small_small, 512, range_0_7_0_7_0_7).
+dpd_bucket(1, small_small_large, 384, range_0_7_0_7_8_9).
+dpd_bucket(2, small_large_small, 384, range_0_7_8_9_0_7).
+dpd_bucket(3, large_small_small, 384, range_8_9_0_7_0_7).
+dpd_bucket(4, large_large_small, 96, range_8_9_8_9_0_7).
+dpd_bucket(5, large_small_large, 96, range_8_9_0_7_8_9).
+dpd_bucket(6, small_large_large, 96, range_0_7_8_9_8_9).
+dpd_bucket(7, large_large_large, 8, range_8_9_8_9_8_9).
+
+dpd_code_space(total_states, 1024).
+dpd_value_space(encoded_states, 1000).
+dpd_unused_gap(unused_states, 24).
+dpd_link(rule_head, bucket_0, small_small_small).
+dpd_link(bucket_0, bucket_1, one_large_digit).
+dpd_link(bucket_1, bucket_4, two_large_digits).
+dpd_link(bucket_4, bucket_7, three_large_digits).
+
+dpd_row(0, row_small_small_small).
+dpd_template(row_small_small_small, b9_a_b8_b_b7_c_b6_d_b5_e_b4_f_b3_0_b2_g_b1_h_b0_i).
+dpd_decode(row_small_small_small, d2_0abc, d1_0def, d0_0ghi).
+dpd_values(row_small_small_small, v_0_7_0_7_0_7).
+dpd_description(row_small_small_small, three_small_digits).
+dpd_occurrence(row_small_small_small, states_512, pct_51_2).
+
+dpd_row(1, row_small_small_large).
+dpd_template(row_small_small_large, b9_a_b8_b_b7_c_b6_d_b5_e_b4_f_b3_1_b2_0_b1_0_b0_i).
+dpd_decode(row_small_small_large, d2_0abc, d1_0def, d0_100i).
+dpd_values(row_small_small_large, v_0_7_0_7_8_9).
+dpd_description(row_small_small_large, two_small_one_large).
+dpd_occurrence(row_small_small_large, states_384, pct_38_4).
+
+dpd_row(2, row_small_large_small).
+dpd_template(row_small_large_small, b9_a_b8_b_b7_c_b6_g_b5_h_b4_f_b3_1_b2_0_b1_1_b0_i).
+dpd_decode(row_small_large_small, d2_0abc, d1_100f, d0_0ghi).
+dpd_values(row_small_large_small, v_0_7_8_9_0_7).
+dpd_description(row_small_large_small, two_small_one_large).
+dpd_occurrence(row_small_large_small, states_384, pct_38_4).
+
+dpd_row(3, row_large_small_small).
+dpd_template(row_large_small_small, b9_g_b8_h_b7_c_b6_d_b5_e_b4_f_b3_1_b2_1_b1_0_b0_i).
+dpd_decode(row_large_small_small, d2_100c, d1_0def, d0_0ghi).
+dpd_values(row_large_small_small, v_8_9_0_7_0_7).
+dpd_description(row_large_small_small, two_small_one_large).
+dpd_occurrence(row_large_small_small, states_384, pct_38_4).
+
+dpd_row(4, row_large_large_small).
+dpd_template(row_large_large_small, b9_g_b8_h_b7_c_b6_0_b5_0_b4_f_b3_1_b2_1_b1_1_b0_i).
+dpd_decode(row_large_large_small, d2_100c, d1_100f, d0_0ghi).
+dpd_values(row_large_large_small, v_8_9_8_9_0_7).
+dpd_description(row_large_large_small, one_small_two_large).
+dpd_occurrence(row_large_large_small, states_96, pct_9_6).
+
+dpd_row(5, row_large_small_large).
+dpd_template(row_large_small_large, b9_d_b8_e_b7_c_b6_0_b5_1_b4_f_b3_1_b2_1_b1_1_b0_i).
+dpd_decode(row_large_small_large, d2_100c, d1_0def, d0_100i).
+dpd_values(row_large_small_large, v_8_9_0_7_8_9).
+dpd_description(row_large_small_large, one_small_two_large).
+dpd_occurrence(row_large_small_large, states_96, pct_9_6).
+
+dpd_row(6, row_small_large_large).
+dpd_template(row_small_large_large, b9_a_b8_b_b7_c_b6_1_b5_0_b4_f_b3_1_b2_1_b1_1_b0_i).
+dpd_decode(row_small_large_large, d2_0abc, d1_100f, d0_100i).
+dpd_values(row_small_large_large, v_0_7_8_9_8_9).
+dpd_description(row_small_large_large, one_small_two_large).
+dpd_occurrence(row_small_large_large, states_96, pct_9_6).
+
+dpd_row(7, row_large_large_large).
+dpd_template(row_large_large_large, b9_x_b8_x_b7_c_b6_1_b5_1_b4_f_b3_1_b2_1_b1_1_b0_i).
+dpd_decode(row_large_large_large, d2_100c, d1_100f, d0_100i).
+dpd_values(row_large_large_large, v_8_9_8_9_8_9).
+dpd_description(row_large_large_large, three_large_digits).
+dpd_occurrence(row_large_large_large, states_8, pct_0_8).
+dpd_dont_care(row_large_large_large, b9).
+dpd_dont_care(row_large_large_large, b8).
+
+dpd_row_next(row_small_small_small, row_small_small_large).
+dpd_row_next(row_small_small_large, row_small_large_small).
+dpd_row_next(row_small_large_small, row_large_small_small).
+dpd_row_next(row_large_small_small, row_large_large_small).
+dpd_row_next(row_large_large_small, row_large_small_large).
+dpd_row_next(row_large_small_large, row_small_large_large).
+dpd_row_next(row_small_large_large, row_large_large_large).
+
+offset_binary_word_size(4, bias_8).
+offset_binary_word_size(8, bias_128).
+offset_binary_conversion(offset_to_twos_complement, xor_msb).
+offset_binary_conversion(twos_complement_to_offset, xor_msb).
+offset_binary_xor_constant(4, hex_08).
+offset_binary_xor_constant(8, hex_80).
+offset_binary_cpu_strategy(unsigned_plus_bias_software).
+offset_binary_cpu_strategy(msb_invert_fast_path).
+
+offset_binary_map(7, bin_1111, tc_0111).
+offset_binary_map(6, bin_1110, tc_0110).
+offset_binary_map(5, bin_1101, tc_0101).
+offset_binary_map(4, bin_1100, tc_0100).
+offset_binary_map(3, bin_1011, tc_0011).
+offset_binary_map(2, bin_1010, tc_0010).
+offset_binary_map(1, bin_1001, tc_0001).
+offset_binary_map(0, bin_1000, tc_0000).
+offset_binary_map(neg_1, bin_0111, tc_1111).
+offset_binary_map(neg_2, bin_0110, tc_1110).
+offset_binary_map(neg_3, bin_0101, tc_1101).
+offset_binary_map(neg_4, bin_0100, tc_1100).
+offset_binary_map(neg_5, bin_0011, tc_1011).
+offset_binary_map(neg_6, bin_0010, tc_1010).
+offset_binary_map(neg_7, bin_0001, tc_1001).
+offset_binary_map(neg_8, bin_0000, tc_1000).
+
+dpd_pass_through_bit(b7).
+dpd_pass_through_bit(b4).
+dpd_pass_through_bit(b0).
+dpd_cohort_rule(max_significand_preserved).
+
+aegean_header_mode(two_of_five_like).
+aegean_header_mode(stars_and_bars_compatible).
+aegean_header_cardinality_basis(two_of_five).
+aegean_header_chirality_basis(odd_even_signature).
+aegean_header_interop(control_plane_modality, delimiter_safe).
+
+storage_efficiency(1, states_10, bcd_bits_4, binary_bits_4, mixed_bits_4, mixed_vs_bcd_0).
+storage_efficiency(2, states_100, bcd_bits_8, binary_bits_7, mixed_bits_7, mixed_vs_bcd_neg_1).
+storage_efficiency(3, states_1000, bcd_bits_12, binary_bits_10, mixed_bits_10, mixed_vs_bcd_neg_2).
+storage_efficiency(4, states_10000, bcd_bits_16, binary_bits_14, mixed_bits_14, mixed_vs_bcd_neg_2).
+storage_efficiency(5, states_100000, bcd_bits_20, binary_bits_17, mixed_bits_17, mixed_vs_bcd_neg_3).
+storage_efficiency(6, states_1000000, bcd_bits_24, binary_bits_20, mixed_bits_20, mixed_vs_bcd_neg_4).
+storage_efficiency(7, states_10000000, bcd_bits_28, binary_bits_24, mixed_bits_24, mixed_vs_bcd_neg_4).
+storage_efficiency(8, states_100000000, bcd_bits_32, binary_bits_27, mixed_bits_27, mixed_vs_bcd_neg_5).
+storage_efficiency(9, states_1000000000, bcd_bits_36, binary_bits_30, mixed_bits_30, mixed_vs_bcd_neg_6).
+storage_efficiency(10, states_10000000000, bcd_bits_40, binary_bits_34, mixed_bits_34, mixed_vs_bcd_neg_6).
+storage_efficiency(11, states_100000000000, bcd_bits_44, binary_bits_37, mixed_bits_37, mixed_vs_bcd_neg_7).
+storage_efficiency(12, states_1000000000000, bcd_bits_48, binary_bits_40, mixed_bits_40, mixed_vs_bcd_neg_8).
+storage_efficiency(13, states_10000000000000, bcd_bits_52, binary_bits_44, mixed_bits_44, mixed_vs_bcd_neg_8).
+storage_efficiency(14, states_100000000000000, bcd_bits_56, binary_bits_47, mixed_bits_47, mixed_vs_bcd_neg_9).
+storage_efficiency(15, states_1000000000000000, bcd_bits_60, binary_bits_50, mixed_bits_50, mixed_vs_bcd_neg_10).
+storage_efficiency(16, states_10000000000000000, bcd_bits_64, binary_bits_54, mixed_bits_54, mixed_vs_bcd_neg_10).
+
+encoding_mix_pattern(1, mix_1xA).
+encoding_mix_pattern(2, mix_1xB).
+encoding_mix_pattern(3, mix_1xC).
+encoding_mix_pattern(4, mix_2xB).
+encoding_mix_pattern(5, mix_1xC_plus_1xB).
+encoding_mix_pattern(6, mix_2xC).
+encoding_mix_pattern(7, mix_2xC_plus_1xA).
+encoding_mix_pattern(8, mix_2xC_plus_1xB).
+encoding_mix_pattern(9, mix_3xC).
+encoding_mix_pattern(10, mix_3xC_plus_1xA).
+encoding_mix_pattern(11, mix_3xC_plus_1xB).
+encoding_mix_pattern(12, mix_4xC).
+encoding_mix_pattern(13, mix_4xC_plus_1xA).
+encoding_mix_pattern(14, mix_4xC_plus_1xB).
+encoding_mix_pattern(15, mix_5xC).
+encoding_mix_pattern(16, mix_5xC_plus_1xA).
+
+riscv_fp_extension(q, binary128_ieee754_2008, ratified).
+riscv_fp_extension(l, decimal64_decimal128_ieee754, pending_certification).
+riscv_fp_extension(binary256_interchange, ieee754_2008, optional_interchange_format).
+
+ieee754_encoding_mode(decimal_interchange, dpd_encoding).
+ieee754_encoding_mode(decimal_interchange, bid_encoding).
+ieee754_encoding_mode(binary_interchange, implicit_leading_bit_when_normalized).
+
+decimal_format_profile(decimal32, storage_bits_32, significand_digits_7, combination_bits_11, exponent_bits_8, bias_101, emax_96, emin_neg_95).
+decimal_format_profile(decimal64, storage_bits_64, significand_digits_16, combination_bits_13, exponent_bits_10, bias_398, emax_384, emin_neg_383).
+decimal_format_profile(decimal128, storage_bits_128, significand_digits_34, combination_bits_17, exponent_bits_14, bias_6176, emax_6144, emin_neg_6143).
+
+binary256_profile(storage_bytes_32, storage_bits_256, sign_bits_1, exponent_bits_19, significand_precision_bits_237, stored_significand_bits_236).
+binary256_exponent_profile(offset_binary_bias_262143, emin_neg_262142, emax_262143).
+binary256_special_exponent(hex_00000, zero_or_subnormal).
+binary256_special_exponent(hex_7ffff, infinity_or_nan).
+binary256_rounding_note(one_third_default_rounds_down_due_to_odd_significand_precision).
+
+cohort_selection_rule(inexact_result, select_largest_significand_integer_with_required_exponent).
+cohort_equivalent_value(example_100_0, coeff_1000_exp_neg_1).
+cohort_equivalent_value(example_100_00, coeff_10000_exp_neg_2).
+
+aegean_overlay_mode(invert_binary_priority_for_control_plane_compatibility).
+aegean_overlay_contract(reference_profile_is_ieee_or_riscv, execution_profile_is_aegean_alias_surface).
+aegean_precision_tile(sign_field, aegean_00, tile_u10100).
+aegean_precision_tile(exponent_field, aegean_0c, tile_u1010c).
+aegean_precision_tile(significand_field, aegean_12, tile_u10112).
+aegean_precision_tile(cohort_field, aegean_1a, tile_u1011a).
+aegean_precision_tile(infinity_nan_field, aegean_23, tile_u10123).
+aegean_overlay_flow(sign_field, exponent_field).
+aegean_overlay_flow(exponent_field, significand_field).
+aegean_overlay_flow(significand_field, cohort_field).
+aegean_overlay_flow(cohort_field, infinity_nan_field).
+
+omicron_threshold_rule(center_333, value_333, role_equilibrium_center).
+omicron_threshold_rule(limit_666, value_666, role_combinatorial_limit).
+omicron_threshold_rule(octave_999, value_999, role_next_scale_projection).
+
+omicron_threshold_transition(center_333, limit_666, add_gnomon_333).
+omicron_threshold_transition(limit_666, octave_999, add_center_333).
+omicron_threshold_transition(center_333, octave_999, compose_double_step).
+
+aegean_threshold_tile(value_333, aegean_12, tile_u10112).
+aegean_threshold_tile(value_666, aegean_1a, tile_u1011a).
+aegean_threshold_tile(value_999, aegean_23, tile_u10123).
+
+aegean_precision_rule_set(rule_333, threshold_value_333, mode_center_lock, binary256_reference).
+aegean_precision_rule_set(rule_666, threshold_value_666, mode_limit_lock, binary256_reference).
+aegean_precision_rule_set(rule_999, threshold_value_999, mode_octave_expand, binary256_reference).
+
+binary256_reference_field(sign_bits, count_1).
+binary256_reference_field(exponent_bits, count_19).
+binary256_reference_field(significand_precision_bits, count_237).
+binary256_reference_field(significand_stored_bits, count_236).
+binary256_reference_field(exponent_bias, value_262143).
+
+binary256_threshold_binding(threshold_value_333, exponent_bias_value_262143, relation_reference_anchor).
+binary256_threshold_binding(threshold_value_666, exponent_bias_value_262143, relation_limit_projection).
+binary256_threshold_binding(threshold_value_999, exponent_bias_value_262143, relation_octave_projection).
+
+bitop_labeling_convention(bit_index_origin_one, relation_ctz_equals_ffs_minus_one_except_zero).
+bitop_labeling_convention(bit_index_origin_zero, relation_ctz_equals_ffs_exact).
+bitop_word_identity(log2_from_clz, log2_x_equals_w_minus_1_minus_clz_x).
+bitop_word_identity(clz_from_log2, clz_x_equals_w_minus_1_minus_log2_x).
+
+bitop_negation_duality(ffz, ffs, negate_input).
+bitop_negation_duality(clo, clz, negate_input).
+bitop_negation_duality(cto, ctz, negate_input).
+bitop_inverse_problem(ctz_inverse, left_shift_one_by_i).
+
+ctz_formula(log2_path, ctz_x_equals_log2_of_x_and_neg_x).
+ffs_formula(clz_path, ffs_x_equals_w_minus_clz_of_x_and_neg_x).
+ctz_formula(popcount_path_a, ctz_x_equals_popcount_of_x_and_neg_x_minus_one).
+ctz_formula(popcount_path_b, ctz_x_equals_popcount_of_not_x_or_neg_x).
+ffs_formula(popcount_path, ffs_x_equals_popcount_of_x_xor_not_neg_x).
+
+bitop_zero_semantics(ffs_zero_returns, value_0).
+bitop_zero_semantics(ctz_zero_returns, operand_bit_width_w).
+bitop_zero_semantics(clz_zero_returns, operand_bit_width_w).
+
+pow2_roundup_method(shift_or_fold, requires_nonzero_input).
+pow2_roundup_step(shift_or_fold, shift_1).
+pow2_roundup_step(shift_or_fold, shift_2).
+pow2_roundup_step(shift_or_fold, shift_4).
+pow2_roundup_step(shift_or_fold, shift_8).
+pow2_roundup_step(shift_or_fold, shift_16).
+
+ctz_algorithm(linear_loop, complexity_o_w, branch_heavy).
+ctz_algorithm(byte_table_scan, complexity_o_w, table_lookup_assisted).
+ctz_algorithm(binary_search, complexity_o_log_w, branch_reduction).
+ctz_algorithm(clz_assisted, complexity_o_1_on_hw_clz, isolate_lsb_with_x_and_neg_x).
+ctz_algorithm(popcount_assisted, complexity_o_1_on_hw_popcount, xor_mask_then_popcount).
+ctz_algorithm(debruijn_32, complexity_o_1, branchless_table_hash).
+ctz_algorithm(debruijn_64, complexity_o_1, branchless_table_hash).
+
+ctz_debruijn_constant(word32, hex_077cb531, shift_27, table_size_32).
+ctz_debruijn_folded_constant(word32_halfmul, hex_70a7, shift_11, table_size_32).
+ctz_debruijn_folded_alt(word32_halfmul, hex_70d3).
+ctz_debruijn_folded_constant(word64_halfmul, hex_783a9b23, shift_0, table_size_64).
+ctz_debruijn_folded_constant(word64_halfmul, hex_78291d9b, shift_0, table_size_64).
+ctz_debruijn_folded_constant(word64_halfmul, hex_782c8d4f, shift_0, table_size_64).
+ctz_debruijn_folded_constant(word64_halfmul, hex_78291acf, shift_0, table_size_64).
+
+clz_algorithm(linear_loop, complexity_o_w, branch_heavy).
+clz_algorithm(byte_table_scan, complexity_o_w, table_lookup_assisted).
+clz_algorithm(binary_search, complexity_o_log_w, branch_reduction).
+clz_algorithm(binary_search_plus_table, complexity_o_log_w, cache_sensitive).
+clz_algorithm(debruijn_roundup, complexity_o_1, branchless_hash_after_or_roundup).
+clz_algorithm(branchless_compare_shift, complexity_o_log_w, avoids_mispredict_flush).
+clz_algorithm(float_exponent_extract, complexity_o_1, nonportable_high_latency).
+
+clz_debruijn_constant(word32, hex_07c4acdd, shift_27, table_size_32).
+
+bitop_array_extension(scan_word_blocks_until_nonzero_or_nonone).
+bitop_array_acceleration(recursive_bitmap_tree_index).
+
+bitop_application(integer_normalization_m_times_2_pow_e).
+bitop_application(newton_raphson_division_support).
+bitop_application(integer_to_float_conversion_support).
+bitop_application(binary_gcd_trailing_zero_strip).
+bitop_application(priority_queue_pop_with_ffs).
+bitop_application(tower_of_hanoi_disk_selection_via_ctz_k).
+bitop_application(gray_code_flip_bit_ctz_k).
+bitop_application(hailstone_loop_shift_optimization).
+bitop_application(log2_overflow_anticipation_for_multiply).
+bitop_application(gosper_loop_detection_with_clz_ctz).
+bitop_application(null_suppression_leading_zero_bytes).
+bitop_application(exponential_random_integer_from_clz).
+
+bitmask_operation(mask_set_to_one, bitwise_or).
+bitmask_operation(mask_clear_to_zero, bitwise_and).
+bitmask_operation(mask_toggle, bitwise_xor).
+bitmask_operation(mask_query_status, bitwise_and_compare_nonzero).
+bitmask_operation(mask_write_subset, clear_then_or_value).
+bitmask_operation(mask_merge_source_destination, destination_and_not_mask_or_source_and_mask).
+
+bitmask_identity(or_with_one_forces_one).
+bitmask_identity(or_with_zero_keeps_bit).
+bitmask_identity(and_with_zero_forces_zero).
+bitmask_identity(and_with_one_keeps_bit).
+bitmask_identity(xor_with_one_inverts_bit).
+bitmask_identity(xor_with_zero_keeps_bit).
+
+bitmask_equation(write_subset, register_equals_register_and_not_mask_or_value).
+bitmask_equation(merge_subset, destination_equals_destination_and_not_mask_or_source_and_mask).
+
+bitmask_query_rule(bit_is_set_when_and_mask_nonzero).
+bitmask_query_rule(bit_is_clear_when_and_mask_zero).
+
+bitmask_use_case(function_arguments_bitfield_packing).
+bitmask_use_case(sprite_and_cursor_blit_masking).
+bitmask_use_case(hash_index_power_of_two_masking).
+bitmask_use_case(vector_predication_mask_select).
+bitmask_use_case(dirty_rectangle_partial_redraw).
+
+mask_table_header_mode(control_codes_plus_aegean_tiles).
+mask_table_header_mode(stars_and_bars_two_of_five_pattern).
+mask_table_axis(control_codes, canonical_ascii_0_to_31_plus_del).
+mask_table_axis(aegean_tiles, alias_indexed_overlay_surface).
+mask_table_gate_rule(null_and_escape_reserved_control_anchors).
+mask_table_gate_rule(fs_gs_rs_us_frame_boundaries).
+
+blit_mask_pipeline(stage_1, screen_and_sprite_mask).
+blit_mask_pipeline(stage_2, screen_or_sprite_bits).
+blit_mask_pipeline(stage_3, optional_dirty_rectangle_restore).
+
+hash_mask_rule(power_of_two_bucket_count_requires_mask_of_n_minus_1).
+hash_mask_rule(index_equals_hash_and_mask).
+hash_mask_rule(mask_equivalent_to_modulo_for_power_of_two).
+
+tagged_pointer_mode(alignment_derived_low_bits_as_tags).
+tagged_pointer_mode(valid_pointer_plus_inline_tag_metadata).
+tagged_pointer_mode(null_and_sentinel_as_limited_tag_space).
+
+tagged_pointer_tag_semantics(bit_0, read_only_flag).
+tagged_pointer_tag_semantics(bit_1, dirty_flag).
+tagged_pointer_tag_semantics(bit_2, access_condition_flag).
+tagged_pointer_tag_semantics(bit_3, type_selector_flag).
+
+tagged_pointer_alignment_fact(table_entry_alignment_bytes_16, low_bits_available_4).
+tagged_pointer_alignment_example(tagged_ptr_hex_3421, base_addr_hex_3420, read_only_flag_set).
+tagged_pointer_alignment_example(tagged_ptr_hex_f472, base_addr_hex_f470, dirty_flag_set).
+
+tagged_pointer_mask_rule(base_address_equals_pointer_and_not_low_tag_mask).
+tagged_pointer_mask_rule(low_tag_bits_equals_pointer_and_low_tag_mask).
+tagged_pointer_mask_rule(low_tag_mask_for_16byte_alignment, hex_000f).
+
+tagged_pointer_vs_null_rule(tagged_pointer_more_flexible_than_null_sentinel_tags).
+tagged_pointer_vs_null_rule(null_sentinel_provides_finite_distinct_values_only).
+
+tagged_architecture_property(word_includes_reserved_tag_bits).
+tagged_architecture_property(hardware_support_for_tag_interpretation_possible).
+tagged_architecture_example(lisp_machine_style_tag_support).
+
+malloc_alignment_fact(gnu_libc_malloc_alignment, platform_32bit, bytes_8).
+malloc_alignment_fact(gnu_libc_malloc_alignment, platform_64bit, bytes_16).
+malloc_alignment_fact(posix_memalign, supports_larger_alignment_requests).
+
+tagged_pointer_api_pattern(optional_out_pointer_null_guard_before_deref).
+tagged_pointer_api_pattern(global_sentinel_address_as_special_pointer_value).
+
+tagged_pointer_advantage(space_efficiency_vs_pointer_plus_separate_tag).
+tagged_pointer_advantage(pointer_and_tag_atomic_update_in_single_word).
+tagged_pointer_advantage(reduced_external_synchronization_for_updates).
+
+tagged_pointer_disadvantage(debugger_support_may_require_tag_aware_tools).
+tagged_pointer_disadvantage(zero_null_semantics_more_pervasive_in_languages).
+tagged_pointer_disadvantage(cplusplus_zero_overload_resolution_prefers_nullptr).
+
+qemu_riscv_target(machine_virt, device_virtio_gpu_gl, display_sdl_gl_on).
+qemu_riscv_target(kernel_mode, constitutional_virtual_machine_surface).
+
+framebuffer_buffer_mapping(omni_front_left, gl_front_left, dialect_fixed_standard).
+framebuffer_buffer_mapping(omni_back_left, gl_back_left, dialectic_interpretation_space).
+framebuffer_buffer_mapping(omni_front_right, gl_front_right, odd_permutation_chiral_left).
+framebuffer_buffer_mapping(omni_back_right, gl_back_right, even_permutation_chiral_right).
+
+bom_buffer_mapping(front_left, be_identity).
+bom_buffer_mapping(back_left, le_swapped).
+bom_buffer_mapping(front_right, be_swapped_odd).
+bom_buffer_mapping(back_right, le_swapped_even).
+
+breathing_invariant_mapping(front_buffer, collapsed_canonical_identity).
+breathing_invariant_mapping(back_buffer, expanded_execution_state).
+breathing_invariant_mapping(buffer_swap, compose_collapse_after_expand).
+
+klein_surface_grid(points_60, planes_60, incidences_3600).
+klein_surface_quorum(consensus_members_15).
+stencil_layout(line_pair_bits_0_3, permutation_bits_4_5, cohort_bits_6_7).
+stencil_mask(line_pair_mask, hex_0f).
+stencil_mask(permutation_mask, hex_30).
+stencil_mask(cohort_mask, hex_c0).
+
+depth_wallis_mapping(depth_0_0, sexagesimal_pow_neg_4).
+depth_wallis_mapping(depth_0_25, sexagesimal_pow_neg_2).
+depth_wallis_mapping(depth_0_5, sexagesimal_pow_0_omicron_pivot).
+depth_wallis_mapping(depth_0_75, sexagesimal_pow_2).
+depth_wallis_mapping(depth_1_0, sexagesimal_pow_4).
+
+pixel_ownership_mapping(owned_fragment, peer_in_consensus).
+pixel_ownership_mapping(discarded_fragment, peer_not_synchronized).
+pixel_ownership_mapping(ownership_failure, no_quorum_no_commit).
+
+cohort_msaa_mapping(samples_2x, cohorts_2_binary_choice).
+cohort_msaa_mapping(samples_4x, cohorts_4_bom_states).
+cohort_msaa_mapping(samples_8x, cohorts_8_nonstandard_encodings).
+cohort_msaa_mapping(samples_16x, cohorts_16_pfister_closure).
+
+framebuffer_config_rule(min_width_60, min_height_60, klein_incidence_minimum_surface).
+framebuffer_config_rule(depth_bits_24, wallis_layers_resolution).
+framebuffer_config_rule(stencil_bits_8, klein_masking_resolution).
+framebuffer_config_rule(samples_16, cohort_resolution_target).
+framebuffer_config_rule(stereo_enabled, chiral_left_right_buffers).
+framebuffer_config_rule(double_buffer_enabled, breathing_invariant_required).
+
+riscv_framebuffer_mapping(qemu_virt_framebuffer_base, hex_08000000).
+riscv_framebuffer_mapping(klein_fb_width, value_60).
+riscv_framebuffer_mapping(klein_fb_height, value_60).
+riscv_framebuffer_mapping(klein_fb_stride_bytes, value_240).
+riscv_framebuffer_mapping(klein_fb_size_bytes, value_14400).
+
+bootstrap_mapping(code16k_rows_7, fano_lines_7).
+bootstrap_mapping(code16k_modules, protocol_bootstrap_modules).
+bootstrap_mapping(render_to_back_buffer_then_resolve_to_front, breathing_bootstrap_cycle).
+
+shader_pass_mapping(input_stencil, line_pair_and_permutation_selector).
+shader_pass_mapping(input_depth, wallis_exponent_layer).
+shader_pass_mapping(input_multisample_coverage, cohort_resolution_signal).
+shader_pass_mapping(stencil_test_threshold, discriminator_two_of_five).
+shader_pass_mapping(output_color, canonical_surface_value).
+
+runtime_cycle_rule(render_back_buffer_execution_state).
+runtime_cycle_rule(resolve_multisample_cohort).
+runtime_cycle_rule(swap_buffers_for_collapse_expand_composition).
+runtime_cycle_rule(update_omicron_state_by_pivot_70_mod_666).
+
+barcode_trinity_mapping(maxicode, texture_object).
+barcode_trinity_mapping(aztec_code, vertex_object).
+barcode_trinity_mapping(beecode, query_object).
+
+maxicode_texture_role(shader_texture_source).
+maxicode_texture_role(render_target_attachment).
+maxicode_texture_theory(image_container_with_type_size_format_constraints).
+maxicode_texture_feature(mipmap_chain_support).
+maxicode_texture_feature(texture_completeness_required_for_sampling).
+maxicode_texture_feature(sampler_object_can_override_sampling_params).
+maxicode_texture_feature(swizzle_mask_reorders_color_channels).
+maxicode_texture_feature(depth_stencil_mode_switch_depth_or_stencil_sampling).
+
+texture_type_rule(gl_texture_1d, dimensionality_1d).
+texture_type_rule(gl_texture_2d, dimensionality_2d).
+texture_type_rule(gl_texture_3d, dimensionality_3d).
+texture_type_rule(gl_texture_rectangle, no_mipmap_non_normalized_coords).
+texture_type_rule(gl_texture_buffer, buffer_backed_no_mipmap).
+texture_type_rule(gl_texture_cube_map, six_square_faces).
+texture_type_rule(gl_texture_1d_array, array_of_1d_images).
+texture_type_rule(gl_texture_2d_array, array_of_2d_images).
+texture_type_rule(gl_texture_cube_map_array, array_of_cubemaps).
+texture_type_rule(gl_texture_2d_multisample, multisample_single_image_no_mipmap).
+texture_type_rule(gl_texture_2d_multisample_array, multisample_array_no_mipmap).
+
+texture_completeness_rule(mipmap_completeness).
+texture_completeness_rule(cubemap_completeness).
+texture_completeness_rule(image_format_completeness).
+texture_completeness_rule(sampler_dependent_completeness).
+
+aztec_vertex_role(vertex_stream_source).
+aztec_vertex_role(indexed_reordering_without_data_duplication).
+aztec_vertex_role(vao_defines_attribute_state_and_buffer_bindings).
+aztec_vertex_role(vbo_provides_attribute_storage).
+aztec_vertex_rule(single_index_array_shared_by_all_attributes).
+aztec_vertex_rule(attribute_type_must_match_shader_input_class).
+aztec_vertex_rule(vertex_order_and_primitive_mode_define_geometry).
+
+beecode_query_role(asynchronous_gpu_measurement_object).
+beecode_query_target(gl_samples_passed).
+beecode_query_target(gl_any_samples_passed).
+beecode_query_target(gl_any_samples_passed_conservative).
+beecode_query_target(gl_primitives_generated).
+beecode_query_target(gl_transform_feedback_primitives_written).
+beecode_query_target(gl_time_elapsed).
+beecode_query_target(gl_timestamp).
+beecode_query_scope_rule(begin_end_query_required_except_timestamp).
+beecode_query_scope_rule(indexed_query_stream_support_for_geometry_streams).
+
+framebuffer_semantic(image_is_2d_pixel_array_with_format).
+framebuffer_semantic(layered_image_is_ordered_sequence_of_images).
+framebuffer_semantic(texture_contains_images_and_mip_levels).
+framebuffer_semantic(renderbuffer_single_image_not_shader_readable).
+framebuffer_semantic(attach_is_object_to_object_link_not_context_bind).
+
+framebuffer_binding_target(gl_framebuffer_sets_read_and_draw).
+framebuffer_binding_target(gl_read_framebuffer_read_only_target).
+framebuffer_binding_target(gl_draw_framebuffer_draw_only_target).
+
+framebuffer_attachment_point(gl_color_attachment_i, color_renderable_only).
+framebuffer_attachment_point(gl_depth_attachment, depth_format_only).
+framebuffer_attachment_point(gl_stencil_attachment, stencil_format_only).
+framebuffer_attachment_point(gl_depth_stencil_attachment, packed_depth_stencil_preferred).
+
+framebuffer_layer_rule(array_or_3d_or_cubemap_can_attach_layered_images).
+framebuffer_layer_rule(cubemap_layer_order_px_nx_py_ny_pz_nz).
+framebuffer_layer_rule(layered_attachment_requires_all_attachments_layered).
+
+framebuffer_no_attachment_rule(default_width_height_nonzero_required).
+framebuffer_no_attachment_rule(default_layers_samples_define_raster_limits).
+
+framebuffer_completeness_rule(attachment_complete).
+framebuffer_completeness_rule(non_missing_attachment_or_no_attachment_defaults_set).
+framebuffer_completeness_rule(valid_draw_buffer_bindings).
+framebuffer_completeness_rule(valid_read_buffer_binding).
+framebuffer_completeness_rule(multisample_count_and_layout_match).
+framebuffer_completeness_rule(layer_target_consistency).
+framebuffer_completeness_rule(implementation_supported_format_combo).
+
+framebuffer_feedback_rule(read_write_same_image_is_undefined_behavior_without_barrier_constraints).
+framebuffer_feedback_rule(texture_barrier_reduces_but_does_not_remove_all_hazards).
+
+two_of_five_framing_rule(line_by_line_buffer_framing_uses_aegean_headers).
+two_of_five_framing_rule(bom_circular_inversion_applied_across_all_seven_factorial_orders).
+
+signed_representation_layer(1, sign_magnitude, explicit_sign_plus_magnitude).
+signed_representation_layer(2, ones_complement, bitwise_not_with_end_around_carry_model).
+signed_representation_layer(3, twos_complement, bitwise_not_plus_one_ring_mod_2_pow_n).
+signed_representation_layer(4, offset_binary, excess_k_bias_model).
+signed_representation_layer(5, base_neg2, alternating_sign_radix_model).
+
+signed_representation_property(sign_magnitude, has_positive_and_negative_zero).
+signed_representation_property(ones_complement, has_positive_and_negative_zero).
+signed_representation_property(twos_complement, single_zero_only).
+signed_representation_property(offset_binary, zero_maps_to_bias_k).
+signed_representation_property(base_neg2, no_extra_sign_bit_required).
+
+signed_representation_range(sign_magnitude_n_bits, min_neg_2_pow_n_minus_1_plus_1, max_pos_2_pow_n_minus_1_minus_1).
+signed_representation_range(ones_complement_n_bits, min_neg_2_pow_n_minus_1_plus_1, max_pos_2_pow_n_minus_1_minus_1).
+signed_representation_range(twos_complement_n_bits, min_neg_2_pow_n_minus_1, max_pos_2_pow_n_minus_1_minus_1).
+
+signed_representation_operation(sign_magnitude_add_sub_sign_sensitive_logic).
+signed_representation_operation(ones_complement_add_requires_end_around_carry).
+signed_representation_operation(twos_complement_add_same_as_unsigned_modulo_width).
+signed_representation_operation(offset_binary_convert_to_twos_via_msb_xor).
+signed_representation_operation(base_neg2_weight_pattern_plus_minus_alternation).
+
+signed_representation_conversion(sign_magnitude_to_ones_complement, complement_magnitude_bits).
+signed_representation_conversion(ones_to_twos_complement, add_one).
+signed_representation_conversion(offset_binary_to_twos_complement, xor_msb_path).
+signed_representation_conversion(twos_complement_negation, invert_bits_then_add_one).
+
+signed_representation_hardware_fact(ieee754_exponent_uses_bias_encoding).
+signed_representation_hardware_fact(single_precision_exponent_bias_127).
+signed_representation_hardware_fact(double_precision_exponent_bias_1023).
+
+omicron_gnomon_signed_mapping(little_o, sign_local_transform_layer).
+omicron_gnomon_signed_mapping(omicron_pivot, representation_transition_operator).
+omicron_gnomon_signed_mapping(big_o, composed_surface_layer).
+omicron_gnomon_signed_mapping(frame_compose_window_minutes_5, five_signed_layers_alignment).
+
+lut_truth_table_rule(n_inputs_n, row_count_equals_2_pow_n).
+lut_truth_table_rule(output_bit_selected_by_index_k_from_input_vector).
+lut_truth_table_rule(index_k_equals_sum_vi_times_2_pow_i).
+
+binary_operator_code(0, contradiction_bottom).
+binary_operator_code(1, nor).
+binary_operator_code(2, converse_nonimplication).
+binary_operator_code(3, not_p).
+binary_operator_code(4, material_nonimplication).
+binary_operator_code(5, not_q).
+binary_operator_code(6, xor).
+binary_operator_code(7, nand).
+binary_operator_code(8, and).
+binary_operator_code(9, xnor_equivalence).
+binary_operator_code(10, projection_q).
+binary_operator_code(11, implication_p_implies_q).
+binary_operator_code(12, projection_p).
+binary_operator_code(13, converse_implication_q_implies_p).
+binary_operator_code(14, or).
+binary_operator_code(15, tautology_top).
+
+operator_property(commutative, and).
+operator_property(commutative, or).
+operator_property(commutative, xor).
+operator_property(commutative, xnor_equivalence).
+operator_property(associative, and).
+operator_property(associative, or).
+operator_property(associative, xor).
+operator_property(associative, xnor_equivalence).
+
+beecode_witness_mapping(canonical_payload, aztec_surface).
+beecode_witness_mapping(canonical_payload, maxicode_surface).
+beecode_witness_mapping(correspondence_proof_between_surfaces, enabled).
+
+dynamic_slide_rule_component(gnomon, invariant_table_calibration).
+dynamic_slide_rule_component(omicron, moving_selector_alignment).
+dynamic_slide_rule_component(header, mode_selection_prefix).
+dynamic_slide_rule_component(payload, canonical_substrate_bits).
+dynamic_slide_rule_component(reading_rule, projection_specific_interpretation).
+
+header_bitfield_layout(op_bits_4, carrier_bits_2, signed_bits_2).
+header_bitfield_mapping(op_bits_4, selects_binary_operator_0_to_15).
+header_bitfield_mapping(carrier_bits_2, selects_aztec_maxicode_beecode_or_other).
+header_bitfield_mapping(signed_bits_2, selects_twos_ones_signmag_or_bias_frame).
+
+projection_compromise_rule(aspect_ratio_16_9, reconciliation_surface_for_multiple_formats).
+projection_compromise_rule(geometric_mean_of_extremes_principle, compromise_selection_method).
+
+polyform_basis_degree(2, domino).
+polyform_basis_degree(3, tromino).
+polyform_basis_degree(4, tetromino).
+polyform_basis_degree(5, pentomino).
+polyform_basis_degree(6, hexomino).
+polyform_basis_degree(7, heptomino).
+polyform_basis_degree(8, octomino).
+polyform_basis_degree(9, nonomino).
+polyform_basis_degree(10, decomino).
+
+polyform_rank(polyominoid).
+polyform_rank(polycube).
+
+polyform_group(pseudo_polyomino).
+polyform_group(polyabolo).
+polyform_group(polydrafter).
+polyform_group(polyhex).
+polyform_group(polyiamond).
+polyform_group(polyknight).
+polyform_group(polystick).
+
+polyform_family(polyominoes, square_cells_2d).
+polyform_family(polycubes, cube_cells_3d).
+polyform_family(polyiamonds, equilateral_triangle_cells_2d).
+polyform_family(polyhexes, regular_hexagon_cells_2d).
+polyform_family(polytans, isosceles_right_triangle_cells_2d).
+polyform_family(polyrhombs, congruent_rhombus_cells_2d).
+polyform_family(polyrombiks, multi_size_rhombus_cells).
+polyform_family(polyocts, octagon_square_mixed_cells).
+polyform_family(polyrounds, circle_quarter_arc_cells).
+polyform_family(polybends, quarter_arc_combinator_cells).
+polyform_family(polyhops, offset_hopscotch_square_cells).
+polyform_family(polyores, golden_triangle_cells).
+
+polynomial_degree_class(degree_undefined, zero_polynomial).
+polynomial_degree_class(0, constant_polynomial).
+polynomial_degree_class(1, linear_polynomial).
+polynomial_degree_class(2, quadratic_polynomial).
+polynomial_degree_class(3, cubic_polynomial).
+polynomial_degree_class(4, quartic_polynomial).
+polynomial_degree_class(5, quintic_polynomial).
+polynomial_degree_class(6, sextic_polynomial).
+polynomial_degree_class(7, septic_polynomial).
+
+polynomial_property(univariate).
+polynomial_property(bivariate).
+polynomial_property(multivariate).
+polynomial_property(monomial).
+polynomial_property(binomial).
+polynomial_property(trinomial).
+polynomial_property(irreducible).
+polynomial_property(square_free).
+polynomial_property(homogeneous).
+polynomial_property(quasi_homogeneous).
+
+polyform_polynomial_mapping(polyform_degree_n, polynomial_degree_n).
+polyform_polynomial_mapping(polyform_cell_count, polynomial_term_count_proxy).
+polyform_polynomial_mapping(polyform_symmetry_class, polynomial_property_class).
 
 % ============================================================
 % CONSTITUTIONAL LOGIC STACK

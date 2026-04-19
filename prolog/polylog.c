@@ -1867,6 +1867,8 @@ static void print_substrate_replay_manifest(void) {
     printf("011 sexagesimal_notation_headers   frame_interpretation_form\n");
     printf("012 duodecimal_classification      hierarchical_group_order_form\n");
     printf("013 frame_sequence_resolution      replay_control_surface_form\n");
+    printf("graph_mode=control_plus_aegean_overlay\n");
+    printf("graph_artifacts=bitboard_only\n");
     printf("Duality: two-graph index <-> dual-inverse substrate ordering\n");
 }
 
