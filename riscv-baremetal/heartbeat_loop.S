@@ -1,3 +1,18 @@
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: SUPPORT FILE / PROTOTYPE
+ *
+ * This is not assembled as real RISC-V source in its current form. It mixes
+ * documentation headings with assembly-like labels and reads more like an
+ * executable design sketch for a pure assembly heartbeat loop.
+ *
+ * Treat it as pseudocode for:
+ * - phase rotation
+ * - BOM/chirality toggling
+ * - logic-window rotation
+ * - a future assembly-only main loop
+ */
 # OMICRON Stream Interpolator - Foundational Rotation Loop
 # ========================================================
 
@@ -38,6 +53,7 @@ logic_rotate:
 
 heartbeat:
     # Call all three rotations
+    # In a real assembled version, this would be one full machine heartbeat.
     jal phase_rotate
     jal chiral_rotate
     jal logic_rotate
@@ -75,6 +91,7 @@ main_loop:
     # Process any pending VirtIO/serial input here
     # Interpolate streams
     # etc.
+    # None of that input logic exists in this file yet; this is a placeholder.
     
     # Back to loop
     j main_loop

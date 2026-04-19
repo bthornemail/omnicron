@@ -2,6 +2,22 @@
 # OMICRON Channel Feeder
 # Feeds data into 4 VirtIO serial channels simultaneously
 
+"""
+SOURCE-OF-TRUTH NOTE
+
+STATUS: HOST TOOL
+
+This is host-side tooling only. It does not prove that the guest kernel consumes
+these payloads. It opens Unix sockets, waits for QEMU-side connections, and
+sends a few initial payloads that match the intended 4-channel story.
+
+Code-level caveat:
+- this script assumes QEMU creates and connects to `/tmp/omicron_ch0` through
+  `/tmp/omicron_ch3`
+- it does not validate that the guest actually has a working virtio-serial
+  receive loop
+"""
+
 import socket
 import time
 import sys
@@ -35,6 +51,7 @@ def send_data(conn, data):
         conn.sendall(data.encode('latin-1'))
 
 def main():
+    # Host orchestration only: create sockets, wait for QEMU, then push bytes.
     print("=== OMICRON Channel Feeder ===")
     print("Waiting for QEMU to start with VirtIO channels...")
     

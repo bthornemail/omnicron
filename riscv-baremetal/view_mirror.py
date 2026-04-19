@@ -2,6 +2,20 @@
 # Ivshmem Mirror Viewer
 # Reads the shared memory from host and displays the logic state
 
+"""
+SOURCE-OF-TRUTH NOTE
+
+STATUS: HOST TOOL
+
+This is a host-side viewer only. It assumes the guest is writing a specific
+mirror layout into `/dev/shm/omicron_mirror`.
+
+Important current caveat from code:
+- the live `atomic_kernel.c` path disables mirror writes by returning null from
+  `get_mirror()` when `IVSHMEM_BASE` is `0`
+- so this viewer may show an existing file that remains all zeroes
+"""
+
 import mmap
 import struct
 import time

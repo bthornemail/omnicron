@@ -1,5 +1,21 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: DEMO
+ *
+ * Heartbeat demo kernel.
+ *
+ * This file isolates the three sequencing functions:
+ * - phase rotation
+ * - BOM/chirality toggling
+ * - logic-window rotation
+ *
+ * It also demonstrates local byte interpolation, but it is still a self-driven
+ * demo and not the live `my_kernel.flat` guest path.
+ */
+
 #define MASTER_PERIOD 5040
 #define FANO_POINTS 7
 #define LANE_DEPTH 15
@@ -120,6 +136,7 @@ static void dump_state(omicron_state_t *s) {
 // ============================================================
 
 void main(void) {
+    /* Demo path: run a bounded heartbeat sample, then print the resulting state. */
     // Initialize state
     g_omicron.phase = 0;
     g_omicron.bom_mode = 0xFFFE;

@@ -1,4 +1,16 @@
 #include <stdint.h>
+
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROBE
+ *
+ * SBI call-number probe.
+ *
+ * This file experiments with several SBI call IDs using the same payload.
+ * It is explicitly exploratory and should be read as a diagnostic test rather
+ * than a stable runtime component.
+ */
 static volatile long sbi_call(long a0, long a1, long a2, long a3, long a4, long a5) {
     register long r0 asm("a0") = a0;
     register long r1 asm("a1") = a1;

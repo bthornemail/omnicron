@@ -3,6 +3,21 @@
 
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: SUPPORT FILE / PROTOTYPE ALGORITHM
+ *
+ * This header contains a self-contained composition model built around:
+ * - Fano-plane triples
+ * - control-plane names
+ * - a small delta-law helper
+ * - a deterministic "choose one composition at a tick" function
+ *
+ * It should be read as algorithmic scaffolding. It is not currently the direct
+ * source of truth for the live `my_kernel.flat` runtime path.
+ */
+
 // ============================================================
 // COMPOSITION ALGORITHM
 // Deterministic composition rule for Control–Projective Lattice
@@ -29,6 +44,7 @@
 #define CB  6
 
 // Port atoms
+/* Human-readable names for the seven point labels above. */
 static const char *port_atom_names[] = {"ESC", "FS", "GS", "RS", "US", "CP", "CB"};
 
 // 7 Fano lines (each is a triple of port atoms)
@@ -83,6 +99,7 @@ static inline uint32_t delta(uint32_t x, uint32_t C) {
 
 // Kernel constant GS (0x1D) repeated
 static inline uint32_t kernel_constant(void) {
+    /* Repeated GS / 0x1D value in 16-bit form. */
     return 0x1D1D;
 }
 
@@ -92,6 +109,7 @@ static inline uint32_t kernel_constant(void) {
 // ============================================================
 
 static inline uint8_t fano_phase(uint32_t tick) {
+    /* Pick one of the 7 Fano positions from the raw tick. */
     return tick % 7;
 }
 
@@ -160,7 +178,7 @@ static inline uint8_t lines_containing(uint8_t point, uint8_t results[]) {
 
 static inline uint8_t gate_control(uint8_t ctrl, uint8_t line[]) {
     (void)ctrl; (void)line;
-    // All gates pass in this implementation
+    // This is currently permissive scaffolding: every candidate line is allowed.
     return 1;
 }
 
@@ -203,7 +221,7 @@ static inline composition_result_t compose_at_tick(uint32_t tick, uint32_t kerne
     
     if (num_candidates == 0) return result;
     
-    // Step 3: Codec lane selects one line
+    // Step 3: Use another tick-derived index to pick among the eligible lines.
     uint8_t line_idx = candidate_lines[(tick / 7) % num_candidates];
     uint8_t l0 = fano_lines[line_idx][0];
     uint8_t l1 = fano_lines[line_idx][1];
@@ -213,7 +231,7 @@ static inline composition_result_t compose_at_tick(uint32_t tick, uint32_t kerne
     uint8_t ctrl = tick % 4;
     if (!gate_control(ctrl, fano_lines[line_idx])) return result;
     
-    // Step 5: Validate centroid
+    // Step 5: Compare the chosen line's parity to the kernel state's parity.
     uint8_t line_par = line_parity(l0, l1, l2);
     uint8_t glob_par = global_centroid(kernel_state);
     if (line_par != glob_par) return result;

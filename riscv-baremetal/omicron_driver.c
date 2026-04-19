@@ -1,5 +1,17 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: DEMO
+ *
+ * Console-heavy 4-channel demo.
+ *
+ * This file is a readable standalone demonstration of the 4-channel idea:
+ * it prints banners, pushes fixed payloads through `interpolate`, toggles BOM,
+ * then dumps state. It is not the active runtime path behind `my_kernel.flat`.
+ */
+
 static volatile long sbi_call(long a0, long a1, long a2, long a3, long a4, long a5) {
     register long r0 asm("a0") = a0;
     register long r1 asm("a1") = a1;

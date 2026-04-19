@@ -1,5 +1,18 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: DEMO
+ *
+ * This is a standalone demo kernel for the interpolation idea.
+ * It is self-fed: `main()` injects fixed bytes directly into `interpolate_stream`
+ * and prints state via SBI console calls.
+ *
+ * It is useful as a readable model of the byte interpreter, but it is not the
+ * same thing as the current `my_kernel.flat` runtime path.
+ */
+
 typedef struct {
     uint64_t regs[64];
     uint8_t current_channel;
@@ -71,6 +84,7 @@ void render_bitboard(OmicronState *s) {
 }
 
 void main(void) {
+    /* Demo-only path: no external input, no virtio receive, no shared memory. */
     g_state.current_channel = 0;
     g_state.current_pos = 0;
     g_state.escaping = 0;

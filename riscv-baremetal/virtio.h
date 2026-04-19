@@ -3,6 +3,19 @@
 
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: SUPPORT FILE / PROTOTYPE
+ *
+ * VirtIO structural scaffold.
+ *
+ * This header defines data structures and a small OMICRON-oriented interpreter
+ * model for a virtio-backed byte stream. It is not, by itself, a working guest
+ * driver. Nothing on the active `my_kernel.flat` runtime path currently uses
+ * these definitions to service real virtio traffic.
+ */
+
 #define VIRTIO_MAGIC             0x74726976
 #define VIRTIO_CONFIG_S         0x10000000
 #define VIRTIO_CONFIG_MSI       0x10010000
@@ -130,6 +143,10 @@ static void apply_chiral_payload(omicron_virtio_t *s, uint8_t byte) {
 }
 
 static void omicron_interpret(omicron_virtio_t *s, uint8_t byte) {
+    /*
+     * Header-level prototype logic for interpreting a received byte stream.
+     * Useful for design intent; not currently wired into the boot artifact.
+     */
     if (s->current_pos == 0 && byte == 0x1B) {
         return;
     }

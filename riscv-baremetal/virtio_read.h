@@ -1,5 +1,19 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROTOTYPE
+ *
+ * Unwired virtio read loop prototype.
+ *
+ * This file sketches how heartbeat and channel sampling could be interleaved,
+ * but the key fact from code is that it is not on the active runtime path:
+ * - it is not included by `atomic_kernel.c`
+ * - `virtio_interrupt()` currently marks all channels unavailable
+ * - `main_with_virtio()` is a proposal, not the boot entrypoint in use
+ */
+
 // ============================================================
 // VIRTIO-SERIAL READ FOR OMICRON KERNEL
 // ============================================================
@@ -74,6 +88,7 @@ void sample_channels(omicron_state_t *s) {
 
 // Full main loop with heartbeat + channel sampling
 void main_with_virtio(void) {
+    /* Prototype entrypoint only: not the live kernel entry used by my_kernel.flat. */
     omicron_state_t om;
     
     // Initialize

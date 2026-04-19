@@ -1,5 +1,16 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROBE
+ *
+ * SBI dot printer.
+ *
+ * This file repeatedly emits `.` through SBI with a delay. It is useful for
+ * proving a minimal console loop and little else.
+ */
+
 static volatile long sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4, long arg5) {
     register long a0 asm("a0") = arg0;
     register long a1 asm("a1") = arg1;

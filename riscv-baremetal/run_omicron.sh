@@ -2,16 +2,31 @@
 # OMICRON Stream Interpolator - QEMU Launch Script
 # 4-Channel VirtIO + Shared Memory "Logic Mirror"
 
+# SOURCE-OF-TRUTH NOTE
+#
+# STATUS: HOST TOOL
+#
+# This script only launches QEMU with a particular device layout:
+# - one guest kernel image
+# - four Unix-domain socket-backed virtio serial ports
+# - one ivshmem file backing `/dev/shm/omicron_mirror`
+#
+# Important limitation:
+# launching QEMU this way does not prove the guest kernel actually consumes the
+# virtio channels or writes to the mirror. Those are guest-side responsibilities.
+
 QEMU=qemu-system-riscv64
 BIOS=/usr/share/qemu/opensbi-riscv64-generic-fw_dynamic.bin
 KERNEL=/root/omnicron/riscv-baremetal/my_kernel.flat
 MEM_PATH=/dev/shm/omicron_mirror
 
 # Clean up from previous runs
+# Remove old socket paths and mirror files so QEMU can recreate them cleanly.
 rm -f /tmp/omicron_ch{0,1,2,3}
 rm -f "$MEM_PATH"
 
 # Launch QEMU with 4 VirtIO Serial + Shared Memory
+# `exec` replaces this shell with the QEMU process.
 exec $QEMU -M virt -m 256M \
   -bios "$BIOS" \
   -kernel "$KERNEL" \

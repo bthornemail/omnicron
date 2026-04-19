@@ -1,4 +1,15 @@
 #include <stdint.h>
+
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROBE
+ *
+ * Timed character pattern probe.
+ *
+ * This file repeatedly emits `X` with a delay. It is a bare-metal pacing test,
+ * not a protocol implementation.
+ */
 static volatile long sbi_call(long a0, long a1, long a2, long a3, long a4, long a5) {
     register long r0 asm("a0") = a0;
     register long r1 asm("a1") = a1;

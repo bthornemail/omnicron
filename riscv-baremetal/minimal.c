@@ -1,5 +1,16 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROBE
+ *
+ * Minimal SBI console proof-of-life.
+ *
+ * It prints `OK` once and then spins forever. This is a tiny sanity-check
+ * kernel used to confirm that the SBI console path works at all.
+ */
+
 static volatile long sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4, long arg5) {
     register long a0 asm("a0") = arg0;
     register long a1 asm("a1") = arg1;

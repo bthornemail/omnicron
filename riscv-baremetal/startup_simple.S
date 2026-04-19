@@ -1,3 +1,14 @@
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: SUPPORT FILE
+ *
+ * This is the simplest startup stub in the tree. It skips most boot-time
+ * ceremony, sets a stack, preloads a few argument registers, and jumps into
+ * `main`.
+ *
+ * Use this as a bring-up helper when full startup logic is unnecessary.
+ */
 .section .text
 .globl _start
 .type _start, @function
@@ -13,6 +24,7 @@ _start:
     la sp, _stack_top
     
     # Initialize Omicron state in a0-a3 as parameters (if needed)
+    # These values only matter if the C `main` chooses to read them.
     li a0, 0    # phase = 0
     li a1, 0xFFFE # bom = FFFE
     li a2, 0    # channel = 0

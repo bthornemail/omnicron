@@ -3,6 +3,18 @@
 
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: SUPPORT FILE / TYPE LAYER
+ *
+ * This header defines data structures for sexagesimal numbers, digits, stars-
+ * and-bars encodings, and a few named fractions or approximants.
+ *
+ * It is primarily a vocabulary and helper layer. The current live kernel does
+ * not directly execute all of these ideas.
+ */
+
 // ============================================================
 // CONSTITUTIONAL LAW: SEXAGESIMAL FRACTIONS
 // Pure type layer for sexagesimal values (U+2150–U+218B)
@@ -36,9 +48,9 @@
 // ============================================================
 
 typedef struct {
-    uint8_t position;    // POS_DEGREE through POS_FOURTH
-    uint8_t branch;     // BRANCH_LEFT or BRANCH_RIGHT
-    uint8_t coefficient; // 0-59
+    uint8_t position;    // Which sexagesimal place the digit belongs to.
+    uint8_t branch;     // Which side / branch of the notation it sits on.
+    uint8_t coefficient; // The actual 0-59 digit value.
 } sexagesimal_digit_t;
 
 // ============================================================
@@ -58,12 +70,12 @@ typedef struct {
 #define MAX_DIGITS 8
 
 typedef struct {
-    uint32_t numerator;
-    uint32_t denominator;
-    uint8_t convergence;       // CONV_* constant
-    uint8_t digit_count;      // Number of expansion digits
-    sexagesimal_digit_t digits[MAX_DIGITS];
-    uint8_t repeating_start; // Index where repeat begins (0 if none)
+    uint32_t numerator;          // Source rational numerator.
+    uint32_t denominator;        // Source rational denominator.
+    uint8_t convergence;         // Finite, repeating, or irrational-like class.
+    uint8_t digit_count;         // How many entries in `digits` are meaningful.
+    sexagesimal_digit_t digits[MAX_DIGITS]; // Small inline digit buffer.
+    uint8_t repeating_start;     // Where a repeating tail begins, if any.
 } sexagesimal_fraction_t;
 
 // ============================================================
@@ -99,6 +111,7 @@ typedef struct {
 
 // Create a sexagesimal digit
 static inline sexagesimal_digit_t mk_digit(uint8_t pos, uint8_t branch, uint8_t coeff) {
+    /* Build one bounded digit value, clamping invalid coefficients to 0. */
     sexagesimal_digit_t d;
     d.position = pos;
     d.branch = branch;
@@ -113,6 +126,7 @@ static inline uint8_t sexagesimal_position_depth(uint8_t pos) {
 
 // Create a finite fraction from numerator/denominator
 static inline void finite_fraction(sexagesimal_fraction_t *f, uint32_t num, uint32_t denom) {
+    /* Initialize the common metadata for a finite rational value. */
     f->numerator = num;
     f->denominator = denom;
     f->convergence = CONV_FINITE;
@@ -122,6 +136,7 @@ static inline void finite_fraction(sexagesimal_fraction_t *f, uint32_t num, uint
 
 // Encode coefficient as stars-bars
 static inline stars_bars_coefficient_t encode_stars_bars(sexagesimal_digit_t *d) {
+    /* Convert one digit into a simple stars/bars surface encoding. */
     stars_bars_coefficient_t sb;
     sb.stars = d->coefficient;
     sb.bars = sexagesimal_position_depth(d->position);
@@ -205,6 +220,7 @@ static inline void frac_1_10(sexagesimal_fraction_t *f) {
 // ============================================================
 
 static inline void approx_sqrt2(irrational_approximant_t *a) {
+    /* Hard-coded historical approximation in sexagesimal digits. */
     a->constant = IRR_SQRT2;
     a->precision = 4;
     a->digits[0] = 1;

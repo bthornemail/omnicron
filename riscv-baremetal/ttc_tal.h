@@ -1,6 +1,17 @@
 /*
  * ttc_tal.h - Typed Assembly Language for Stars & Bars
  *
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: SUPPORT FILE / PROTOTYPE TYPE SYSTEM
+ *
+ * This header is a design-heavy type vocabulary and API surface. It defines a
+ * typed machine model, opcodes, value representations, and checker interfaces.
+ * It does not by itself prove that the live kernel uses this machinery.
+ *
+ * Read this as constitutional/type-system scaffolding for future or adjacent
+ * work, not as evidence that the current boot artifact executes TAL programs.
+ *
  * Constitutional Law Enforcement at the Assembly Level:
  *   - Every value has a type annotation
  *   - Type checker can prove safety statically

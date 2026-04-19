@@ -1,5 +1,17 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: DEMO
+ *
+ * UART-backed interpolation demo.
+ *
+ * This file writes directly to the memory-mapped UART instead of using SBI.
+ * Like `interpolator.c`, it demonstrates the stream model by feeding itself
+ * fixed bytes. It is a demo kernel, not the current production runtime path.
+ */
+
 typedef struct {
     uint64_t regs[64];
     uint8_t current_channel;

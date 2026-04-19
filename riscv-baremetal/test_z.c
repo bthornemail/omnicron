@@ -1,5 +1,16 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROBE
+ *
+ * Delayed single-character printer.
+ *
+ * This is another tiny console probe. It emits `Z` with long delays to make
+ * timing and liveness easy to see in QEMU output.
+ */
+
 static volatile long sbi_call(long a0, long a1, long a2, long a3, long a4, long a5) {
     register long r0 asm("a0") = a0;
     register long r1 asm("a1") = a1;

@@ -1,5 +1,17 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROBE
+ *
+ * Memory-write probe.
+ *
+ * This file writes recognizable marker words to a fixed RAM address and then
+ * emits dots through SBI forever. It is for validating memory visibility and
+ * basic guest execution, not for exercising the OMICRON protocol.
+ */
+
 #define MEM_LOG 0x10012000
 
 static volatile uint32_t *log_base = (volatile uint32_t *)MEM_LOG;

@@ -1,5 +1,17 @@
 #include <stdint.h>
 
+/*
+ * SOURCE-OF-TRUTH NOTE
+ *
+ * STATUS: PROBE
+ *
+ * SBI console boot test.
+ *
+ * This is another small bring-up kernel. It prints `OMICRON BOOT` and then
+ * emits dots forever. It proves console output, not the larger constitutional
+ * machine behavior.
+ */
+
 #define SBI_CONSOLE_PUTCHAR 1
 
 static volatile long sbi_call(long arg0, long arg1, long arg2, long arg3, long arg4, long arg5) {
