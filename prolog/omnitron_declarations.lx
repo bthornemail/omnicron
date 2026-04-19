@@ -1,0 +1,258 @@
+; ============================================================
+; OMNITRON DECLARATIONS (Lisp-like logic surface)
+; ============================================================
+;
+; SOURCE-OF-TRUTH NOTE
+;
+; STATUS: ACTIVE DECLARATION SURFACE
+;
+; This file is the current working syntax for logic declarations.
+; It is intentionally Lisp-like and ASCII-safe.
+;
+; Design intent:
+; - keep ontology terms stable even if implementations change
+; - capture logical structure in one durable declaration layer
+; - preserve canonical names and projection stages
+
+(declare/syntax
+  (name omnitron-lx)
+  (style lisp-like-logic)
+  (transport ascii))
+
+(declare/pipeline
+  (stage -1 raw-binary-group-ordering)
+  (stage -0 canonical-ascii-ordering)
+  (stage 0 sexagesimal-notation-headers)
+  (stage 0.5 duodecimal-classification)
+  (stage 0.75 frame-sequence-resolution)
+  (stage 0 plain-text)
+  (stage 1 prolog-datalog)
+  (stage 2 s-expression)
+  (stage 3 m-expression)
+  (stage 4 f-expression)
+  (stage 5 ast-core)
+  (stage 6 kernel-events)
+  (stage 7 ascii-stream))
+
+(declare/invariants
+  (predicate-identity operator-name-preserved)
+  (argument-order args-sequence-preserved)
+  (stage-meaning phase-semantics-preserved)
+  (receipt-meaning closure-semantics-preserved)
+  (canonical-address slot-meaning-preserved)
+  (grammar-boundaries control-structure-preserved)
+  (raw-binary-ordering group-bounds-preserved)
+  (canonical-ascii-ordering control-position-preserved)
+  (sexagesimal-header-ordering wallis-header-preserved)
+  (duodecimal-addressing class-path-preserved)
+  (frame-sequence-ordering replay-order-preserved))
+
+; ------------------------------------------------------------
+; Structural ontology terms
+; ------------------------------------------------------------
+
+(declare/term term)
+(declare/term slot)
+(declare/term root)
+(declare/term join)
+(declare/term combine)
+(declare/term sex60)
+
+(declare/relation leq)
+(declare/relation covers)
+(declare/relation left-of)
+(declare/relation right-of)
+
+; ------------------------------------------------------------
+; Claim / world / closure / receipt ontology
+; ------------------------------------------------------------
+
+(declare/term claim)
+(declare/term claim-group)
+(declare/term supports)
+(declare/term conflicts)
+(declare/term contradicting)
+
+(declare/term proposal)
+(declare/term candidate-world)
+(declare/term unique-minimal-world)
+
+(declare/term closure)
+(declare/term digit-constraint)
+(declare/term sum-constraint)
+(declare/term carry-propagation)
+
+(declare/term receipt)
+(declare/term lower-to-receipt)
+(declare/term verify-receipt)
+(declare/term emit-receipt)
+
+; ------------------------------------------------------------
+; Surface projections
+; ------------------------------------------------------------
+
+(declare/term stars-bars-from-sex60)
+(declare/term braille-from-sex60)
+(declare/term hexagram-from-sex60)
+(declare/term render-sex60)
+
+; ------------------------------------------------------------
+; Core constants and cycles
+; ------------------------------------------------------------
+
+(declare/constant fano-points 7)
+(declare/constant slot-surface 60)
+(declare/constant total-closure 5040)
+(declare/constant omicron-center 333)
+(declare/constant omicron-limit 666)
+(declare/constant omicron-pivot 70)
+
+(declare/fact (cycle-divides 5040 360 14))
+(declare/fact (cycle-divides 5040 240 21))
+(declare/fact (harmonic-ratio 14 21 2/3))
+
+; ------------------------------------------------------------
+; Raw binary substrate / duodecimal addressing
+; ------------------------------------------------------------
+
+(declare/substrate
+  (layer 009 raw-binary-group-ordering deterministic-core-kernel-form)
+  (layer 010 canonical-ascii-ordering control-surface-form)
+  (layer 011 sexagesimal-notation-headers frame-interpretation-form)
+  (layer 012 duodecimal-classification hierarchical-group-order-form)
+  (layer 013 frame-sequence-resolution replay-control-surface-form))
+
+(declare/group-order bit-pairs 2)
+(declare/group-order nibbles 4)
+(declare/group-order fano-words 7)
+(declare/group-order bytes 8)
+(declare/group-order duodecimal-groups 12)
+(declare/group-order utf16 16)
+(declare/group-order utf32 32)
+(declare/group-order sexagesimal-frame 60)
+(declare/group-order register64 64)
+
+(declare/ascii-canonical-order
+  (position 0 nul)
+  (position 1 soh)
+  (position 2 stx)
+  (position 3 etx)
+  (position 4 eot)
+  (position 5 enq)
+  (position 6 ack)
+  (position 7 nak)
+  (position 8 bel)
+  (position 9 bs)
+  (position 10 ht)
+  (position 11 lf)
+  (position 12 vt)
+  (position 13 ff)
+  (position 14 cr)
+  (position 15 so)
+  (position 16 si)
+  (position 17 dle)
+  (position 18 dc1)
+  (position 19 dc3)
+  (position 20 dc2)
+  (position 21 dc4)
+  (position 22 syn)
+  (position 23 etb)
+  (position 24 can)
+  (position 25 em)
+  (position 26 sub)
+  (position 27 esc)
+  (position 28 fs)
+  (position 29 gs)
+  (position 30 rs)
+  (position 31 us)
+  (position 32 del))
+
+(declare/duodecimal-main-class 0 pipeline-generalities)
+(declare/duodecimal-main-class 1 invariants-foundations)
+(declare/duodecimal-main-class 2 canonical-identity)
+(declare/duodecimal-main-class 3 federation-social)
+(declare/duodecimal-main-class 4 notation-philology)
+(declare/duodecimal-main-class 5 sexagesimal-science)
+(declare/duodecimal-main-class 6 runtime-technology)
+(declare/duodecimal-main-class 7 projections-arts)
+(declare/duodecimal-main-class 8 program-literature)
+(declare/duodecimal-main-class 9 receipts-history)
+(declare/duodecimal-main-class 10 metatron-domain)
+(declare/duodecimal-main-class 11 merkaba-domain)
+
+(declare/rule substrate-ordering-law
+  (law
+    (ordered
+      raw-binary-group-ordering
+      canonical-ascii-ordering
+      sexagesimal-notation-headers
+      duodecimal-classification
+      frame-sequence-resolution)))
+
+; ------------------------------------------------------------
+; ASCII control-plane roles
+; ------------------------------------------------------------
+
+(declare/ascii-control nul frame-boundary null)
+(declare/ascii-control esc escape-meta meta)
+(declare/ascii-control fs file-separator chunk)
+(declare/ascii-control gs group-separator record)
+(declare/ascii-control rs record-separator unit)
+(declare/ascii-control us unit-separator field)
+
+; ------------------------------------------------------------
+; Fano plane declarations
+; ------------------------------------------------------------
+
+(declare/fano-line l0 (p0 p1 p2))
+(declare/fano-line l1 (p0 p3 p4))
+(declare/fano-line l2 (p0 p5 p6))
+(declare/fano-line l3 (p1 p3 p5))
+(declare/fano-line l4 (p1 p4 p6))
+(declare/fano-line l5 (p2 p3 p6))
+(declare/fano-line l6 (p2 p4 p5))
+
+; ------------------------------------------------------------
+; Runtime intent declarations
+; ------------------------------------------------------------
+
+(declare/runtime
+  (component orientation chiral-flow)
+  (component base sexagesimal-foundation)
+  (component header marker-clock-seed)
+  (component program log-steps))
+
+(declare/opcode sync synchronization sync-point)
+(declare/opcode wait timing pause)
+(declare/opcode rotate-l transform counter-clockwise)
+(declare/opcode rotate-r transform clockwise)
+(declare/opcode join composition merge)
+(declare/opcode split decomposition divide)
+(declare/opcode emit output produce)
+(declare/opcode hash fingerprint identity)
+(declare/opcode map transform apply)
+
+; ------------------------------------------------------------
+; Omicron gnomon declarations
+; ------------------------------------------------------------
+
+(declare/gnomon
+  (center 333)
+  (limit 666)
+  (pivot 70)
+  (next-octave 999))
+
+(declare/rule central-inversion
+  (inputs x)
+  (outputs y)
+  (law (equals y (minus 666 x))))
+
+(declare/rule balanced-rotate-low
+  (when (lt x 333))
+  (law (equals y (plus x 333))))
+
+(declare/rule balanced-rotate-high
+  (when (gte x 333))
+  (law (equals y (minus x 333))))
+
+; End of active Lisp-like logic declarations.

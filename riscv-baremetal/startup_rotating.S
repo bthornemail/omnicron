@@ -19,6 +19,7 @@
 
 _start:
     # Disable interrupts first
+    # This makes boot deterministic before higher-level code is ready.
     csrci mstatus, 3
 
     # Check hart ID - only hart 0 runs
@@ -52,12 +53,14 @@ _start:
     j main
 
 wait_for_hart:
+    # Non-primary harts stay parked here forever.
     wfi
     j wait_for_hart
 
 .size _start, .-_start
 
 # External C functions
+/* These globals advertise symbols this startup expects to exist somewhere else. */
 .global main
 .global interpolate_stream
 .global apply_chiral_payload

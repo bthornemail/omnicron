@@ -38,9 +38,13 @@
 #define POS_THIRD  3   // 60^-3 = 1/216000
 #define POS_FOURTH 4   // 60^-4 = 1/12960000
 
+/* These constants let code talk about a digit's place value by name. */
+
 // Branch direction (left = lower, right = upper in Wallis notation)
 #define BRANCH_LEFT  0
 #define BRANCH_RIGHT 1
+
+/* Branch is this header's way of remembering which side of the notation is used. */
 
 // ============================================================
 // 2. SEXAGESIMAL DIGIT
@@ -62,12 +66,15 @@ typedef struct {
 #define CONV_REPEATING   1  // Non-regular denominator (repeats)
 #define CONV_IRRATIONAL   2  // No exact rational representation
 
+/* This is a tiny classification of how the expansion behaves over time. */
+
 // ============================================================
 // 4. FRACTION TERM
 // Rooted term: numerator / denominator with expansion digits
 // ============================================================
 
 #define MAX_DIGITS 8
+/* Inline storage is capped at 8 digits in this lightweight representation. */
 
 typedef struct {
     uint32_t numerator;          // Source rational numerator.
@@ -100,9 +107,9 @@ typedef struct {
 #define IRR_PHI    2  // Golden ratio
 
 typedef struct {
-    uint8_t constant;
-    uint8_t precision; // number of digits
-    uint8_t digits[MAX_DIGITS];
+    uint8_t constant;   // Which named irrational this approximates.
+    uint8_t precision;  // How many entries in `digits` are meaningful.
+    uint8_t digits[MAX_DIGITS]; // Raw sexagesimal digits for the approximation.
 } irrational_approximant_t;
 
 // ============================================================
@@ -121,6 +128,7 @@ static inline sexagesimal_digit_t mk_digit(uint8_t pos, uint8_t branch, uint8_t 
 
 // Position depth (for stars-bars encoding)
 static inline uint8_t sexagesimal_position_depth(uint8_t pos) {
+    /* In this simplified model, position number and depth are the same thing. */
     return pos;  // degree=0, prime=1, second=2, third=3, fourth=4
 }
 
@@ -150,6 +158,7 @@ static inline stars_bars_coefficient_t encode_stars_bars(sexagesimal_digit_t *d)
 
 // 1/2 = 0;30  — U+00BD
 static inline void frac_1_2(sexagesimal_fraction_t *f) {
+    /* Hard-code the known sexagesimal form of one half. */
     f->numerator = 1;
     f->denominator = 2;
     f->convergence = CONV_FINITE;
@@ -161,6 +170,7 @@ static inline void frac_1_2(sexagesimal_fraction_t *f) {
 
 // 1/3 = 0;20  — U+2153
 static inline void frac_1_3(sexagesimal_fraction_t *f) {
+    /* Hard-code the known sexagesimal form of one third. */
     f->numerator = 1;
     f->denominator = 3;
     f->convergence = CONV_FINITE;
@@ -172,6 +182,7 @@ static inline void frac_1_3(sexagesimal_fraction_t *f) {
 
 // 2/3 = 0;40  — U+2154
 static inline void frac_2_3(sexagesimal_fraction_t *f) {
+    /* Hard-code the known sexagesimal form of two thirds. */
     f->numerator = 2;
     f->denominator = 3;
     f->convergence = CONV_FINITE;
@@ -183,6 +194,10 @@ static inline void frac_2_3(sexagesimal_fraction_t *f) {
 
 // 1/7 = 0;8,34,17 repeating — U+2150
 static inline void frac_1_7(sexagesimal_fraction_t *f) {
+    /*
+     * This entry records the fraction as repeating, but only seeds the leading
+     * degree digit here instead of storing the full repeating cycle.
+     */
     f->numerator = 1;
     f->denominator = 7;
     f->convergence = CONV_REPEATING;
@@ -193,6 +208,7 @@ static inline void frac_1_7(sexagesimal_fraction_t *f) {
 
 // 1/8 = 0;7,30 — U+215B
 static inline void frac_1_8(sexagesimal_fraction_t *f) {
+    /* Hard-code the known sexagesimal form of one eighth. */
     f->numerator = 1;
     f->denominator = 8;
     f->convergence = CONV_FINITE;
@@ -205,6 +221,7 @@ static inline void frac_1_8(sexagesimal_fraction_t *f) {
 
 // 1/10 = 0;6 — U+2152
 static inline void frac_1_10(sexagesimal_fraction_t *f) {
+    /* Hard-code the known sexagesimal form of one tenth. */
     f->numerator = 1;
     f->denominator = 10;
     f->convergence = CONV_FINITE;
@@ -231,6 +248,7 @@ static inline void approx_sqrt2(irrational_approximant_t *a) {
 
 // Ptolemy's π ≈ 3;8,30
 static inline void approx_ptolemy_pi(irrational_approximant_t *a) {
+    /* Hard-coded historical approximation of pi in sexagesimal digits. */
     a->constant = IRR_PI;
     a->precision = 3;
     a->digits[0] = 3;
@@ -243,6 +261,7 @@ static inline void approx_ptolemy_pi(irrational_approximant_t *a) {
 // ============================================================
 
 static const char* position_name(uint8_t pos) {
+    /* Render one position constant into a human-readable label. */
     switch (pos) {
         case POS_DEGREE:   return "degree";
         case POS_PRIME:   return "prime";
@@ -254,6 +273,7 @@ static const char* position_name(uint8_t pos) {
 }
 
 static const char* convergence_name(uint8_t conv) {
+    /* Render one convergence class into a human-readable label. */
     switch (conv) {
         case CONV_FINITE:     return "finite";
         case CONV_REPEATING:  return "repeating";

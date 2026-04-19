@@ -13,18 +13,19 @@
  */
 
 typedef struct {
-    uint64_t regs[64];
-    uint8_t current_channel;
-    uint8_t current_pos;
-    uint8_t escaping;
-    uint16_t chirality;
-    uint8_t depth;
-    uint32_t fas;
+    uint64_t regs[64];         // 64 storage slots for packed bytes.
+    uint8_t current_channel;   // Which logical channel is active.
+    uint8_t current_pos;       // Where the next byte lands inside the surface.
+    uint8_t escaping;          // Non-zero means the next byte is control.
+    uint16_t chirality;        // Current BOM / byte-order mode.
+    uint8_t depth;             // Extra field reserved for future depth logic.
+    uint32_t fas;              // Extra field reserved for future FAS-style use.
 } OmicronState;
 
 static OmicronState g_state;
 
 void __attribute__((section(".text"))) puthex(uint64_t val) {
+    /* Print a 64-bit value directly to the UART one nibble at a time. */
     for (int i = 60; i >= 0; i -= 4) {
         char c = "0123456789ABCDEF"[(val >> i) & 0xF];
         volatile char *uart = (volatile char *)0x10000000;
@@ -34,6 +35,7 @@ void __attribute__((section(".text"))) puthex(uint64_t val) {
 }
 
 void __attribute__((section(".text"))) puts(const char *s) {
+    /* Print a string directly to the UART MMIO address. */
     while (*s) {
         volatile char *uart = (volatile char *)0x10000000;
         *uart = *s++;
@@ -42,12 +44,14 @@ void __attribute__((section(".text"))) puts(const char *s) {
 }
 
 void __attribute__((section(".text"))) putc(char c) {
+    /* Print one character directly to the UART MMIO address. */
     volatile char *uart = (volatile char *)0x10000000;
     *uart = c;
     for (volatile int d = 0; d < 1000; d++);
 }
 
 void __attribute__((section(".text"))) apply_chiral_payload(OmicronState *s, uint8_t byte) {
+    /* Store one payload byte into the current register slot. */
     uint8_t idx = s->current_pos;
     if (idx < 64) {
         if (s->chirality == 0xFE) {
@@ -59,6 +63,7 @@ void __attribute__((section(".text"))) apply_chiral_payload(OmicronState *s, uin
 }
 
 void __attribute__((section(".text"))) interpolate_stream(OmicronState *s, uint8_t byte) {
+    /* ESC means the next byte is interpreted as channel/position control. */
     if (s->escaping) {
         s->current_channel = (byte >> 6) & 0x03;
         s->current_pos = byte & 0x3F;
@@ -71,6 +76,7 @@ void __attribute__((section(".text"))) interpolate_stream(OmicronState *s, uint8
 }
 
 void __attribute__((section(".text"))) dump_state(OmicronState *s) {
+    /* Print the core fields and the first few registers for human inspection. */
     puts("\r\nOMICRON STATE\r\n");
     putc('C'); putc('h'); putc(':'); puthex(s->current_channel); putc('\r'); putc('\n');
     putc('P'); putc('o'); putc('s'); putc(':'); puthex(s->current_pos); putc('\r'); putc('\n');
@@ -82,6 +88,7 @@ void __attribute__((section(".text"))) dump_state(OmicronState *s) {
 }
 
 void main(void) {
+    /* Demo path: initialize blank state, feed a fixed payload, then print it. */
     g_state.current_channel = 0;
     g_state.current_pos = 0;
     g_state.escaping = 0;
@@ -93,6 +100,7 @@ void main(void) {
     puts("BOM: FFFE\r\n");
 
     for (int i = 0; i < 8; i++) {
+        /* Feed eight AA bytes into the local interpreter. */
         interpolate_stream(&g_state, 0xAA);
     }
 
@@ -101,7 +109,9 @@ void main(void) {
     g_state.chirality = 0xFEFF;
     puts("BOM: FEFF (toggled)\r\n");
 
+    /* Print the state after the chirality change and first payload. */
     dump_state(&g_state);
 
+    /* Stay alive forever so the UART output remains the final visible result. */
     while (1) { }
 }

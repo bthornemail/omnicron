@@ -16,6 +16,7 @@
 _start:
     .cfi_startproc
     .cfi_undefined ra
+    # `.cfi_*` directives are debugger/unwinder hints, not CPU instructions.
 
     # Read the current hart (hardware thread) ID.
     csrr t0, mhartid
@@ -33,6 +34,7 @@ _start:
 
 wait_for_hart:
     # Idle non-primary harts forever.
+    # `wfi` means "wait for interrupt": a low-activity sleep instruction.
     wfi
     j wait_for_hart
 
@@ -48,6 +50,7 @@ wait_for_hart:
 _stack_end:
 .global _tbs_start
 _tbs_start:
+/* A second reserved block used as thread-local / per-thread scratch space. */
 .space 16384
 
 _tbs_end:

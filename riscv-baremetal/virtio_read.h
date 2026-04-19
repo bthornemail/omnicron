@@ -21,12 +21,13 @@
 // Plugs into omicron_heartbeat.c
 
 #define CHANNEL_BUF_SIZE 256
+/* This is just a software-side queue size, not a real virtqueue size. */
 
 typedef struct {
-    uint8_t data[CHANNEL_BUF_SIZE];
-    uint32_t head;
-    uint32_t tail;
-    uint8_t available;
+    uint8_t data[CHANNEL_BUF_SIZE]; /* Buffered bytes already copied into RAM. */
+    uint32_t head;                  /* Where new bytes would be appended. */
+    uint32_t tail;                  /* Where the next read will consume from. */
+    uint8_t available;              /* Simple "channel currently has data" flag. */
 } channel_buffer_t;
 
 static channel_buffer_t g_channels[4];
@@ -39,7 +40,8 @@ void virtio_interrupt(void) {
     // 2. Copy data to our buffer
     // 3. Set available flag
     
-    // For now, simulate having no data until VirtIO is fully working
+    // For now, simulate having no data until VirtIO is fully working.
+    // This means the whole prototype remains "structurally present but inactive."
     g_channels[0].available = 0;
     g_channels[1].available = 0;
     g_channels[2].available = 0;
@@ -48,10 +50,14 @@ void virtio_interrupt(void) {
 
 // Sample a channel - returns byte or -1 if empty
 int virtio_read_channel(uint8_t ch) {
+    /* Reject impossible channel IDs first. */
     if (ch > 3) return -1;
+    /* If the software queue says no data is present, fail immediately. */
     if (!g_channels[ch].available) return -1;
+    /* If head and tail match, the queue is empty. */
     if (g_channels[ch].head == g_channels[ch].tail) return -1;
     
+    /* Consume one byte and advance the tail pointer. */
     uint8_t byte = g_channels[ch].data[g_channels[ch].tail];
     g_channels[ch].tail = (g_channels[ch].tail + 1) % CHANNEL_BUF_SIZE;
     return byte;
@@ -59,12 +65,15 @@ int virtio_read_channel(uint8_t ch) {
 
 // Interleave heartbeat with channel sampling
 void sample_channels(omicron_state_t *s) {
-    // Phase-based sampling (like you described)
+    // This function encodes the intended scheduling policy:
+    // different channels are sampled at different phases.
     
     // Phase 0-14: Sample channel 2 (Hex) - 15/16 logic window
     if (s->phase < 15) {
         int b = virtio_read_channel(2);
         if (b >= 0) {
+            // If a byte exists, feed it into the same interpolation logic the
+            // demo kernels use.
             interpolate_stream(s, (uint8_t)b);
         }
     }
@@ -73,6 +82,7 @@ void sample_channels(omicron_state_t *s) {
     if ((s->phase % 2) == 0) {
         int b = virtio_read_channel(3);
         if (b >= 0 && b == 0xFFFE) {
+            // The "sign" channel is supposed to drive BOM mode changes.
             s->bom_mode = 0xFFFE;
         } else if (b >= 0 && b == 0xFEFF) {
             s->bom_mode = 0xFEFF;
@@ -91,7 +101,7 @@ void main_with_virtio(void) {
     /* Prototype entrypoint only: not the live kernel entry used by my_kernel.flat. */
     omicron_state_t om;
     
-    // Initialize
+    // Start with a blank local machine state.
     om.phase = 0;
     om.bom_mode = 0xFFFE;
     om.logic_window = 0;
@@ -101,7 +111,11 @@ void main_with_virtio(void) {
     
     putchar('O'); putchar('M'); putchar('I'); putchar('\r'); putchar('\n');
     
-    // Main loop
+    // The intended runtime shape is:
+    // 1. advance heartbeat state
+    // 2. read any pending bytes from the logical channels
+    // 3. let channel 1 carry control traffic
+    // 4. repeat forever
     while (1) {
         // 1. Heartbeat - rotate phase, chiral, logic
         rotate_phase(&om);
@@ -115,6 +129,7 @@ void main_with_virtio(void) {
         int c1 = virtio_read_channel(1);
         if (c1 >= 0) {
             // Control commands from decimal channel
+            // This branch is intentionally left unspecified in the current code.
         }
         
         // 4. Continue heartbeat

@@ -31,9 +31,11 @@ _start:
     li a3, 0    # pos = 0
     
     # Call main (will never return since main loops forever)
+    # `jal` jumps and also saves a return address in `ra`.
     jal main
     
     # If we get here, something went wrong - halt
+    # `ebreak` traps into the debugger / monitor if one is attached.
     ebreak
     j .
 
@@ -43,4 +45,5 @@ _start:
 .section .bss
 .align 4
 _stack_top:
+/* Reserve a simple fixed-size stack for this startup shape. */
 .skip 16384

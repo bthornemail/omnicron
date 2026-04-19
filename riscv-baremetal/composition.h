@@ -43,12 +43,15 @@
 #define CP  5
 #define CB  6
 
+/* These integer IDs are the header's compact stand-ins for the seven symbols. */
+
 // Port atoms
 /* Human-readable names for the seven point labels above. */
 static const char *port_atom_names[] = {"ESC", "FS", "GS", "RS", "US", "CP", "CB"};
 
 // 7 Fano lines (each is a triple of port atoms)
 static const uint8_t fano_lines[7][3] = {
+    /* Each row is one allowable 3-point composition. */
     {ESC, FS, US},   // Line 0
     {ESC, GS, CP},   // Line 1
     {ESC, RS, CB},   // Line 2
@@ -74,6 +77,7 @@ static const uint8_t all_fano_lines[7][3] = {
 #define CTRL_US 3  // Atomic / always allow
 
 static const char *control_names[] = {"FS", "GS", "RS", "US"};
+/* These names mirror the four control-plane IDs above. */
 
 // ============================================================
 // 3. DELTA LAW (State Evolution)
@@ -84,16 +88,20 @@ static const char *control_names[] = {"FS", "GS", "RS", "US"};
 #define MASK  ((1 << WIDTH) - 1)
 
 static inline uint32_t rotl(uint32_t x, int k) {
+    /* Keep the rotation amount inside the chosen 16-bit width. */
     k = k % WIDTH;
+    /* Rotate left, then mask back down to 16 bits. */
     return ((x << k) | (x >> (WIDTH - k))) & MASK;
 }
 
 static inline uint32_t rotr(uint32_t x, int k) {
+    /* Same logic as rotl(), but in the opposite direction. */
     k = k % WIDTH;
     return ((x >> k) | (x << (WIDTH - k))) & MASK;
 }
 
 static inline uint32_t delta(uint32_t x, uint32_t C) {
+    /* This is the same core state-mixing rule used elsewhere in the tree. */
     return (rotl(x, 1) ^ rotl(x, 3) ^ rotr(x, 2) ^ C) & MASK;
 }
 
@@ -114,6 +122,7 @@ static inline uint8_t fano_phase(uint32_t tick) {
 }
 
 static inline void fano_triplet(uint8_t phase, uint8_t *a, uint8_t *b, uint8_t *c) {
+    /* Expand one phase number into the three point IDs on that line. */
     *a = fano_lines[phase][0];
     *b = fano_lines[phase][1];
     *c = fano_lines[phase][2];
@@ -125,6 +134,7 @@ static inline void fano_triplet(uint8_t phase, uint8_t *a, uint8_t *b, uint8_t *
 // ============================================================
 
 static inline uint8_t popcount16(uint32_t x) {
+    /* Count set bits in a 16-bit value using a compact bit-hack. */
     x = x - ((x >> 1) & 0x5555);
     x = (x & 0x3333) + ((x >> 2) & 0x3333);
     x = (x + (x >> 4)) & 0x0F0F;
@@ -132,6 +142,7 @@ static inline uint8_t popcount16(uint32_t x) {
 }
 
 static inline uint8_t global_centroid(uint32_t state) {
+    /* Reduce the bit-count down to a single parity bit. */
     return popcount16(state) & 1;
 }
 
@@ -141,6 +152,7 @@ static inline uint8_t global_centroid(uint32_t state) {
 // ============================================================
 
 static inline uint8_t chirality(uint8_t centroid_parity) {
+    /* This model treats parity directly as the chirality choice. */
     return centroid_parity;  // 0 = left, 1 = right
 }
 
@@ -160,6 +172,7 @@ static inline void orient(uint8_t chi, uint8_t *a, uint8_t *b, uint8_t *c) {
 // ============================================================
 
 static inline uint8_t lines_containing(uint8_t point, uint8_t results[]) {
+    /* Search the 7 known lines and collect those that contain the given point. */
     uint8_t count = 0;
     for (uint8_t i = 0; i < 7; i++) {
         if (fano_lines[i][0] == point || 
@@ -188,6 +201,7 @@ static inline uint8_t gate_control(uint8_t ctrl, uint8_t line[]) {
 // ============================================================
 
 static inline uint8_t line_parity(uint8_t a, uint8_t b, uint8_t c) {
+    /* XOR is used here as a tiny parity summary for one chosen triple. */
     return a ^ b ^ c;
 }
 
@@ -204,8 +218,8 @@ static inline uint8_t line_parity(uint8_t a, uint8_t b, uint8_t c) {
 // ============================================================
 
 typedef struct {
-    uint8_t a, b, c;  // The triple of port atoms
-    uint8_t valid;
+    uint8_t a, b, c;  // The chosen triple of port atoms.
+    uint8_t valid;    // Non-zero only if all selection checks passed.
 } composition_result_t;
 
 static inline composition_result_t compose_at_tick(uint32_t tick, uint32_t kernel_state) {
@@ -213,12 +227,14 @@ static inline composition_result_t compose_at_tick(uint32_t tick, uint32_t kerne
     result.valid = 0;
     
     // Step 1: Fano winner point
+    // The raw tick chooses one point in the 7-point space.
     uint8_t fano_point = tick % 7;
     
     // Step 2: Find lines containing fano_point
     uint8_t candidate_lines[3];
     uint8_t num_candidates = lines_containing(fano_point, candidate_lines);
     
+    // If no candidate lines exist, the composition fails immediately.
     if (num_candidates == 0) return result;
     
     // Step 3: Use another tick-derived index to pick among the eligible lines.
@@ -228,12 +244,14 @@ static inline composition_result_t compose_at_tick(uint32_t tick, uint32_t kerne
     uint8_t l2 = fano_lines[line_idx][2];
     
     // Step 4: Control gating
+    // A second small tick-derived value stands in for control-plane choice.
     uint8_t ctrl = tick % 4;
     if (!gate_control(ctrl, fano_lines[line_idx])) return result;
     
     // Step 5: Compare the chosen line's parity to the kernel state's parity.
     uint8_t line_par = line_parity(l0, l1, l2);
     uint8_t glob_par = global_centroid(kernel_state);
+    // If the local line summary and the global state summary disagree, reject it.
     if (line_par != glob_par) return result;
     
     // Step 6: Apply chirality
@@ -252,7 +270,7 @@ static inline composition_result_t compose_at_tick(uint32_t tick, uint32_t kerne
 // INV-C1: Selected line is a valid Fano line
 static inline uint8_t inv_c1_valid_line(composition_result_t *r) {
     if (!r->valid) return 1;
-    // Check if triple is in valid lines
+    // Check if the chosen triple matches one of the known legal lines.
     for (uint8_t i = 0; i < 7; i++) {
         if (all_fano_lines[i][0] == r->a && 
             all_fano_lines[i][1] == r->b && 
@@ -271,6 +289,7 @@ static inline uint8_t inv_c1_valid_line(composition_result_t *r) {
 // INV-C4: Fano winner appears in selected line
 static inline uint8_t inv_c4_winner_in_line(composition_result_t *r, uint8_t winner) {
     if (!r->valid) return 1;
+    // The originally selected point should still appear somewhere in the triple.
     return (r->a == winner || r->b == winner || r->c == winner);
 }
 

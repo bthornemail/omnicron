@@ -1,0 +1,82 @@
+% OMNITRON bootstrap facts for polylog ingestion.
+% This file intentionally uses only parser-safe Prolog facts/rules.
+
+ascii_control(0, nul, frame_boundary, null).
+ascii_control(27, esc, escape_meta, meta).
+ascii_control(28, fs, file_separator, chunk).
+ascii_control(29, gs, group_separator, record).
+ascii_control(30, rs, record_separator, unit).
+ascii_control(31, us, unit_separator, field).
+ascii_control(127, del, delete, remove).
+
+fano_line(l0, [p0, p1, p2]).
+fano_line(l1, [p0, p3, p4]).
+fano_line(l2, [p0, p5, p6]).
+fano_line(l3, [p1, p3, p5]).
+fano_line(l4, [p1, p4, p6]).
+fano_line(l5, [p2, p3, p6]).
+fano_line(l6, [p2, p4, p5]).
+fano_incidence(Line, Point) :- fano_line(Line, Points), member(Point, Points).
+
+position_class(quadprime, -4, wallis_quadprime).
+position_class(tripleprime, -3, wallis_tripleprime).
+position_class(doubleprime, -2, wallis_doubleprime).
+position_class(prime, -1, wallis_prime).
+position_class(degree, 0, wallis_degree).
+position_class(minute, 1, wallis_prime).
+position_class(second, 2, wallis_doubleprime).
+position_class(third, 3, wallis_tripleprime).
+position_class(fourth, 4, wallis_quadprime).
+
+slot_range(S) :- between(0, 59, S).
+omicron_pivot(degree, 70).
+combinatorial_limit(666).
+target_center(333).
+grand_cycle(total_closure, 5040).
+
+invariant(predicate_identity, operator_name_preserved).
+invariant(argument_order, args_sequence_preserved).
+invariant(stage_meaning, phase_semantics_preserved).
+invariant(receipt_meaning, closure_semantics_preserved).
+invariant(canonical_address, slot_meaning_preserved).
+invariant(grammar_boundaries, control_structure_preserved).
+
+pipeline_stage(1, plain_text, ascii_source).
+pipeline_stage(2, prolog_datalog, truth_relation).
+pipeline_stage(3, s_expression, exact_structure).
+pipeline_stage(4, m_expression, concise_human).
+pipeline_stage(5, f_expression, flow_execution).
+pipeline_stage(6, ast, invariant_core).
+pipeline_stage(7, kernel_events, runtime_form).
+pipeline_stage(8, ascii_stream, transport_form).
+
+opcode(sync, synchronization, sync_point).
+opcode(wait, timing, pause).
+opcode(rotate_l, transform, counter_clockwise).
+opcode(rotate_r, transform, clockwise).
+opcode(join, composition, merge).
+opcode(split, decomposition, divide).
+opcode(emit, output, produce).
+opcode(hash, fingerprint, identity).
+opcode(map, transform, apply).
+opcode(load, state, set_tile).
+opcode(set_mode, config, set_mode4).
+opcode(set_line, config, set_fano_line).
+opcode(set_point, config, set_projective_point).
+
+event(sync, slot_boundary).
+event(wait, slot_pause).
+event(emit, value_output).
+event(hash, fingerprint_computed).
+event(map, state_transformed).
+event(rotate_l, bits_rotated_left).
+event(rotate_r, bits_rotated_right).
+event(join, states_merged).
+event(split, states_divided).
+event(load, tile_loaded).
+event(set_mode, mode_changed).
+event(set_line, line_selected).
+event(set_point, point_selected).
+
+central_inversion_rule(uses_combinatorial_limit, true).
+balanced_rotate_rule(two_branch_definition, true).

@@ -1,0 +1,649 @@
+% ============================================================
+% CONSTITUTIONAL LOGIC STACK
+% A Complete implementation of the 7-layer architecture
+% Matching the Numerical Constitution Specification
+% ============================================================
+% SOURCE-OF-TRUTH NOTE
+%
+% STATUS: PROTOTYPE LOGIC LAYER
+%
+% This file is the Prolog-side logical stack that sits conceptually above the
+% bare-metal kernel in `riscv-baremetal/atomic_kernel.c`.
+%
+% Relationship to the bare-metal code:
+% - the kernel advances phase, chirality/BOM, witness, and fingerprint state
+% - this file models claims, proposals, closure, receipts, and surfaces
+% - the kernel is the execution substrate; this file is the declarative
+%   reasoning/projection substrate
+%
+% Important current truth:
+% - this file is not wired directly into the boot artifact
+% - it is best read as the logical counterpart to the constitutional machine,
+%   not as code that the guest kernel is invoking live at boot time
+%
+% Bare-metal concept mapping:
+% - kernel phase / heartbeat       <-> classify_phase/2, closure sequencing ideas
+% - kernel witness/fingerprint     <-> lower_to_receipt/2, verify_receipt/1
+% - kernel FS/GS/RS/US structure   <-> layered terms, slots, surfaces
+% - kernel surfaces / stars-bars   <-> stars_bars_from_sex60/2 and projections
+      % Layer 1 - Claims
+      % Layer 2 - Proposals
+      % Layer 3 - Closure/CHR
+      % Layer 4 - Receipts
+      % Layer 5 - Surfaces
+      % Utilities
+% ============================================================
+% CONSTANTS (from Numerical Constitution)
+% ============================================================
+% These constants mirror the same constitutional number families named in the
+% bare-metal comments and `CONSTITUTION.md`.
+% Possibility Order
+% Incidence Order
+% Closure Order  
+% ============================================================
+% LAYER NULL: ALGEBRAIC OPERATOR SANITY
+% ============================================================
+% This layer plays the role of a symbolic "sanity gate" before higher-level
+% reasoning, much like the kernel's low-level invariants constrain execution.
+% Operator classifications for Layer NULL
+operator_class(join, commutative).
+operator_class(compose, noncommutative).
+operator_class(delta, anticommutative).
+operator_class(meet, commutative).
+operator_class(top, idempotent).
+operator_class(bottom, nilpotent).
+% Sanity check - pre-commit algebraic validation
+  % Walk every declared operator class and verify the expected property.
+  % Noncommutative is allowed - just passes
+% Commutator and anticommutator diagnostics
+% These are small algebra helpers for talking about order sensitivity.
+% Symmetric combine check
+% ============================================================
+% LAYER 0: ROOT PREDICATES AND SCOPES
+% ============================================================
+% This layer is the Prolog-side analogue of the kernel's structured state
+% surface: terms, positions, and coefficients instead of registers and bytes.
+% Position classes for sexagesimal (Wallis-style)
+% These names line up with the sexagesimal support vocabulary in
+% `riscv-baremetal/sexagesimal.h`.
+position_order(quadprime, -4).
+position_order(tripleprime, -3).
+position_order(doubleprime, -2).
+position_order(prime, -1).
+position_order(degree, 0).
+position_order(minute, 1).
+position_order(second, 2).
+position_order(third, 3).
+position_order(fourth, 4).
+% Term declaration
+% In this prototype, any atomic Prolog value can serve as a term name.
+term(T) :- atomic(T).
+% Slot: position class + coefficient (0-59)
+  % A slot is one coefficient at one named position on one term.
+% Root: degree position coefficient
+  % The root is the degree / unit position of the term.
+% Structural relations
+% These are symbolic relations, not memory mutations like in the kernel.
+join(A, B, C) :- term(A), term(B), term(C).
+combine(List, Term) :- maplist(term, List), term(Term).
+% Partial order for poset interpretation
+leq(A, B) :- covers(A, B).
+covers(A, B) :- slot(A, P, _), slot(B, P, _).
+% Position ordering
+left_of(P, Q) :- position_order(P, O1), position_order(Q, O2), O1 < O2.
+right_of(P, Q) :- position_order(P, O1), position_order(Q, O2), O1 > Q.
+% Sexagesimal term constructor
+  % Build one sexagesimal object from left digits, a unit, and right digits.
+% Exact fraction construction
+  % This is trying to create a finite sexagesimal fraction from a rational pair.
+% Repeating fraction
+  % Record that a term has some repeating-cycle label.
+  % Gather all slot coefficients as the visible repeating digit list.
+% Irrational approximant
+  % Represent an irrational only through a named approximation and digits.
+% ============================================================
+% LAYER 1: DISJUNCTIVE DATALOG CLAIMS
+% ============================================================
+% This layer starts to look like the logical equivalent of "events observed by
+% the kernel." The kernel emits state/witness; this layer turns propositions
+% into claims that can support or conflict with each other.
+% Claim: claim(ID, Context, Statement, Status)
+% Status: proposed | accepted | rejected | closed
+  % A claim exists when there is an assertion and no contradiction blocks it.
+% Claim group for choice rules
+% Exclusive claim (one must hold)
+% Defeasible claim
+% Claim dependencies
+  % One claim supports another if its statement logically implies the other.
+  % Two claims conflict when their statements are declared incompatible.
+% Contradiction detection
+% ============================================================
+% LAYER 2: ASP / STABLE-MODEL PROPOSALS
+% ============================================================
+% If Layer 1 says "what claims are on the table", Layer 2 says "which coherent
+% world do we choose from them?" This is a logical counterpart to the kernel's
+% selection and progression through one concrete execution path.
+% Proposal selection (choice rules)
+  % Collect the currently selected claims into one candidate world object.
+% Candidate world generation
+  % Enumerate one set of selected claims that is both consistent and minimal.
+% Consistency check
+% Minimality (no proper subset is model)
+% Unique minimal world
+% ============================================================
+% LAYER 3: CHR / CLP CLOSURE
+% ============================================================
+% This layer is the declarative "closure engine." In the bare-metal framing,
+% this sits conceptually where execution history has already happened and we are
+% now computing what follows from it.
+% CHR rules for reflexivity, antisymmetry, transitivity
+% These are the relational equivalents of structural invariants.
+% Idempotence and uniqueness  
+% Position ordering
+% Join associativity
+% Segment merge
+% Digit constraints (0-59 bound)
+digit_constraint(Coeff) :- between(0, 59, Coeff).
+% Sum constraints
+sum_constraint(A, B, C) :- C is A + B.
+% Carry propagation
+  % If one digit overflows beyond 59, carry one unit into the next position.
+% Closure operation
+  % A closure object says an accepted claim has been paired with a proposal and
+  % transformed into a closed result.
+% ============================================================
+% LAYER 4: PROLOG LOWERING / RECEIPTS
+% ============================================================
+% This is the closest layer to the kernel's witness/fingerprint language.
+% The kernel currently computes witness-like values and fingerprints; this file
+% turns logical results into receipt-shaped Prolog objects.
+% Receipt generation
+  % Generate one receipt ID for one claim/proposal/closure triple.
+% Lowering to receipt (canonical form)
+  % Convert any fully-ground term into a receipt record with a hash and time.
+% Operational sexagesimal evaluation
+  % Reduce a structured sexagesimal term into one numeric value.
+evaluate_coeff_list([], _, 0).
+% Receipt verification
+  % This is the logical cousin of replay verification on the kernel side.
+% Verified receipt emission
+  % Print the verified receipt contents in a readable textual form.
+% Receipt recording (in-memory for now)
+  % Current implementation note: this only prints a record, it does not persist
+  % to a durable store.
+% ============================================================
+% LAYER 5: STARS & BARS / BRAILLE / HEXAGRAM
+% ============================================================
+% This is the projection layer: logical values become surfaces. That matches the
+% architectural rule in `ASCII_CONSTITUTIONAL_MACHINE.md` that surfaces are
+% derived witnesses, not sovereign truth.
+% Stars & Bars rendering
+  % Build a coarse stars-and-bars summary from left, unit, and right parts.
+count_stars([], 0).
+% Braille projection (8-dot)
+  % Compress a sexagesimal term down into one braille-code-point-like value.
+sum_coefficients([], 0).
+% Hexagram projection (6-line)
+  % Compress left/right structural lengths into one small symbolic code.
+% Wallis glyph rendering
+wallis_glyph(quadprime, '⁗').
+wallis_glyph(tripleprime, '‴').
+wallis_glyph(doubleprime, '″').
+wallis_glyph(prime, '′').
+wallis_glyph(degree, '°').
+wallis_glyph(minute, '′').
+wallis_glyph(second, '″').
+% Render sexagesimal term
+  % Convert the structured sexagesimal value into a printable Wallis-style string.
+render_coeff_list([], '').
+% ============================================================
+% UTILITIES
+% ============================================================
+% These helpers support the rest of the file with IDs, hashing, and phase labels.
+% Generate unique receipt ID
+  % Current strategy: combine wall-clock time and a random suffix.
+% Hash term for fingerprint
+  % This is the Prolog-side analogue of reducing a structured value to a compact
+  % fingerprint-like summary.
+% Complexity questions
+complexity_question(1, propositional_completeness).
+complexity_question(2, quantifier_scope_discipline).
+complexity_question(3, monotone_vs_nonmonotone).
+complexity_question(4, stable_model_existence).
+complexity_question(5, uniqueness_vs_multiplicity).
+complexity_question(6, constraint_store_satisfiability).
+complexity_question(7, chr_rewrite_confluence).
+complexity_question(8, termination_guarantee).
+complexity_question(9, grounding_finiteness).
+complexity_question(10, reducibility_search_hardness).
+% Phase classifier
+% These labels are conceptual phase families, not the same thing as the kernel's
+% numeric heartbeat phase counter.
+classify_phase(closure, conjunction_dominant).
+classify_phase(accumulation, conjunction_dominant).
+classify_phase(proposal, disjunction_dominant).
+classify_phase(branching, disjunction_dominant).
+classify_phase(claim, implication_dominant).
+classify_phase(rule, implication_dominant).
+classify_phase(normalization, equivalence_dominant).
+classify_phase(canonical, equivalence_dominant).
+% ============================================================
+% INITIALIZATION
+% ============================================================
+  % Print a startup banner when the module is loaded.
+% ============================================================
+% EXAMPLE USAGE
+% ============================================================
+% Example run:
+% ?- init_stack.
+% ?- sex60(t1, [slot(prime,3), slot(doubleprime,12)], 5, [slot(second,30)]).
+% ?- render_sex60(Term, String).
+% ?- sanity_check.
+% Loading the file automatically prints the layer banner above.
+parent(john, mary).
+% ============================================================
+% ASCII CONTROL CODE MAPPINGS (60 controls)
+% ============================================================
+ascii_control(0x00, nul,    frame_boundary,    null).
+ascii_control(0x01, soh,    header_start,      start).
+ascii_control(0x02, stx,    text_start,        begin).
+ascii_control(0x03, etx,    text_end,          end).
+ascii_control(0x04, eot,    transmission_end,  terminate).
+ascii_control(0x05, enq,    query_marker,      ask).
+ascii_control(0x06, ack,    acknowledge,       success).
+ascii_control(0x07, bel,    attention,         alert).
+ascii_control(0x08, bs,     backspace,         undo).
+ascii_control(0x09, ht,     tab_horizontal,    indent).
+ascii_control(0x0A, lf,     line_feed,         newline).
+ascii_control(0x0B, vt,     tab_vertical,      vtab).
+ascii_control(0x0C, ff,     form_feed,         page).
+ascii_control(0x0D, cr,     carriage_return,   return).
+ascii_control(0x0E, so,     shift_out,         mode_change).
+ascii_control(0x0F, si,     shift_in,          mode_return).
+ascii_control(0x10, dle,    data_link_escape,  escape).
+ascii_control(0x11, dc1,    device_control_1,  xon).
+ascii_control(0x12, dc2,    device_control_2,  select).
+ascii_control(0x13, dc3,    device_control_3,  xoff).
+ascii_control(0x14, dc4,    device_control_4,  deselect).
+ascii_control(0x15, nak,    negative_ack,      failure).
+ascii_control(0x16, syn,    sync_idle,         sync).
+ascii_control(0x17, etb,    end_block,         block_end).
+ascii_control(0x18, can,    cancel,            abort).
+ascii_control(0x19, em,     end_medium,        media_end).
+ascii_control(0x1A, sub,    substitute,        replace).
+ascii_control(0x1B, esc,    escape_meta,       meta).
+ascii_control(0x1C, fs,     file_separator,    chunk).
+ascii_control(0x1D, gs,     group_separator,   record).
+ascii_control(0x1E, rs,     record_separator,  unit).
+ascii_control(0x1F, us,     unit_separator,    field).
+ascii_control(0x7F, del,    delete,            remove).
+% ============================================================
+% FANO PLANE (7 lines, 3 points per line)
+% ============================================================
+fano_line(l0, [p0, p1, p2]).
+fano_line(l1, [p0, p3, p4]).
+fano_line(l2, [p0, p5, p6]).
+fano_line(l3, [p1, p3, p5]).
+fano_line(l4, [p1, p4, p6]).
+fano_line(l5, [p2, p3, p6]).
+fano_line(l6, [p2, p4, p5]).
+fano_incidence(Line, Point) :- fano_line(Line, Points), member(Point, Points).
+% ============================================================
+% SEXAGESIMAL POSITIONS (60 slots)
+% ============================================================
+% Position classes and their orders
+position_class(quadprime,   -4, '⁗').
+position_class(tripleprime, -3, '‴').
+position_class(doubleprime, -2, '″').
+position_class(prime,       -1, '′').
+position_class(degree,       0, '°').
+position_class(minute,       1, '′').
+position_class(second,       2, '″').
+position_class(third,        3, '‴').
+position_class(fourth,       4, '⁗').
+% Slot range (0-59)
+slot_range(S) :- between(0, 59, S).
+% ============================================================
+% WALLIS NOTATION SCALING
+% ============================================================
+% Multiples of 60 (left of degree)
+wallis_left(1, minute,       60).
+wallis_left(2, second,       3600).
+wallis_left(3, third,        216000).
+wallis_left(4, fourth,       12960000).
+% Fractions of 60 (right of degree)
+wallis_right(-1, prime,       60).
+wallis_right(-2, doubleprime, 3600).
+wallis_right(-3, tripleprime, 216000).
+wallis_right(-4, quadprime,   12960000).
+% Omicron pivot (the degree symbol, value 70 in gematria)
+omicron_pivot(degree, 70).
+omicron_role(zero_substitute, balanced_rotation).
+% ============================================================
+% OMICRON / 666 / 333 COMPOSITION
+% ============================================================
+% 3x3x3 rotation matrix (27 states)
+rotation_matrix(3, 3, 3, 27).
+target_center(333).
+combinatorial_limit(666).
+% N-ball/sphere/circle relationship
+geometric_layer(n_circle, 1, smith_boundary).
+geometric_layer(n_sphere, 2, fano_projective).
+geometric_layer(n_ball,   3, omicron_density).
+% ============================================================
+% CYCLE HIERARCHY (5040 Grand Cycle)
+% ============================================================
+% Divisibility relationships
+% ============================================================
+% AEGEAN NUMERALS (Starts and Bars headers)
+% ============================================================
+% Aegean numerals 0-9 (used in 2-of-5 encoding)
+aegean_numeral(0, '𐄀', none).
+aegean_numeral(1, '𐄇', vertical).
+aegean_numeral(2, '𐄈', horizontal).
+aegean_numeral(3, '𐄉', vertical).
+aegean_numeral(4, '𐄊', horizontal).
+aegean_numeral(5, '𐄋', vertical).
+aegean_numeral(6, '𐄌', horizontal).
+aegean_numeral(7, '𐄍', vertical).
+aegean_numeral(8, '𐄎', horizontal).
+aegean_numeral(9, '𐄏', vertical).
+% 3-Aegean character encoding (9x9x9 = 729 states)
+% 2-of-5 selection for error correction
+% ============================================================
+% BRAILLE ENCODING (6-dot and 8-dot)
+% ============================================================
+% 6-dot Braille (64 states - hexagram aligned)
+% 8-dot Braille (256 states - octet aligned)
+% Pairwise assessment (256x256 = 65536 states)
+% ============================================================
+% POLYFORM LOGIC MAPPING
+% ============================================================
+% Polynomial expression mapping
+% Rows = Degree (vertical complexity)
+% Columns = Terms (horizontal breadth)
+% Shape = Truth table configuration
+% Cardinality = Function weight/energy
+polyform_type(monomino,  1, [single]).
+polyform_type(domino,    2, [pair]).
+polyform_type(tromino,   3, [line, angle]).
+polyform_type(tetromino, 4, [line, square, t_shape, l_shape, z_shape]).
+polyform_type(pentomino, 5, [12_shapes]).
+% HSV color space for typecasting (16-bit color)
+color_channel(hue,        type_class,      0..360).
+color_channel(saturation, priority,        0..255).
+color_channel(value,      omicron_speed,   0..255).
+% ============================================================
+% MESSAGING CODES
+% ============================================================
+% BeeCode (15-bit messaging)
+beecode_capacity(15).
+% MaxiCode/Aztec shared center (40-bit)
+shared_center_capacity(40).
+shared_center_ratio(5/8, 8/5).
+% Code16K (reconciliation layer)
+code16k_capacity(16000).
+code16k_role(error_correction, reconciliation).
+% ============================================================
+% SMITH CIRCLES (Impedance backdrop)
+% ============================================================
+smith_role(coordinate_plane, complex_terrain).
+smith_function(impedance_calculation, link_cost).
+smith_region(center,       0,      matched).
+smith_region(near_center,  0.3,    low_mismatch).
+smith_region(mid_circle,   0.6,    moderate_mismatch).
+smith_region(outer_edge,   1.0,    high_mismatch).
+smith_region(beyond,       >1.0,   reactive).
+% ============================================================
+% METATRON'S CUBE (13 circles, Platonic solids)
+% ============================================================
+cube_circles(13).
+cube_contains(tetrahedron,   4, fire).
+cube_contains(hexahedron,    6, earth).
+cube_contains(octahedron,    8, air).
+cube_contains(dodecahedron,  12, ether).
+cube_contains(icosahedron,   20, water).
+cube_energy(masculine, lines, active).
+cube_energy(feminine, circles, receptive).
+% ============================================================
+% MERKABA / FANO PROJECTION
+% ============================================================
+merkaba_component(tetrahedron_up,   projective, male).
+merkaba_component(tetrahedron_down, receptive,  female).
+merkaba_rotation(counter_rotating,  balance).
+% Fano plane as projective geometry
+fano_projective(order, 2).
+fano_projective(points, 7).
+fano_projective(lines, 7).
+fano_projective(incidence, 3).
+% ============================================================
+% BIT OPERATIONS (O and I instead of 0 and 1)
+% ============================================================
+bit(o).
+bit(i).
+bit_not(o, i).
+bit_not(i, o).
+bit_and(o, o, o).
+bit_and(o, i, o).
+bit_and(i, o, o).
+bit_and(i, i, i).
+bit_or(o, o, o).
+bit_or(o, i, i).
+bit_or(i, o, i).
+bit_or(i, i, i).
+bit_xor(o, o, o).
+bit_xor(o, i, i).
+bit_xor(i, o, i).
+bit_xor(i, i, o).
+% ============================================================
+% B8 OCTET OPERATIONS
+% ============================================================
+b8_rotate_left([A,B,C,D,E,F,G,H], [B,C,D,E,F,G,H,A]).
+b8_rotate_right([A,B,C,D,E,F,G,H], [H,A,B,C,D,E,F,G]).
+b8_not(Bits, NotBits) :- maplist(bit_not, Bits, NotBits).
+b8_and(A, B, C) :- maplist(bit_and, A, B, C).
+b8_or(A, B, C)  :- maplist(bit_or, A, B, C).
+b8_xor(A, B, C) :- maplist(bit_xor, A, B, C).
+% ============================================================
+% TILE16 (4-bit hex characters)
+% ============================================================
+tile16_value(t0, 0x0).  tile16_value(t8, 0x8).
+tile16_value(t1, 0x1).  tile16_value(t9, 0x9).
+tile16_value(t2, 0x2).  tile16_value(ta, 0xA).
+tile16_value(t3, 0x3).  tile16_value(tb, 0xB).
+tile16_value(t4, 0x4).  tile16_value(tc, 0xC).
+tile16_value(t5, 0x5).  tile16_value(td, 0xD).
+tile16_value(t6, 0x6).  tile16_value(te, 0xE).
+tile16_value(t7, 0x7).  tile16_value(tf, 0xF).
+% ============================================================
+% MODE4 (2-bit execution modes)
+% ============================================================
+mode4_meaning(xx, quiescent).
+mode4_meaning(xX, receptive).
+mode4_meaning(Xx, projective).
+mode4_meaning(XX, active).
+% ============================================================
+% ORIENTATION (Chiral flow)
+% ============================================================
+orientation(identity,   0,   no_transform).
+orientation(reverse,    180, half_turn).
+orientation(swap,       90,  quarter_turn_right).
+orientation(rotate_180, 180, half_turn_alt).
+orientation(peer,       270, quarter_turn_left).
+% ============================================================
+% KERNEL OPCODES
+% ============================================================
+opcode(sync,      synchronization,  sync_point).
+opcode(wait,      timing,           pause).
+opcode(rotate_l,  transform,        counter_clockwise).
+opcode(rotate_r,  transform,        clockwise).
+opcode(join,      composition,      merge).
+opcode(split,     decomposition,    divide).
+opcode(emit,      output,           produce).
+opcode(hash,      fingerprint,      identity).
+opcode(map,       transform,        apply).
+opcode(load,      state,            set_tile).
+opcode(set_mode,  config,           set_mode4).
+opcode(set_line,  config,           set_fano_line).
+opcode(set_point, config,           set_projective_point).
+% ============================================================
+% KERNEL EVENTS
+% ============================================================
+event(sync,      slot_boundary).
+event(wait,      slot_pause).
+event(emit,      value_output).
+event(hash,      fingerprint_computed).
+event(map,       state_transformed).
+event(rotate_l,  bits_rotated_left).
+event(rotate_r,  bits_rotated_right).
+event(join,      states_merged).
+event(split,     states_divided).
+event(load,      tile_loaded).
+event(set_mode,  mode_changed).
+event(set_line,  line_selected).
+event(set_point, point_selected).
+% ============================================================
+% WLOG STRUCTURE
+% ============================================================
+% WLOG = Orientation + Base + Header + Program
+wlog_component(orientation, chiral_flow).
+wlog_component(base,        sexagesimal_foundation).
+wlog_component(header,      marker_clock_seed).
+wlog_component(program,     log_steps).
+% Header = Marker + Clock + ConfigSeed
+header_component(marker,    orientation_mark).
+header_component(clock,     base_timing).
+header_component(seed,      initial_config).
+% ConfigSeed = Slot60 + Mode4 + Line7 + Point3 + Tile16
+config_seed_component(slot,  position).
+config_seed_component(mode,  execution_mode).
+config_seed_component(line,  fano_line).
+config_seed_component(point, projective_point).
+config_seed_component(tile,  initial_tile).
+% LOG = Slot60 + Opcode
+log_step(Slot, Opcode) :- slot_range(Slot), opcode(Opcode, _, _).
+% Program = recursive list of LOG steps
+program(done).
+program(step(Log, Rest)) :- program(Rest).
+% ============================================================
+% RUNTIME STATE
+% ============================================================
+% Config = Slot60 + Mode4 + Line7 + Point3 + Tile16 + B8
+config_field(slot,   current_position).
+config_field(mode,   current_mode).
+config_field(line,   current_line).
+config_field(point,  current_point).
+config_field(tile,   current_tile).
+config_field(bits,   current_octet).
+% Runtime = Header + Config + Program
+runtime_state(header, program, config).
+% ============================================================
+% PROJECTION INVARIANTS
+% ============================================================
+% These must be preserved across all projections
+invariant(predicate_identity,     operator_name_preserved).
+invariant(argument_order,         args_sequence_preserved).
+invariant(stage_meaning,          phase_semantics_preserved).
+invariant(receipt_meaning,        closure_semantics_preserved).
+invariant(canonical_address,      slot_meaning_preserved).
+invariant(grammar_boundaries,     control_structure_preserved).
+% ============================================================
+% PIPELINE STAGES (Lawful projections)
+% ============================================================
+% Plain text → Prolog/Datalog → S-expr → M-expr → F-expr → AST → Events → ASCII
+pipeline_stage(1, plain_text,     any_unicode).
+pipeline_stage(2, prolog_datalog, truth_relation).
+pipeline_stage(3, s_expression,   exact_structure).
+pipeline_stage(4, m_expression,   concise_human).
+pipeline_stage(5, f_expression,   flow_execution).
+pipeline_stage(6, ast,            invariant_core).
+pipeline_stage(7, kernel_events,  runtime_form).
+pipeline_stage(8, ascii_stream,   transport_form).
+% Each stage removes one kind of ambiguity
+ambiguity_removed(prolog_datalog, variable_binding).
+ambiguity_removed(s_expression,   operator_precedence).
+ambiguity_removed(m_expression,   bracket_overhead).
+ambiguity_removed(f_expression,   evaluation_order).
+ambiguity_removed(ast,            surface_syntax).
+ambiguity_removed(kernel_events,  control_flow).
+ambiguity_removed(ascii_stream,   character_encoding).
+% ============================================================
+% CENTRAL INVERSION (The Omicron Calculus)
+% ============================================================
+% Every state has a mirror
+% Balanced rotation avoids zero
+% Division avoidance
+% ============================================================
+% DETERMINISTIC REPLAY
+% ============================================================
+% The core law: C ∘ E ∘ C = C and E ∘ C ∘ E = E
+% C = collapse (to identity), E = expand (to execution)
+% ============================================================
+% END OF BOOTSTRAP DATALOG
+% ============================================================
+% ============================================================
+% RAW BINARY SUBSTRATE (deterministic replay layer)
+% ============================================================
+substrate_layer(9, raw_binary_group_ordering, deterministic_core_kernel_form).
+substrate_layer(10, canonical_ascii_ordering, control_surface_form).
+substrate_layer(11, sexagesimal_notation_headers, frame_interpretation_form).
+substrate_layer(12, duodecimal_classification, hierarchical_group_order_form).
+substrate_layer(13, frame_sequence_resolution, replay_control_surface_form).
+group_order(bit_pairs, 2).
+group_order(nibbles, 4).
+group_order(fano_words, 7).
+group_order(bytes, 8).
+group_order(duodecimal, 12).
+group_order(utf16, 16).
+group_order(utf32, 32).
+group_order(sexagesimal_frame, 60).
+group_order(register64, 64).
+canonical_ascii_order(0, nul).
+canonical_ascii_order(1, soh).
+canonical_ascii_order(2, stx).
+canonical_ascii_order(3, etx).
+canonical_ascii_order(4, eot).
+canonical_ascii_order(5, enq).
+canonical_ascii_order(6, ack).
+canonical_ascii_order(7, nak).
+canonical_ascii_order(8, bel).
+canonical_ascii_order(9, bs).
+canonical_ascii_order(10, ht).
+canonical_ascii_order(11, lf).
+canonical_ascii_order(12, vt).
+canonical_ascii_order(13, ff).
+canonical_ascii_order(14, cr).
+canonical_ascii_order(15, so).
+canonical_ascii_order(16, si).
+canonical_ascii_order(17, dle).
+canonical_ascii_order(18, dc1).
+canonical_ascii_order(19, dc3).
+canonical_ascii_order(20, dc2).
+canonical_ascii_order(21, dc4).
+canonical_ascii_order(22, syn).
+canonical_ascii_order(23, etb).
+canonical_ascii_order(24, can).
+canonical_ascii_order(25, em).
+canonical_ascii_order(26, sub).
+canonical_ascii_order(27, esc).
+canonical_ascii_order(28, fs).
+canonical_ascii_order(29, gs).
+canonical_ascii_order(30, rs).
+canonical_ascii_order(31, us).
+canonical_ascii_order(32, del).
+duodecimal_main_class(0, pipeline_generalities).
+duodecimal_main_class(1, invariants_foundations).
+duodecimal_main_class(2, canonical_identity).
+duodecimal_main_class(3, federation_social).
+duodecimal_main_class(4, notation_philology).
+duodecimal_main_class(5, sexagesimal_science).
+duodecimal_main_class(6, runtime_technology).
+duodecimal_main_class(7, projections_arts).
+duodecimal_main_class(8, program_literature).
+duodecimal_main_class(9, receipts_history).
+duodecimal_main_class(10, metatron_domain).
+duodecimal_main_class(11, merkaba_domain).
+substrate_stage_order(raw_binary_group_ordering, canonical_ascii_ordering).
+substrate_stage_order(canonical_ascii_ordering, sexagesimal_notation_headers).
+substrate_stage_order(sexagesimal_notation_headers, duodecimal_classification).
+substrate_stage_order(duodecimal_classification, frame_sequence_resolution).
