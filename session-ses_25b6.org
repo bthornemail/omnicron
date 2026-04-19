@@ -1,0 +1,314 @@
+#+TITLE: Session ses_25b6
+#+AUTHOR: Codex
+#+DATE: 2026-04-19
+#+STARTUP: overview
+
+* Purpose
+
+This file is the cleaned working record for session =ses_25b6b9022ffewSEipuPxAjIao9=.
+
+It replaces the raw assistant transcript with a durable build history for the
+OMICRON RISC-V bare-metal kernel and adjacent constitutional-machine work.
+
+This document is intended to answer four questions quickly:
+
+- What was attempted?
+- What is confirmed to have worked?
+- What is contradicted or missing?
+- What should happen next?
+
+* Session Metadata
+
+- Session ID: =ses_25b6b9022ffewSEipuPxAjIao9=
+- Original session window: 2026-04-19 07:11:24 UTC to 2026-04-19 09:06:00 UTC
+- Repository root: =/root/omnicron=
+- Primary target: =riscv-baremetal/atomic_kernel.c=
+- Secondary target: =riscv-baremetal/interpolator.c=
+
+* Executive Summary
+
+The session made real architectural progress but did not leave behind a
+reproducible bare-metal build record.
+
+What is solid:
+
+- the repo contains a coherent constitutional architecture split
+- the kernel, Prolog layer, and constitution documents are present
+- several relocation classes were identified while compiling the RISC-V kernel
+- the build log shows repeated work to remove literals, divisions, and large
+  tables from the kernel path
+
+What is not yet solid:
+
+- the current =atomic_kernel.c= does not compile reproducibly
+- the session claims a successful build, but the current tree does not match
+  that claim
+- the successful build is missing a final exact source snapshot and exact flags
+- no durable witness artifact was preserved for the claimed successful run
+
+* Build Story
+
+** Phase 1: Initial compile failures
+
+The session began by trying to compile the RISC-V kernel after edits to console
+formatting and hexadecimal output.
+
+Observed failure class:
+
+- relocation truncation against =.LC0=
+
+Interpretation:
+
+- string literals or compiler-emitted literal pools were still present
+- the build environment was sensitive to code model and relocation distance
+
+** Phase 2: Literal and console simplification
+
+The session repeatedly tried to reduce relocation pressure by:
+
+- simplifying hex output
+- avoiding helper strings
+- removing or neutering =emit_str=
+- replacing more symbolic output with direct character emission
+
+This likely reduced some sources of =.rodata= pressure, but the transcript does
+not show a clean root-cause closure at that point.
+
+** Phase 3: Claim of a successful kernel build
+
+At one point the session states:
+
+- the kernel compiles successfully
+- the binary is about 9 KB
+- the kernel runs under QEMU
+- console output is disabled
+- mixed radix and channel handling are simplified
+
+This is the strongest positive milestone in the original record, but it is not
+fully reproducible from the current tree because the exact successful source
+state is missing.
+
+** Phase 4: Extended kernel work reintroduces failures
+
+Later in the session, more features were added back in:
+
+- debug output paths
+- Fano composition logic
+- modulo removal helpers
+- structural composition logic
+
+New failure classes then appeared:
+
+- undefined reference to =__umoddi3=
+- relocation truncation against =FANO_LINES=
+- relocation truncation against =g_kernel=
+- later, relocation truncation against =g_debug0=
+
+This shows that the work after the earlier “successful build” did not stay on a
+confirmed good baseline.
+
+* Confirmed Evidence
+
+** Present in repository
+
+- [README.md](/root/omnicron/README.md)
+- [CONSTITUTION.md](/root/omnicron/CONSTITUTION.md)
+- [ASCII_CONSTITUTIONAL_MACHINE.md](/root/omnicron/ASCII_CONSTITUTIONAL_MACHINE.md)
+- [riscv-baremetal/ATOMIC_KERNEL_SPEC.md](/root/omnicron/riscv-baremetal/ATOMIC_KERNEL_SPEC.md)
+- [riscv-baremetal/atomic_kernel.c](/root/omnicron/riscv-baremetal/atomic_kernel.c)
+- [riscv-baremetal/interpolator.c](/root/omnicron/riscv-baremetal/interpolator.c)
+- [prolog/constitutional_stack.pl](/root/omnicron/prolog/constitutional_stack.pl)
+
+** Present in the original session record
+
+- repeated compile attempts with =riscv64-unknown-elf-gcc=
+- multiple linker failures recorded explicitly
+- an explicit claim that the kernel compiled and ran at one stage
+- later regressions after adding more features
+
+* Contradictions
+
+** “Compiles successfully” versus current tree
+
+The original session claims the kernel compiled and ran, but the current
+repository state does not reproduce that outcome.
+
+Current compile attempt against the live tree fails with relocation truncation
+against =g_debug0= in =atomic_kernel.c=.
+
+This means one of the following is true:
+
+- the successful build used different source than the current file
+- the successful build used different compiler or linker flags
+- the successful build used a different linker script
+- the success claim was premature and not preserved as a stable artifact
+
+** “Relocation fixed” versus failure migration
+
+The session appears to solve one relocation source only for another one to
+appear later.
+
+Failure migration observed across the session:
+
+- =.LC0=
+- =g_kernel=
+- =FANO_LINES=
+- =g_debug0=
+
+This suggests the root issue was broader than any one symbol.
+
+* Likely Root Causes
+
+The current evidence suggests a combination of the following:
+
+- code model mismatch for the chosen bare-metal memory layout
+- far symbol references from the generated code
+- literal pools and const data emitted farther away than expected
+- unsupported runtime helper generation such as =__umoddi3= under =-nostdlib=
+- globals or tables placed in ways that trigger relocations outside the allowed
+  immediate range
+
+This section is still an engineering hypothesis, not a closed proof.
+
+* Current Status
+
+** Architecture status
+
+The conceptual stack is coherent:
+
+- ASCII as canonical control substrate
+- C/POSIX kernel as deterministic replay substrate
+- Prolog as the existing logic layer
+- Scheme and Datalog are defined architecturally but not yet implemented as
+  first-class runtime layers in this repository
+
+** Bare-metal kernel status
+
+Current state:
+
+- =atomic_kernel.c=: not reproducibly buildable from the current tree
+- =interpolator.c=: smaller and easier to reason about, useful as a reduced
+  baseline
+- build history: informative, but not yet a trustworthy reproduction ledger
+
+* What Is Missing
+
+To make this session genuinely durable, the project still needs:
+
+- one exact known-good compile command
+- one exact known-good source snapshot
+- one exact known-good linker script snapshot
+- one recorded toolchain version tied to that snapshot
+- one preserved runtime witness from QEMU or GDB
+- one section listing intentionally disabled features in the working build
+- one diagnosis section distinguishing symptom fixes from root-cause fixes
+
+* Recommended Recovery Path
+
+** 1. Establish a reduced known-good baseline
+
+Start from the smallest kernel that compiles and runs.
+
+Candidates:
+
+- [riscv-baremetal/interpolator.c](/root/omnicron/riscv-baremetal/interpolator.c)
+- a reduced clone of [riscv-baremetal/atomic_kernel.c](/root/omnicron/riscv-baremetal/atomic_kernel.c)
+
+Success criterion:
+
+- clean compile
+- stable QEMU boot
+- one observable witness
+
+** 2. Freeze the build recipe
+
+Record:
+
+- compiler version
+- compile command
+- linker script
+- machine flags
+- binary size
+- SHA256 of the produced artifact
+
+** 3. Reintroduce features one family at a time
+
+Suggested order:
+
+1. heartbeat only
+2. witness accumulator
+3. mirror or debug witness path
+4. structural control grammar
+5. Fano composition
+6. channel timing
+
+** 4. Preserve evidence at every milestone
+
+For each milestone, keep:
+
+- compile output
+- artifact size
+- exact command
+- runtime transcript or GDB note
+
+* Next Actions
+
+** Immediate
+
+- [ ] make =session-ses_25b6.org= the canonical cleaned ledger
+- [ ] reproduce one working compile from the current tree
+- [ ] if reproduction fails, isolate the smallest failing symbol reference
+- [ ] decide whether =atomic_kernel.c= or =interpolator.c= is the recovery base
+
+** Near term
+
+- [ ] add a =Build Witness= section with real commands and outputs
+- [ ] add a =Known Good Artifact= section once a binary is reproduced
+- [ ] split architectural notes from build notes when new sessions are added
+
+* Build Witness
+
+As of 2026-04-19, the current live-tree compile check still fails.
+
+Command used:
+
+#+begin_src sh
+cd /root/omnicron/riscv-baremetal && \
+riscv64-unknown-elf-gcc -march=rv64ia -mabi=lp64 -nostdlib -T linker.ld \
+  -o /tmp/omicron-test.flat atomic_kernel.c startup_simple.S
+#+end_src
+
+Observed result:
+
+#+begin_example
+/usr/lib/gcc/riscv64-unknown-elf/13.2.0/../../../riscv64-unknown-elf/bin/ld:
+warning: /tmp/omicron-test.flat has a LOAD segment with RWX permissions
+/tmp/cc....o: in function `emit_h8':
+atomic_kernel.c:(.text+0x1264): relocation truncated to fit: R_RISCV_HI20
+against `g_debug0'
+collect2: error: ld returned 1 exit status
+#+end_example
+
+This witness supersedes any unverified claim of a working live-tree build.
+
+* Constitutional Relevance
+
+This session matters because it sits exactly at the boundary between the
+constitutional architecture and the executable machine.
+
+The repository now has:
+
+- constitutional numbers
+- an explicit ASCII constitutional machine document
+- an existing Prolog receipt and closure layer
+
+What it still needs is a reproducible kernel witness that makes the lower layer
+as durable as the architecture above it.
+
+* Notes
+
+- The original raw transcript was extremely verbose and mixed build work with
+  unrelated mathematical and exploratory material.
+- This Org file is intentionally shorter and should remain editorial rather than
+  transcript-like.
+- Future session logs should prefer milestone entries over raw tool dumps.
