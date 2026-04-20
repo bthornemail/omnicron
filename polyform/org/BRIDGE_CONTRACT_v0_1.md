@@ -8,6 +8,12 @@ Scope:
 org source -> org_structural_record -> resolved_org_block -> canonical_artifact
 ```
 
+Additional normative lane (coreform/bitboards):
+
+```text
+polyform/bitboards/coreform_chain.logic -> canonical_artifact -> render_packet -> viewer
+```
+
 Normative references:
 - `ORG_BRIDGE_SCHEMA.md`
 - `schema/org_bridge.schema.json`
@@ -73,6 +79,24 @@ See: `scripts/org_structural_to_resolved_ndjson.mjs` and
 | --- | --- | --- |
 | Path Sovereign (current v0.1) | filesystem `file_path` participates in `step_identity` | rename/move changes identity and routing |
 | Logical Source Sovereign (future option) | stable logical source id replaces path identity | rename/move can preserve identity |
+
+## Projection Authority Rules (Normative v0.1)
+
+The projection stack is constitutionally downstream:
+
+```text
+canonical_artifact -> render_packet -> viewer backends (SVG/WebGL/OpenGL)
+```
+
+Authority constraints:
+
+1. Canonical artifacts are authoritative.
+2. Render packets are derived witness artifacts only.
+3. Viewers are non-authoritative projection surfaces.
+4. Viewer interaction MUST NOT mutate canonical authority.
+5. Rendering failures or backend divergence MUST NOT alter canonical truth.
+6. Coreform authority is `.logic` composer terms; NDJSON/render packets remain
+   witness/projection surfaces only.
 
 ## Golden Fixture
 

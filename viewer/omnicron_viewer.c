@@ -10,6 +10,9 @@
 
 typedef ptrdiff_t GLsizeiptr;
 typedef char GLchar;
+#ifndef PFNGLDRAWELEMENTSPROC
+typedef void (*PFNGLDRAWELEMENTSPROC)(GLenum mode, GLsizei count, GLenum type, const void *indices);
+#endif
 
 typedef struct {
     int width;

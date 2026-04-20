@@ -19,7 +19,7 @@ SRC := logic-interp.c
 POLYLOG := polylog
 POLYLOG_SRC := prolog/polylog.c
 
-.PHONY: all clean test test-polylog test-polylog-bootstrap test-rule-source verify-bridge-replay bitboards graph-bitboards deterministic
+.PHONY: all clean test test-polylog test-polylog-bootstrap test-rule-source verify-bridge-replay verify-coreform-chain bitboards graph-bitboards deterministic
 VIEWER_BIN := omnicron_viewer
 VIEWER_SRC := viewer/omnicron_viewer.c
 
@@ -72,6 +72,10 @@ verify-bridge-replay: $(POLYLOG)
 	chmod +x ./prolog/verify_bridge_fact_equivalence.sh
 	./prolog/verify_bridge_fact_equivalence.sh
 
+verify-coreform-chain:
+	chmod +x ./polyform/bitboards/verify_coreform_chain.mjs ./polyform/bitboards/coreform_logic_to_canonical_ndjson.mjs
+	node ./polyform/bitboards/verify_coreform_chain.mjs
+
 bitboards: $(POLYLOG) test-rule-source
 	chmod +x ./prolog/export_polyform_bitboards.sh
 	./prolog/export_polyform_bitboards.sh
@@ -83,6 +87,7 @@ graph-bitboards: $(POLYLOG) test-rule-source
 deterministic: $(POLYLOG)
 	chmod +x ./prolog/run_rule_source.sh ./prolog/verify_bridge_fact_equivalence.sh ./prolog/export_polyform_bitboards.sh ./prolog/export_control_graph_bitboards.sh ./prolog/deterministic_replay.sh
 	$(MAKE) verify-bridge-replay
+	$(MAKE) verify-coreform-chain
 	cd ./polyform/org && npm run verify-bridge && npm run verify-bridge-golden
 	./prolog/deterministic_replay.sh
 

@@ -1,0 +1,64 @@
+% COREFORM CONSTITUTIONAL AUTHORITY
+%
+% This file is authoritative for coreform construction in the polyform layer.
+% NDJSON/SVG/WebGL/OpenGL are projection witnesses derived downstream.
+
+% Primitive constitutional law
+primitive_operation(bitroll7).
+bitroll_law(bitroll7, rotl1_xor_rotl3_xor_rotr2_xor_c).
+
+% Derived constants from constitutional terms
+derived_constant(ch0_binary, channel_range(0, 15)).
+derived_constant(ch0_binary, field_bits([2, 4, 8, 16, 256])).
+
+derived_constant(ch1_decimal, cycle_factorial(7, 5040)).
+derived_constant(ch1_decimal, lane_depth(15)).
+derived_constant(ch1_decimal, slot_surface(60)).
+
+derived_constant(ch2_hex, frame_address(240)).
+derived_constant(ch2_hex, observer_window(256)).
+
+derived_constant(ch3_sign, bom_chirality_pair(fffe, feff)).
+derived_constant(master_period, 5040).
+
+% Coreform chain root
+coreform_root(coreform_001).
+
+% Linked-list structure (authoritative)
+node(coreform_001_n0, node_meta(coreform_001, 0)).
+node(coreform_001_n1, node_meta(coreform_001, 1)).
+node(coreform_001_n2, node_meta(coreform_001, 2)).
+node(coreform_001_n3, node_meta(coreform_001, 3)).
+
+next(coreform_001_n0, coreform_001_n1).
+next(coreform_001_n1, coreform_001_n2).
+next(coreform_001_n2, coreform_001_n3).
+
+% Mandatory stage sequence
+stage(coreform_001_n0, truth_table).
+stage(coreform_001_n1, karnaugh).
+stage(coreform_001_n2, gate_net).
+stage(coreform_001_n3, carry_lookahead).
+
+% Derivation lineage
+derives_from(coreform_001_n0, bitroll7).
+derives_from(coreform_001_n1, coreform_001_n0).
+derives_from(coreform_001_n2, coreform_001_n1).
+derives_from(coreform_001_n3, coreform_001_n2).
+
+% Deterministic routing bindings
+virtual_address(coreform_001_n0, 'va:0000a001:0.0.00').
+virtual_address(coreform_001_n1, 'va:0000a001:1.0.15').
+virtual_address(coreform_001_n2, 'va:0000a001:2.0.30').
+virtual_address(coreform_001_n3, 'va:0000a001:3.0.45').
+
+balanced_address(coreform_001_n0, 'ba:left:-2048').
+balanced_address(coreform_001_n1, 'ba:left:-1024').
+balanced_address(coreform_001_n2, 'ba:right:+1024').
+balanced_address(coreform_001_n3, 'ba:right:+2048').
+
+% Projection witness mappings (non-authoritative, reference-only)
+pattern_witness(coreform_001_n1, 'polyform/patterns/Karnaugh_map_torus.svg').
+pattern_witness(coreform_001_n2, 'polyform/patterns/Logic gate.md').
+pattern_witness(coreform_001_n3, 'polyform/patterns/Four_bit_adder_with_carry_lookahead.svg').
+

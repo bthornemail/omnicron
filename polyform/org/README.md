@@ -255,6 +255,44 @@ node scripts/org_canonical_to_replay_input.mjs \
 
 This is the bridge-to-runtime handoff surface used by the replay harness.
 
+### Coreform bitboards lane (`.logic` authority -> canonical witness)
+
+Coreform construction authority lives in:
+
+- `polyform/bitboards/coreform_chain.logic`
+
+Coreform chain law:
+
+```text
+truth_table -> karnaugh -> gate_net -> carry_lookahead
+```
+
+with explicit linked predicates:
+
+- `coreform_root/1`
+- `node/2`
+- `next/2`
+- `stage/2`
+- `derives_from/2`
+- `virtual_address/2`
+- `balanced_address/2`
+
+Materialize canonical artifact from `.logic` authority:
+
+```bash
+node ../bitboards/coreform_logic_to_canonical_ndjson.mjs \
+  ../bitboards/coreform_chain.logic \
+  /tmp/coreform.canonical.ndjson
+```
+
+Then project as usual:
+
+```bash
+node scripts/org_canonical_to_render_packet_ndjson.mjs \
+  /tmp/coreform.canonical.ndjson \
+  /tmp/coreform.render_packet.ndjson
+```
+
 ### Projection adapter (canonical -> render packet -> SVG)
 
 Projection is downstream-only: render packets are derived from canonical
@@ -286,6 +324,13 @@ This defines the minimal downstream lane:
 canonical_artifact -> render_packet -> SVG/WebGL/OpenGL adapters
 ```
 
+Normative authority split:
+
+- canonical artifacts are authoritative
+- render packets are derived witness artifacts
+- viewers are non-authoritative projection surfaces
+- interaction must not mutate canonical authority
+
 Native OpenGL backend (GLFW + OpenGL 3.3 core):
 
 ```bash
@@ -294,6 +339,28 @@ make omnicron-viewer
 ```
 
 The native viewer is projection-only and consumes `render_packet` directly.
+
+Browser WebGL2 backend:
+
+```bash
+# 1) produce a packet
+node scripts/org_canonical_to_render_packet_ndjson.mjs \
+  /tmp/org_canonical.ndjson \
+  /tmp/render_packet.ndjson
+
+# 2) serve from polyform/org (or repo root)
+cd /root/omnicron/polyform/org
+python3 -m http.server 8080
+
+# 3) open viewer
+# http://localhost:8080/viewer/webgl2_viewer.html
+# or pre-load via query:
+# http://localhost:8080/viewer/webgl2_viewer.html?packet=/tmp/render_packet.ndjson
+```
+
+If browser fetch to `/tmp/...` is not available from your server root, use
+`Load NDJSON` file picker in the viewer or copy the packet under the served
+directory.
 
 ### Invariant verification matrix
 
@@ -319,6 +386,16 @@ This validates:
 6. receipt-policy mutation does not alter canonical truth fields
 7. parser-stable whitespace normalization (trailing spaces, blank lines)
 8. structural mutation sensitivity (payload/order/scope/property changes)
+
+Coreform-chain verifier:
+
+```bash
+make verify-coreform-chain
+```
+
+This validates single-root linked-chain authority, mandatory stage order,
+deterministic address bindings, and deterministic `.logic -> canonical ->
+render_packet -> svg` derivation.
 
 ### Local validation
 

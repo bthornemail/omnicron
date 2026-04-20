@@ -17,6 +17,13 @@ org text
 
 Contract version: `bridge_contract_v0_1`.
 
+Coreform authority note (bitboards lane):
+
+```text
+polyform/bitboards .logic composer terms are authoritative for coreform construction.
+NDJSON records are witness serialization only.
+```
+
 ## 1) `org_structural_record` (structural front pass)
 
 Produced by tree-sitter query results. This layer is syntax and addressability
@@ -107,7 +114,15 @@ Fields:
 5. host/view layers are projections only and cannot alter artifact semantics.
 6. `step_identity` SHALL be sufficient to derive address seed and both address
    forms without projection-specific semantics.
-7. `canonical_artifact` SHALL be derivable from `resolved_org_block` alone.
+7. In the org lane, `canonical_artifact` SHALL be derivable from
+   `resolved_org_block` alone.
+8. `render_packet` SHALL be derivable from `canonical_artifact` alone.
+9. Projection backends (SVG/WebGL/OpenGL) SHALL NOT alter canonical authority.
+10. Viewer interaction SHALL NOT mutate canonical/replay truth fields.
+11. Coreform fields SHALL originate from constitutional composer terms, not
+    serialization convenience.
+12. In the bitboards lane, `canonical_artifact` MAY be derived directly from
+    `.logic` coreform authority (without org structural/resolved stages).
 
 ## Authority Classification Table
 
@@ -218,4 +233,22 @@ typedef struct {
 {"type":"org_structural_record","file_path":"prolog/omnicron-rule-source.org","headline_path":["OMICRON","CONTROL"],"headline_level":2,"block_kind":"src","block_language":"prolog","block_name":"control_header","byte_span":{"start":1024,"end":1210},"line_span":{"start":44,"end":67},"structural_fingerprint":"..."}
 {"type":"resolved_org_block","step_identity":"...","address_seed":"...","virtual_address":"...","balanced_address":"...","receipt_anchor":"...","source_file":"prolog/omnicron-rule-source.extracted.logic","source_directory":"prolog","artifact_role":"logic_fact_block","language_surface":"prolog","semantic_fingerprint":"..."}
 {"type":"canonical_artifact","artifact_id":"...","artifact_hash":"...","artifact_kind":"prolog_fact_set","payload_kind":"logic_text","producer_step_identity":"...","content_path":"prolog/omnicron-rule-source.extracted.logic","content_sha256":"...","content_bytes":73378,"canonical_payload":"...","replay_stage":"emit"}
+```
+
+## Projection Rule (Normative)
+
+```text
+canonical_artifact -> render_packet -> viewer backends
+```
+
+Where:
+
+- `canonical_artifact` is authoritative.
+- `render_packet` is a derived witness for projection.
+- viewers are non-authoritative display surfaces.
+
+Bitboards coreform lane:
+
+```text
+coreform_chain.logic -> canonical_artifact -> render_packet -> viewer backends
 ```
