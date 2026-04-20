@@ -20,6 +20,8 @@ POLYLOG := polylog
 POLYLOG_SRC := prolog/polylog.c
 
 .PHONY: all clean test test-polylog test-polylog-bootstrap test-rule-source verify-bridge-replay bitboards graph-bitboards deterministic
+VIEWER_BIN := omnicron_viewer
+VIEWER_SRC := viewer/omnicron_viewer.c
 
 all: $(TARGET)
 
@@ -52,6 +54,20 @@ test-polylog-bootstrap: $(POLYLOG)
 test-rule-source: $(POLYLOG)
 	./prolog/run_rule_source.sh
 
+$(VIEWER_BIN): $(VIEWER_SRC)
+	@if ! command -v pkg-config >/dev/null 2>&1; then \
+		echo "ERROR: pkg-config not found (needed for glfw3 detection)." >&2; \
+		exit 2; \
+	fi
+	@if ! pkg-config --exists glfw3; then \
+		echo "ERROR: glfw3 development package not found (pkg-config glfw3)." >&2; \
+		echo "Install GLFW dev libs, then run: make omnicron-viewer" >&2; \
+		exit 2; \
+	fi
+	$(CC) $(CFLAGS) -o $(VIEWER_BIN) $(VIEWER_SRC) $$(pkg-config --cflags --libs glfw3) -lGL -lm $(LDFLAGS)
+
+omnicron-viewer: $(VIEWER_BIN)
+
 verify-bridge-replay: $(POLYLOG)
 	chmod +x ./prolog/verify_bridge_fact_equivalence.sh
 	./prolog/verify_bridge_fact_equivalence.sh
@@ -71,4 +87,4 @@ deterministic: $(POLYLOG)
 	./prolog/deterministic_replay.sh
 
 clean:
-	rm -f $(TARGET) $(POLYLOG) /tmp/logic-interp.sexpr.out /tmp/logic-interp.prolog.out /tmp/polylog.fact.out /tmp/polylog.rule.out /tmp/polylog.bootstrap.out
+	rm -f $(TARGET) $(POLYLOG) $(VIEWER_BIN) /tmp/logic-interp.sexpr.out /tmp/logic-interp.prolog.out /tmp/polylog.fact.out /tmp/polylog.rule.out /tmp/polylog.bootstrap.out

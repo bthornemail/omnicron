@@ -255,6 +255,46 @@ node scripts/org_canonical_to_replay_input.mjs \
 
 This is the bridge-to-runtime handoff surface used by the replay harness.
 
+### Projection adapter (canonical -> render packet -> SVG)
+
+Projection is downstream-only: render packets are derived from canonical
+artifacts and carry no authority over replay truth.
+
+Render packet schema:
+
+- `schema/render_packet.schema.json`
+
+Generate projection packets:
+
+```bash
+node scripts/org_canonical_to_render_packet_ndjson.mjs \
+  /tmp/org_canonical.ndjson \
+  /tmp/render_packet.ndjson
+```
+
+Render first packet to SVG:
+
+```bash
+node scripts/org_render_packet_to_svg.mjs \
+  /tmp/render_packet.ndjson \
+  /tmp/render_packet.svg
+```
+
+This defines the minimal downstream lane:
+
+```text
+canonical_artifact -> render_packet -> SVG/WebGL/OpenGL adapters
+```
+
+Native OpenGL backend (GLFW + OpenGL 3.3 core):
+
+```bash
+make omnicron-viewer
+./omnicron_viewer /tmp/render_packet.ndjson
+```
+
+The native viewer is projection-only and consumes `render_packet` directly.
+
 ### Invariant verification matrix
 
 Run the bridge authority-boundary checks:

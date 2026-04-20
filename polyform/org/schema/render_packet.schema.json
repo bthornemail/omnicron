@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://omnicron.local/polyform/org/schema/render_packet.schema.json",
+  "title": "Render Packet Schema",
+  "description": "Projection-only packet derived from canonical artifacts.",
+  "type": "object",
+  "required": [
+    "type",
+    "schema_version",
+    "frame_id",
+    "source_artifact_id",
+    "source_artifact_hash",
+    "primitive_type",
+    "width",
+    "height",
+    "cell_size",
+    "positions",
+    "colors",
+    "indices",
+    "uvs",
+    "transforms",
+    "labels",
+    "overlay_flags"
+  ],
+  "properties": {
+    "type": { "const": "render_packet" },
+    "schema_version": { "type": "string" },
+    "frame_id": { "type": "string" },
+    "source_artifact_id": { "type": "string" },
+    "source_artifact_hash": { "type": "string" },
+    "primitive_type": {
+      "type": "string",
+      "enum": ["rect_grid"]
+    },
+    "width": { "type": "integer", "minimum": 0 },
+    "height": { "type": "integer", "minimum": 0 },
+    "cell_size": { "type": "integer", "minimum": 1 },
+    "positions": {
+      "type": "array",
+      "items": { "type": "number" }
+    },
+    "colors": {
+      "type": "array",
+      "items": { "type": "number", "minimum": 0, "maximum": 1 }
+    },
+    "indices": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 0 }
+    },
+    "uvs": {
+      "type": "array",
+      "items": { "type": "number" }
+    },
+    "transforms": {
+      "type": "array",
+      "items": { "type": "number" }
+    },
+    "labels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "x", "y"],
+        "properties": {
+          "text": { "type": "string" },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "fill": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "overlay_flags": {
+      "type": "object",
+      "required": ["show_grid", "show_labels", "show_addresses"],
+      "properties": {
+        "show_grid": { "type": "boolean" },
+        "show_labels": { "type": "boolean" },
+        "show_addresses": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
