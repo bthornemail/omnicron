@@ -872,7 +872,7 @@ polyform_polynomial_mapping(polyform_symmetry_class, polynomial_property_class).
 % bare-metal comments and `CONSTITUTION.md`.
 % Possibility Order
 % Incidence Order
-% Closure Order  
+% Closure Order
 % ============================================================
 % LAYER NULL: ALGEBRAIC OPERATOR SANITY
 % ============================================================
@@ -955,7 +955,7 @@ covers(A, B) :- slot(A, P, _), slot(B, P, _).
 % now computing what follows from it.
 % CHR rules for reflexivity, antisymmetry, transitivity
 % These are the relational equivalents of structural invariants.
-% Idempotence and uniqueness  
+% Idempotence and uniqueness
 % Position ordering
 % Join associativity
 % Segment merge
