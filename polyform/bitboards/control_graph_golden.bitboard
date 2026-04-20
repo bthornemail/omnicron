@@ -1,15 +1,15 @@
 # CONTROL GRAPH GOLDEN BITBOARD
 # Generated from: /root/omnicron/prolog/omnicron-rule-source.extracted.logic
-# Edge count: 776
+# Edge count: 886
 # Width bits: 256
 WORD_0=0xDFFFF7FF
 WORD_1=0xBFFFFFFF
 WORD_2=0xFFFFFFFD
 WORD_3=0xFFFF7FFE
 WORD_4=0xFFFDFFFF
-WORD_5=0xEFFFFFFF
+WORD_5=0xFFFFFFFF
 WORD_6=0xFFFFFDFF
-WORD_7=0xFFFEFEFF
+WORD_7=0xFFFFFEFF
 GRID_16x16:
 ###########.####
 #############.##
@@ -22,8 +22,8 @@ GRID_16x16:
 ################
 #.##############
 ################
-############.###
+################
 #########.######
 ################
 ########.#######
-.###############
+################

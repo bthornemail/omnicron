@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://omnicron.local/polyform/org/schema/org_bridge.schema.json",
+  "title": "Org Bridge Schema",
+  "description": "Structural -> semantic -> canonical artifact bridge for org processing.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/org_structural_record" },
+    { "$ref": "#/$defs/resolved_org_block" },
+    { "$ref": "#/$defs/canonical_artifact" }
+  ],
+  "$defs": {
+    "span": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "org_structural_record": {
+      "type": "object",
+      "required": [
+        "type",
+        "schema_version",
+        "file_path",
+        "headline_path",
+        "headline_level",
+        "block_kind",
+        "block_language",
+        "byte_span",
+        "line_span",
+        "structural_fingerprint",
+        "local_order",
+        "payload_hash"
+      ],
+      "properties": {
+        "type": { "const": "org_structural_record" },
+        "schema_version": { "type": "string" },
+        "file_path": { "type": "string" },
+        "document_id": { "type": "string" },
+        "headline_path": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "headline_level": { "type": "integer", "minimum": 0 },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "properties_local": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "directives_local": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "block_kind": { "type": "string" },
+        "block_language": { "type": "string" },
+        "block_name": { "type": "string" },
+        "block_body": { "type": "string" },
+        "byte_span": { "$ref": "#/$defs/span" },
+        "line_span": { "$ref": "#/$defs/span" },
+        "structural_fingerprint": { "type": "string" },
+        "local_order": { "type": "integer", "minimum": 0 },
+        "payload_hash": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "resolved_org_block": {
+      "type": "object",
+      "required": [
+        "type",
+        "schema_version",
+        "step_identity",
+        "address_seed",
+        "virtual_address",
+        "balanced_address",
+        "receipt_anchor",
+        "source_file",
+        "source_directory",
+        "artifact_role",
+        "language_surface",
+        "canonical_payload",
+        "semantic_fingerprint"
+      ],
+      "properties": {
+        "type": { "const": "resolved_org_block" },
+        "schema_version": { "type": "string" },
+        "source": {
+          "type": "object",
+          "required": ["file_path", "headline_path", "byte_span"],
+          "properties": {
+            "file_path": { "type": "string" },
+            "headline_path": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "byte_span": { "$ref": "#/$defs/span" }
+          },
+          "additionalProperties": false
+        },
+        "step_identity": { "type": "string" },
+        "address_seed": { "type": "string" },
+        "virtual_address": { "type": "string" },
+        "balanced_address": { "type": "string" },
+        "receipt_anchor": { "type": "string" },
+        "inherited_context": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "properties_resolved": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "source_file": { "type": "string" },
+        "source_directory": { "type": "string" },
+        "artifact_role": { "type": "string" },
+        "language_surface": { "type": "string" },
+        "canonical_payload": { "type": "string" },
+        "compile_policy": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "boolean", "number"] }
+        },
+        "receipt_requirements": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "boolean", "number"] }
+        },
+        "semantic_fingerprint": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "canonical_artifact": {
+      "type": "object",
+      "required": [
+        "type",
+        "schema_version",
+        "artifact_id",
+        "artifact_hash",
+        "artifact_kind",
+        "payload_kind",
+        "producer_step_identity",
+        "address_seed",
+        "virtual_address",
+        "balanced_address",
+        "receipt_anchor",
+        "content_path",
+        "content_sha256",
+        "content_bytes",
+        "canonical_payload",
+        "projection_hints",
+        "provenance",
+        "replay_stage"
+      ],
+      "properties": {
+        "type": { "const": "canonical_artifact" },
+        "schema_version": { "type": "string" },
+        "artifact_id": { "type": "string" },
+        "artifact_hash": { "type": "string" },
+        "artifact_kind": {
+          "type": "string",
+          "enum": [
+            "prolog_fact_set",
+            "sexpr_payload",
+            "mexpr_payload",
+            "fexpr_payload",
+            "c_fragment",
+            "bitboard",
+            "pgm",
+            "svg",
+            "ndjson_receipt"
+          ]
+        },
+        "payload_kind": { "type": "string" },
+        "producer_step_identity": { "type": "string" },
+        "address_seed": { "type": "string" },
+        "virtual_address": { "type": "string" },
+        "balanced_address": { "type": "string" },
+        "receipt_anchor": { "type": "string" },
+        "content_path": { "type": "string" },
+        "content_sha256": { "type": "string" },
+        "content_bytes": { "type": "integer", "minimum": 0 },
+        "canonical_payload": { "type": "string" },
+        "projection_hints": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "boolean", "number"] }
+        },
+        "provenance": {
+          "type": "object",
+          "required": ["derived_from", "semantic_fingerprint", "resolver_version"],
+          "properties": {
+            "derived_from": { "const": "resolved_org_block" },
+            "semantic_fingerprint": { "type": "string" },
+            "resolver_version": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "replay_stage": {
+          "type": "string",
+          "enum": ["extract", "compile", "emit", "receipt"]
+        },
+        "receipt": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

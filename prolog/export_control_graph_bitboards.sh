@@ -731,6 +731,131 @@ awk '
     n = split(s, a, /,[[:space:]]*/);
     if (n >= 2) printf("projection_compromise:%s->%s\n", a[1], a[2]);
   }
+  /^gl_atomic_counter_rule\(/ {
+    s = $0; sub(/^gl_atomic_counter_rule\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("gl_atomic:%s->%s\n", a[1], a[2]);
+  }
+  /^gl_debug_rule\(/ {
+    s = $0; sub(/^gl_debug_rule\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("gl_debug:%s->%s\n", a[1], a[2]);
+  }
+  /^uss16k_rule\(/ {
+    s = $0; sub(/^uss16k_rule\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("uss16k:%s->%s\n", a[1], a[2]);
+  }
+  /^code16k_constitutional_role\(/ {
+    s = $0; sub(/^code16k_constitutional_role\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("code16k_role:%s->%s\n", a[1], a[2]);
+  }
+  /^code16k_zero_state\(/ {
+    s = $0; sub(/^code16k_zero_state\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("code16k_zero:%s->%s\n", a[1], a[2]);
+  }
+  /^code16k_carrier_derivation\(/ {
+    s = $0; sub(/^code16k_carrier_derivation\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("code16k_carrier:%s->%s\n", a[1], a[2]);
+  }
+  /^derive_carrier\(/ {
+    s = $0; sub(/^derive_carrier\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("derive_carrier:%s->%s\n", a[1], a[2]);
+  }
+  /^webgl_buffer_binding_rule\(/ {
+    s = $0; sub(/^webgl_buffer_binding_rule\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 1) printf("webgl_binding:%s\n", a[1]);
+  }
+  /^gl_zero_field_rule\(/ {
+    s = $0; sub(/^gl_zero_field_rule\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 1) printf("gl_zero_field:%s\n", a[1]);
+  }
+  /^omicron_layer_split\(/ {
+    s = $0; sub(/^omicron_layer_split\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("omicron_split:%s->%s\n", a[1], a[2]);
+  }
+  /^omicron_layer_split_binding\(/ {
+    s = $0; sub(/^omicron_layer_split_binding\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("omicron_split_bind:%s->%s\n", a[1], a[2]);
+  }
+  /^code16k_controller_rule\(/ {
+    s = $0; sub(/^code16k_controller_rule\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("code16k_kernel:%s->%s\n", a[1], a[2]);
+  }
+  /^constitutional_order_tier\(/ {
+    s = $0; sub(/^constitutional_order_tier\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 3) printf("foundation_tier:%s->%s:%s\n", a[1], a[2], a[3]);
+  }
+  /^monoid_structure\(/ {
+    s = $0; sub(/^monoid_structure\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("monoid_structure:%s->%s\n", a[1], a[2]);
+  }
+  /^monoid_identity_law\(/ {
+    s = $0; sub(/^monoid_identity_law\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("monoid_identity:%s->%s\n", a[1], a[2]);
+  }
+  /^zeroary_logic_constant\(/ {
+    s = $0; sub(/^zeroary_logic_constant\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 1) printf("zeroary_constant:%s\n", a[1]);
+  }
+  /^foundation_transition\(/ {
+    s = $0; sub(/^foundation_transition\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 3) printf("foundation_transition:%s->%s:%s\n", a[1], a[2], a[3]);
+  }
+  /^zonoid_generation\(/ {
+    s = $0; sub(/^zonoid_generation\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 3) printf("zonoid_generation:%s:%s:%s\n", a[1], a[2], a[3]);
+  }
+  /^foundation_example\(/ {
+    s = $0; sub(/^foundation_example\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("foundation_example:%s->%s\n", a[1], a[2]);
+  }
+  /^zero_distinction\(/ {
+    s = $0; sub(/^zero_distinction\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("zero_distinction:%s->%s\n", a[1], a[2]);
+  }
+  /^formal_foundation_statement\(/ {
+    s = $0; sub(/^formal_foundation_statement\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 1) printf("foundation_statement:%s\n", a[1]);
+  }
+  /^artifact_contract_split\(/ {
+    s = $0; sub(/^artifact_contract_split\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("artifact_split:%s->%s\n", a[1], a[2]);
+  }
+  /^artifact_contract_format\(/ {
+    s = $0; sub(/^artifact_contract_format\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("artifact_format:%s->%s\n", a[1], a[2]);
+  }
+  /^artifact_contract_chain\(/ {
+    s = $0; sub(/^artifact_contract_chain\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 5) printf("artifact_chain:%s->%s->%s->%s->%s\n", a[1], a[2], a[3], a[4], a[5]);
+  }
+  /^artifact_contract_property\(/ {
+    s = $0; sub(/^artifact_contract_property\(/, "", s); sub(/\)\.$/, "", s);
+    n = split(s, a, /,[[:space:]]*/);
+    if (n >= 2) printf("artifact_property:%s->%s\n", a[1], a[2]);
+  }
 ' "$INPUT_FILE" | sort -u > "$CORE_FILE"
 
 # Aegean overlay edges.

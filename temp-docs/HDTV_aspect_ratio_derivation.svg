@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="-1850 -1050 4224 6336">
+ <title>HDTV aspect ratio derivation</title>
+ <desc>Derivation of 16:9 aspect ratio used in high-definition television by CMG Lee. The upper figure shows rectangles with aspect ratios 4:3 (blue), 5:3 (cyan), 1.85 (green), 2.2 (yellow) and 2.35 (red) with the same area ''A'', and rectangles with aspect ratio 16:9 that covers (black) or is common to (grey) all the previous rectangles. The lower figure shows how this aspect ratio is obtained by considering the two most extreme rectangles. ''m'' and ''n'' are multipliers to maintain their respective aspect ratios and areas.</desc>
+ <style type="text/css">
+  #main  { font-family:Helvetica,Arial,sans-serif; font-size:280px; text-anchor:middle;
+           fill:#000000; stroke-width:16; stroke-linecap:round; stroke:#000000; }
+  text   { stroke:none; cursor:default; }
+  .rect  { filter:url(#filter_outline); }
+ </style>
+ <defs>
+  <filter id="filter_glow">
+   <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+   <feColorMatrix type="matrix" values="0,0,0,0,1 0,0,0,0,1 0,0,0,0,1 0,0,0,8,0"/>
+   <feBlend in="SourceGraphic"/>
+  </filter>
+  <filter id="filter_outline">
+   <feGaussianBlur stdDeviation="20" result="blur"/>
+   <feMorphology in="blur" operator="erode" radius="10" result="erode"/>
+   <feComposite operator="out" in="SourceGraphic" in2="erode"/>
+  </filter>
+  <rect id="rect_4_3"   class="rect" x="-1333" y="-1000" width="2667" height="2000" rx="9" ry="9" fill="#0000ff"/>
+  <rect id="rect_5_3"   class="rect" x="-1667" y="-1000" width="3333" height="2000" rx="9" ry="9" fill="#00ccff" transform="scale(0.89443)"/>
+  <rect id="rect_37_20" class="rect" x="-1850" y="-1000" width="3700" height="2000" rx="9" ry="9" fill="#00cc00" transform="scale(0.84895)"/>
+  <rect id="rect_11_5"  class="rect" x="-2200" y="-1000" width="4400" height="2000" rx="9" ry="9" fill="#ff9900" transform="scale(0.77850)"/>
+  <rect id="rect_47_20" class="rect" x="-2350" y="-1000" width="4700" height="2000" rx="9" ry="9" fill="#ff0000" transform="scale(0.75324)"/>
+  <rect id="rect_16_9"               x="-1778" y="-1000" width="3556" height="2000" rx="9" ry="9"/>
+  <g id="rects" fill="none" stroke="none">
+   <use xlink:href="#rect_47_20"/>
+   <use xlink:href="#rect_4_3"  />
+   <use xlink:href="#rect_16_9" stroke="#000000"/>
+   <use xlink:href="#rect_16_9" fill="#cccccc" fill-opacity="0.75" transform="scale(0.75)"/>
+  </g>
+ </defs>
+ <circle cx="0" cy="0" r="99999" fill="#ffffff"/>
+ <g id="main">
+  <g fill="none" stroke="none">
+   <use xlink:href="#rect_11_5" />
+   <use xlink:href="#rect_37_20"/>
+   <use xlink:href="#rect_5_3"  />
+   <use xlink:href="#rects" stroke-dasharray="6,32"/>
+  </g>
+  <g text-anchor="start" filter="url(#filter_glow)">
+   <text transform="translate(1760,-850)" y="0.6ex" fill="#000000">16:9</text>
+   <text transform="translate(1340,-550)" y="0.6ex" fill="#0000ff">4:3</text>
+   <text transform="translate(1480,-200)" y="0.6ex" fill="#00ccff">5:3</text>
+   <text transform="translate(1540, 150)" y="0.6ex" fill="#00cc00">1.85</text>
+   <text transform="translate(1710, 500)" y="0.6ex" fill="#ff9900">2.20</text>
+   <text transform="translate(1760, 850)" y="0.6ex" fill="#ff0000">2.35</text>
+   <text text-anchor="middle"             y="0.6ex" fill="#999999">16:9</text>
+  </g>
+  <g transform="translate(-1750,1180)">
+   <g transform="translate(3100,450)">
+    <use transform="scale(0.5)" xlink:href="#rects" stroke-width="32" stroke-dasharray="12,64"/>
+    <text y="0.6ex" text-anchor="start" fill="#0000ff"
+     ><tspan x="-650">3</tspan
+     ><tspan font-style="italic">m</tspan
+     ><tspan x="-1ex" y="-250">4</tspan
+     ><tspan font-style="italic">m</tspan
+     ></text>
+    <text y="0.6ex" text-anchor="end" fill="#ff0000"
+     ><tspan x="850" font-style="italic">n</tspan
+     ><tspan x="3.5ex" y="350">2.35</tspan
+     ><tspan font-style="italic">n</tspan
+     ></text>
+   </g>
+   <text y="0.6ex" text-anchor="start"
+    ><tspan>4</tspan
+    ><tspan font-style="italic">m</tspan
+    ><tspan>&#160;&#215; 3</tspan
+    ><tspan font-style="italic">m</tspan
+    ><tspan>&#160;=&#160;</tspan
+    ><tspan font-style="italic">A</tspan
+
+    ><tspan x="0" dy="2ex">&#8756;</tspan
+    ><tspan x="1.8ex" font-style="italic">m</tspan
+    ><tspan>&#160;=&#160;&#8730;(</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 12)</tspan
+
+    ><tspan x="0" dy="2.5ex">2.35</tspan
+    ><tspan font-style="italic">n</tspan
+    ><tspan>&#160;&#215;&#160;</tspan
+    ><tspan font-style="italic">n</tspan
+    ><tspan>&#160;=&#160;</tspan
+    ><tspan font-style="italic">A</tspan
+
+    ><tspan x="0" dy="2ex">&#8756;</tspan
+    ><tspan x="1.8ex" font-style="italic">n</tspan
+    ><tspan>&#160;=&#160;&#8730;(</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 2.35)</tspan
+
+    ><tspan x="0" dy="2.5ex">Aspect ratio of inner rectangle</tspan
+
+    ><tspan x="0" dy="3ex">=</tspan
+    ><tspan x="2ex" dy="-1ex">4</tspan
+    ><tspan font-style="italic">m</tspan
+    ><tspan x="1.7ex">___</tspan
+    ><tspan x="3ex" dy="2ex" font-style="italic">n</tspan
+    ><tspan x="5.5ex" dy="-1ex">=</tspan
+    ><tspan x="7.5ex" dy="-1ex">4&#8730;(</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 12)</tspan
+    ><tspan x="7.2ex">________</tspan
+    ><tspan x="7ex" dy="2ex">&#8730;(</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 2.35)</tspan
+    ><tspan x="16.2ex" dy="-1ex">=</tspan
+    ><tspan x="18.5ex" dy="-1ex">&#8730;(4</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 3)</tspan
+    ><tspan x="17.7ex">________</tspan
+    ><tspan x="17.5ex" dy="2ex">&#8730;(</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 2.35)</tspan
+
+    ><tspan x="0" dy="3ex">=&#8730;</tspan
+    ><tspan x="2.5ex" dy="-1ex">4 &#215; 235</tspan
+    ><tspan x="2.5ex">______</tspan
+    ><tspan x="2.5ex" dy="2ex">3 &#215; 100</tspan
+    ><tspan x="9.5ex" dy="-1ex">=&#8730;</tspan
+    ><tspan x="12ex" dy="-1ex">47</tspan
+    ><tspan x="12ex">__</tspan
+    ><tspan x="12ex" dy="2ex">15</tspan
+    ><tspan x="14.8ex" dy="-1ex">~</tspan
+    ><tspan x="16.2ex">1.7701</tspan
+    ><tspan x="22.4ex">~</tspan
+    ><tspan x="24ex" dy="-1ex">16</tspan
+    ><tspan x="24.1ex">__</tspan
+    ><tspan x="24.7ex" dy="2ex">9</tspan
+
+    ><tspan x="0" dy="2.5ex">Aspect ratio of outer rectangle</tspan
+
+    ><tspan x="0" dy="3ex">=</tspan
+    ><tspan x="2ex" dy="-1ex">2.35</tspan
+    ><tspan font-style="italic">n</tspan
+    ><tspan x="1.7ex">_____</tspan
+    ><tspan x="3ex" dy="2ex">3</tspan
+    ><tspan font-style="italic">m</tspan
+    ><tspan x="8ex" dy="-1ex">=</tspan
+    ><tspan x="10ex" dy="-1ex">2.35</tspan
+    ><tspan x="14ex">&#8730;(</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 2.35)</tspan
+    ><tspan x="10ex">____________</tspan
+    ><tspan x="12ex" dy="2ex">3</tspan
+    ><tspan x="14ex">&#8730;(</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 12)</tspan
+
+    ><tspan x="0" dy="3ex">=</tspan
+    ><tspan x="1ex" dy="-1ex">&#8730;(2.35</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>)</tspan
+    ><tspan x="1.5ex">______</tspan
+    ><tspan x="1ex" dy="2ex">&#8730;(3</tspan
+    ><tspan font-style="italic">A</tspan
+    ><tspan>&#160;/ 4)</tspan
+    ><tspan x="8.5ex" dy="-1ex">=&#8730;</tspan
+    ><tspan x="10.8ex" dy="-1ex">235 &#215; 4</tspan
+    ><tspan x="10.8ex">______</tspan
+    ><tspan x="10.8ex" dy="2ex">100 &#215; 3</tspan
+    ><tspan x="17.7ex" dy="-1ex">=&#8730;</tspan
+    ><tspan x="20ex" dy="-1ex">47</tspan
+    ><tspan x="20ex">__</tspan
+    ><tspan x="20ex" dy="2ex">15</tspan
+    ><tspan x="22.5ex" dy="-1ex">~</tspan
+    ><tspan x="24ex" dy="-1ex">16</tspan
+    ><tspan x="24.1ex">__</tspan
+    ><tspan x="24.7ex" dy="2ex">9</tspan
+    ></text>
+  </g>
+ </g>
+</svg>

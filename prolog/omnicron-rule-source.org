@@ -784,6 +784,135 @@ header_bitfield_mapping(signed_bits_2, selects_twos_ones_signmag_or_bias_frame).
 projection_compromise_rule(aspect_ratio_16_9, reconciliation_surface_for_multiple_formats).
 projection_compromise_rule(geometric_mean_of_extremes_principle, compromise_selection_method).
 
+gl_atomic_counter_rule(arb_shader_atomic_counters_extension, gl_arb_shader_atomic_counters).
+gl_atomic_counter_rule(target_atomic_counter_buffer, hex_92c0).
+gl_atomic_counter_rule(binding_atomic_counter_buffer_binding, hex_92c1).
+gl_atomic_counter_rule(counter_storage_in_buffer_objects, enabled).
+gl_atomic_counter_rule(uniform_atomic_counter_not_set_by_uniform_calls, true).
+gl_atomic_counter_rule(active_atomic_counter_buffers_queryable, true).
+gl_atomic_counter_rule(bindbufferbase_bindbufferrange_for_counter_buffers, true).
+
+gl_debug_rule(khr_debug_extension, gl_khr_debug).
+gl_debug_rule(debug_message_callback_supported, true).
+gl_debug_rule(debug_message_log_retrieval_supported, true).
+gl_debug_rule(debug_groups_push_pop_supported, true).
+gl_debug_rule(object_labeling_supported, true).
+gl_debug_rule(message_dimensions_source_type_id_severity, defined).
+gl_debug_rule(context_debug_flag_controls_output_volume, true).
+
+uss16k_rule(code16k_rows_min, value_2).
+uss16k_rule(code16k_rows_max, value_16).
+uss16k_rule(code16k_ascii_capacity_max, value_77).
+uss16k_rule(code16k_numeric_capacity_max, value_154).
+uss16k_rule(code16k_check_characters, value_2_modulo_107).
+uss16k_rule(code16k_starting_mode_count, value_7).
+uss16k_rule(code16k_symbol_characters_per_row, value_5_data_slots_plus_start_stop).
+uss16k_rule(code16k_symbol_character_total, value_107).
+uss16k_rule(code16k_symbol_character_modules, value_11).
+uss16k_rule(code16k_code_sets, sets_a_b_c).
+uss16k_rule(code16k_mode_formula, s_equals_7_times_r_minus_2_plus_m).
+uss16k_rule(code16k_row_separator_height_modules, value_1).
+uss16k_rule(code16k_uses_code128_pattern_family, true).
+uss16k_rule(code16k_control_machine_shape, small_finite_mode_automaton).
+uss16k_rule(code16k_control_machine_inputs, current_mode_plus_short_lookahead_plus_local_shift_decision).
+uss16k_rule(code16k_mode_switch_policy, switch_only_when_local_symbol_cost_justified).
+
+code16k_constitutional_role(code16k, initialized_neutral_reference_field).
+code16k_constitutional_role(code16k, zero_state_logical_codebook).
+code16k_constitutional_role(code16k, non_polymorphic_gl_buffer_contract).
+code16k_constitutional_role(code16k, framebuffer_completeness_anchor).
+code16k_zero_state(code16k, initialized).
+code16k_zero_state(code16k, neutral).
+code16k_zero_state(code16k, reference_field).
+code16k_zero_state(code16k, not_polymorphic_gl_buffer).
+
+code16k_carrier_derivation(code16k, aztec_vertex_projection).
+code16k_carrier_derivation(code16k, maxicode_texture_projection).
+code16k_carrier_derivation(code16k, beecode_witness_projection).
+derive_carrier(code16k, aztec_vertex).
+derive_carrier(code16k, maxicode_texture).
+derive_carrier(code16k, beecode_witness).
+
+webgl_buffer_binding_rule(first_bind_locks_target_array_or_element_array).
+webgl_buffer_binding_rule(rebinding_across_array_and_element_targets_invalid_operation).
+webgl_buffer_binding_rule(polymorphic_single_buffer_role_not_allowed).
+
+gl_zero_field_rule(resource_without_user_data_initialized_to_zero).
+gl_zero_field_rule(default_draw_buffer_color_clear_0_0_0_0).
+gl_zero_field_rule(default_draw_buffer_depth_clear_1_0).
+gl_zero_field_rule(default_draw_buffer_stencil_clear_0).
+
+omicron_layer_split(constitutional_body, slots_60).
+omicron_layer_split(encoding_controller_face, slots_16).
+omicron_layer_split(bootstrap_kernel, counters_6).
+omicron_layer_split_binding(code16k_logic, prefer_slots_16).
+omicron_layer_split_binding(full_omicron_instrument, prefer_slots_60).
+omicron_layer_split_binding(minimal_live_encoder_kernel, prefer_counters_6).
+
+code16k_controller_rule(kernel_counter_1, current_code_set).
+code16k_controller_rule(kernel_counter_2, shift_depth).
+code16k_controller_rule(kernel_counter_3, numeric_run_length).
+code16k_controller_rule(kernel_counter_4, class_channel_state).
+code16k_controller_rule(kernel_counter_5, output_position).
+code16k_controller_rule(kernel_counter_6, error_or_conflict_status).
+
+constitutional_order_tier(0, monoid, lawful_identity_and_composition).
+constitutional_order_tier(1, zonoid, continuous_generated_body).
+constitutional_order_tier(2, polyform, discrete_sampled_witness).
+constitutional_order_tier(3, carrier, encoded_transport_surface).
+constitutional_order_tier(4, projection, human_visible_reading).
+
+monoid_structure(monoid, carrier_set_m).
+monoid_structure(monoid, associative_composition_operator).
+monoid_structure(monoid, identity_element_e).
+monoid_identity_law(left_identity, e_compose_x_equals_x).
+monoid_identity_law(right_identity, x_compose_e_equals_x).
+monoid_identity_law(associativity, x_compose_y_compose_z_grouping_invariant).
+
+zeroary_logic_constant(true_constant).
+zeroary_logic_constant(false_constant).
+zeroary_logic_constant(identity_constant).
+zeroary_logic_constant(null_origin_constant).
+
+foundation_transition(monoid, zonoid, continuous_composition_of_generators).
+zonoid_generation(generator_segments, minkowski_sum_accumulation, centrally_symmetric_body).
+zonoid_generation(generator_set, projection_closure, reachable_state_region).
+foundation_transition(zonoid, polyform, lattice_sampling_and_tiling).
+foundation_transition(polyform, carrier, encoding_surface_binding).
+foundation_transition(carrier, projection, reader_visible_projection_surface).
+
+foundation_example(monoid_layer, empty_stream_identity_epsilon).
+foundation_example(zonoid_layer, phase_manifold_from_repeated_clocks).
+foundation_example(polyform_layer, frame_witness_slots_60).
+
+zero_distinction(arithmetic_zero, quantity_value).
+zero_distinction(monoid_identity_zero_state, neutral_action).
+zero_distinction(identity_matrix, not_zero_matrix).
+zero_distinction(no_op_instruction, not_null_payload_data).
+
+formal_foundation_statement(polyform_presupposes_composition_law).
+formal_foundation_statement(composition_with_identity_is_monoidal).
+formal_foundation_statement(continuous_monoidal_accumulation_yields_zonoid_structure).
+formal_foundation_statement(discrete_sampling_of_zonoid_yields_polyform_structure).
+formal_foundation_statement(pipeline_compact_formula_monoid_to_zonoid_to_polyform_to_code).
+
+artifact_contract_split(guest, computes_canonical_state).
+artifact_contract_split(guest, derives_bitboards_polyforms_and_frame_cells).
+artifact_contract_split(guest, emits_deterministic_artifact_stream).
+artifact_contract_split(host, does_not_reinterpret_geometry_or_scene_semantics).
+artifact_contract_split(host, displays_or_copies_emitted_artifacts_only).
+
+artifact_contract_format(raster_witness, pgm_u8).
+artifact_contract_format(structural_witness, svg_geometry).
+artifact_contract_format(proof_witness, ndjson_receipts).
+artifact_contract_format(binary_witness, framed_binary_payload).
+artifact_contract_format(control_witness, bitboard_text).
+
+artifact_contract_chain(bytes, replay, frame_derivation, artifact_emission, display).
+artifact_contract_property(guest_authoritative_geometry, true).
+artifact_contract_property(host_dumb_mirror, true).
+artifact_contract_property(hashable_and_diffable_outputs, true).
+
 polyform_basis_degree(2, domino).
 polyform_basis_degree(3, tromino).
 polyform_basis_degree(4, tetromino).

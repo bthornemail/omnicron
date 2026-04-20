@@ -14,6 +14,9 @@ syntax. It is a prototype front end, not the ontology itself.
 `prolog/omnitron_pipeline.h` is the C interface for the lawful projection
 pipeline. It defines stage types, invariants, and projection signatures.
 
+`prolog/omnitron_artifact_contract.h` is the guest-to-host artifact interface
+for deterministic witness surfaces (PGM/SVG/NDJSON/framed binary).
+
 `prolog/omnitron_ddc_lexicon.h` is the two-graph DDC-style classification
 interface. It defines:
 - Graph A: term to canonical class number
@@ -69,6 +72,9 @@ Control-plane graph artifacts (bitboard-only):
 The executable `.org` layer keeps ASCII aliases for Aegean and DPD table facts;
 Unicode Aegean glyphs live in `.lx` declaration metadata.
 
+For software-rendering/no-SDL host mirroring, see:
+- `prolog/ARTIFACT_CONTRACT.md`
+
 ## The Ontology In One Line
 
 ```text
@@ -109,6 +115,27 @@ raw_binary_group_ordering
 This is modeled in both declaration and executable-source layers:
 - `prolog/omnitron_declarations.lx` as Lisp-like declarations
 - `prolog/omnicron-rule-source.org` as parser-safe Prolog facts/rules
+
+## Constitutional Foundation Ladder
+
+The current algebra-to-geometry stack is explicitly modeled as:
+
+```text
+Monoid -> Zonoid -> Polyform -> Carrier -> Projection
+```
+
+Interpretation:
+- Monoid: lawful identity and associative composition (`e * x = x * e = x`)
+- Zonoid: continuous generated body via lawful accumulation
+- Polyform: discrete sampled witness over lattice/cell surfaces
+- Carrier: encoded transport surface
+- Projection: human-visible/readable rendering
+
+This distinguishes arithmetic zero (quantity) from monoid identity
+(neutral action), which is critical for the `Code16k` zero-state contract.
+
+Extended narrative/design note:
+- `temp-docs/Omicron-Gnomon Computational Instrument.md`
 
 ## The Main Object Families
 
