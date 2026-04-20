@@ -32,6 +32,22 @@ function countNewlines(s) {
   return n;
 }
 
+function normalizeBodyForIdentity(payload) {
+  let lines = String(payload ?? "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+$/g, ""));
+  while (lines.length > 0 && lines[0] === "") {
+    lines.shift();
+  }
+  while (lines.length > 0 && lines[lines.length - 1] === "") {
+    lines.pop();
+  }
+  const s = lines.join("\n");
+  return s.endsWith("\n") ? s : `${s}\n`;
+}
+
 function lineOffsetsFromSource(source) {
   const lines = source.split("\n");
   const offsets = [];
@@ -216,7 +232,7 @@ for (let idx = 0; idx < sortedRows.length; idx += 1) {
     block_name: block.name || "",
     block_body: body,
     local_order: idx,
-    payload_hash: sha256Hex(body),
+    payload_hash: sha256Hex(normalizeBodyForIdentity(body)),
     byte_span: { start: byteStart, end: byteEnd },
     line_span: { start: lineStart, end: lineEnd },
     structural_fingerprint: fp

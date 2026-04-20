@@ -15,7 +15,18 @@ function sha256Hex(input) {
 }
 
 function normalizePayload(payload) {
-  const s = String(payload ?? "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  let lines = String(payload ?? "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+$/g, ""));
+  while (lines.length > 0 && lines[0] === "") {
+    lines.shift();
+  }
+  while (lines.length > 0 && lines[lines.length - 1] === "") {
+    lines.pop();
+  }
+  const s = lines.join("\n");
   return s.endsWith("\n") ? s : `${s}\n`;
 }
 
@@ -124,7 +135,6 @@ function deriveStepIdentity(rec, sourceFile, sourceDirectory) {
       rec.block_name || "",
       rec.payload_hash || sha256Hex(rec.block_body || ""),
       String(rec.local_order ?? 0),
-      JSON.stringify(rec.byte_span || {}),
       sourceFile || "",
       sourceDirectory || ""
     ].join("|")

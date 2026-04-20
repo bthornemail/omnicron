@@ -15,6 +15,8 @@ org text
 -> canonical_artifact (runtime/replay inputs)
 ```
 
+Contract version: `bridge_contract_v0_1`.
+
 ## 1) `org_structural_record` (structural front pass)
 
 Produced by tree-sitter query results. This layer is syntax and addressability
@@ -107,6 +109,36 @@ Fields:
    forms without projection-specific semantics.
 7. `canonical_artifact` SHALL be derivable from `resolved_org_block` alone.
 
+## Authority Classification Table
+
+### Authoritative inputs (affect canonical truth)
+
+- stable source path (current policy)
+- structural scope (`headline_path`, `headline_level`)
+- inherited authoritative properties
+- normalized payload bytes
+- local block order
+- routing witness fields:
+  - `address_seed`
+  - `virtual_address`
+  - `balanced_address`
+  - `receipt_anchor`
+
+### Non-authoritative inputs (must not affect canonical truth)
+
+- whitespace-only formatting noise
+- harmless trailing text outside captured executable structure
+- projection hints
+- receipt-policy options
+- display-only metadata
+- byte/line spans (locator-only, not truth-authoritative)
+
+## Path Sovereignty Policy
+
+Current policy: filesystem path is authoritative and participates in identity
+derivation. Renaming/moving a source file changes identity/routing unless a
+future logical-source-id policy supersedes path identity.
+
 ## Suggested `step_identity` Construction
 
 ```text
@@ -119,7 +151,6 @@ step_identity = sha256(
   + block_name
   + payload_hash
   + local_order
-  + byte_span
   + source_file/source_directory
 )
 ```
@@ -135,6 +166,39 @@ receipt_anchor = sha256("receipt|" + step_identity + "|" + address_seed)
 
 This keeps identity canonical while allowing multiple lawful address
 projections.
+
+### Address Range Parameters (Normative v0.1)
+
+`org_structural_to_resolved_ndjson.mjs` derives addresses with these exact
+constraints:
+
+- `lane = hex(address_seed[0..2]) mod 16`  -> `lane in [0,15]`
+- `channel = hex(address_seed[2..4]) mod 16` -> `channel in [0,15]`
+- `slot = hex(address_seed[4..8]) mod 60` -> `slot in [0,59]`
+- `page = hex(address_seed[8..16])` -> formatted as 8 hex chars
+- `raw_balance = hex(address_seed[16..24]) mod 8192`
+- `balanced_signed = raw_balance - 4096` -> `balanced_signed in [-4096,+4095]`
+- `chirality_bit = hex(address_seed[24..26]) & 0x1`
+- `chirality = "left"` when `chirality_bit = 0`; `"right"` when `chirality_bit = 1`
+
+Encoded forms:
+
+- `virtual_address = "va:<page_hex8>:<lane>.<channel>.<slot>"`
+- `balanced_address = "ba:<chirality>:<signed_int>"`
+
+### Truth Hash Formula (Normative v0.1)
+
+`org_resolved_to_canonical_ndjson.mjs` computes truth hashes as:
+
+```text
+artifact_id =
+SHA256(step_identity | address_seed | virtual_address | balanced_address | source_file | artifact_kind)
+
+artifact_hash =
+SHA256(artifact_id | content_sha256 | payload_kind | receipt_anchor | semantic_fingerprint)
+```
+
+Where `|` denotes literal string concatenation with pipe separators.
 
 ## C-Style Routing Shape (Reference)
 

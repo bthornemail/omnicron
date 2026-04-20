@@ -175,6 +175,9 @@ Bridge contract:
 
 - Human-readable spec: `ORG_BRIDGE_SCHEMA.md`
 - Machine-readable schema: `schema/org_bridge.schema.json`
+- Version: `bridge_contract_v0_1`
+- Frozen contract note: `BRIDGE_CONTRACT_v0_1.md`
+- Change discipline: `BRIDGE_CHANGE_POLICY.md`
 
 ### Adapter script (query -> structural NDJSON)
 
@@ -243,13 +246,22 @@ Run the bridge authority-boundary checks:
 npm run verify-bridge
 ```
 
+Validate frozen golden canonical hash:
+
+```bash
+npm run verify-bridge-golden
+```
+
 This validates:
 
 1. deterministic replay at canonical stage
 2. semantic-noise rejection for non-authoritative metadata
-3. routing witness mutation changes artifact identity
-4. projection hints are non-authoritative
-5. receipt-policy mutation does not alter canonical truth fields
+3. end-to-end upstream source-noise rejection
+4. routing witness mutation changes artifact identity
+5. projection hints are non-authoritative
+6. receipt-policy mutation does not alter canonical truth fields
+7. parser-stable whitespace normalization (trailing spaces, blank lines)
+8. structural mutation sensitivity (payload/order/scope/property changes)
 
 ### Local validation
 

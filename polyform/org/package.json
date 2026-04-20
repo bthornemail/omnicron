@@ -21,7 +21,8 @@
     "pre-build:upload": "prebuild --upload-all",
     "test": "tree-sitter test && script/parse-examples.sh",
     "test-windows": "tree-sitter test",
-    "verify-bridge": "node scripts/verify_bridge_invariants.mjs"
+    "verify-bridge": "node scripts/verify_bridge_invariants.mjs",
+    "verify-bridge-golden": "node scripts/verify_bridge_golden.mjs"
   },
   "repository": "https://github.com/milisims/tree-sitter-org",
   "author": "Emilia Simmons",

@@ -64,6 +64,13 @@ function main() {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "org-bridge-invariants-"));
   const orgInput = path.join(tempDir, "fixture.org");
   fs.copyFileSync(fixture, orgInput);
+  const orgSourceBase = fs.readFileSync(orgInput, "utf8");
+
+  function canonicalFromOrgContent(content, label) {
+    fs.writeFileSync(orgInput, content, "utf8");
+    const run = runPipeline(orgRoot, orgInput, path.join(tempDir, label));
+    return readSingleJsonLine(run.canonical);
+  }
 
   // Invariant 1: same resolved block yields same canonical artifact.
   const runA = runPipeline(orgRoot, orgInput, path.join(tempDir, "runA"));
@@ -104,15 +111,24 @@ function main() {
   // Invariant 2b: companion end-to-end source-surface non-authority check.
   // Apply harmless Org-level noise *after* authoritative captured structures,
   // then rerun structural -> resolved -> canonical and require unchanged output.
-  const orgSourceBase = fs.readFileSync(orgInput, "utf8");
   const orgNoisy = `${orgSourceBase}\n# non-authoritative trailing noise\n`;
-  fs.writeFileSync(orgInput, orgNoisy, "utf8");
-  const runNoisy = runPipeline(orgRoot, orgInput, path.join(tempDir, "runNoisy"));
-  const canonicalNoisySource = readSingleJsonLine(runNoisy.canonical);
+  const canonicalNoisySource = canonicalFromOrgContent(orgNoisy, "runNoisy");
   assertEq(
     "Invariant 2b (upstream source-surface noise rejection)",
     canonicalA,
     canonicalNoisySource
+  );
+
+  // Invariant 2c: parser-stable whitespace noise should preserve canonical output.
+  // Note: full CRLF/LF invariance is parser-dependent and validated separately.
+  const orgWhitespaceNoisy = orgSourceBase
+    .replace("barcode_trinity_mapping(maxicode, texture_object).", "barcode_trinity_mapping(maxicode, texture_object).   ")
+    .concat("\n\n");
+  const canonicalWhitespace = canonicalFromOrgContent(orgWhitespaceNoisy, "runWhitespace");
+  assertEq(
+    "Invariant 2c (parser-stable whitespace normalization)",
+    canonicalA,
+    canonicalWhitespace
   );
 
   // Invariant 3: changing routing witness changes artifact identity predictably.
@@ -162,6 +178,54 @@ function main() {
   const canonicalReceipt = readSingleJsonLine(canonicalReceiptFile);
   assertEq("Invariant 5a (artifact_hash stable under receipt policy mutation)", canonicalA.artifact_hash, canonicalReceipt.artifact_hash);
   assertEq("Invariant 5b (receipt anchor stable)", canonicalA.receipt_anchor, canonicalReceipt.receipt_anchor);
+
+  // Invariant 6a: payload mutation changes canonical identity/hash.
+  const orgPayloadMut = orgSourceBase.replace(
+    "barcode_trinity_mapping(beecode, query_object).",
+    "barcode_trinity_mapping(beecode, query_object_changed)."
+  );
+  const canonicalPayloadMut = canonicalFromOrgContent(orgPayloadMut, "runPayloadMut");
+  assertNeq(
+    "Invariant 6a1 (payload mutation changes artifact_id)",
+    canonicalA.artifact_id,
+    canonicalPayloadMut.artifact_id
+  );
+  assertNeq(
+    "Invariant 6a2 (payload mutation changes artifact_hash)",
+    canonicalA.artifact_hash,
+    canonicalPayloadMut.artifact_hash
+  );
+
+  // Invariant 6b: structural scope mutation (headline path) changes identity/hash.
+  const orgHeadlineMut = orgSourceBase.replace(
+    "* OMICRON GNOMON FRAME :aegean:barcode:",
+    "* OMICRON GNOMON FRAME CHANGED :aegean:barcode:"
+  );
+  const canonicalHeadlineMut = canonicalFromOrgContent(orgHeadlineMut, "runHeadlineMut");
+  assertNeq(
+    "Invariant 6b1 (headline mutation changes artifact_id)",
+    canonicalA.artifact_id,
+    canonicalHeadlineMut.artifact_id
+  );
+  assertNeq(
+    "Invariant 6b2 (headline mutation changes artifact_hash)",
+    canonicalA.artifact_hash,
+    canonicalHeadlineMut.artifact_hash
+  );
+
+  // Invariant 6c: authoritative inherited property mutation changes identity/hash.
+  const orgPropertyMut = orgSourceBase.replace(":LUT_WIDTH: 5", ":LUT_WIDTH: 9");
+  const canonicalPropertyMut = canonicalFromOrgContent(orgPropertyMut, "runPropertyMut");
+  assertNeq(
+    "Invariant 6c1 (authoritative property mutation changes artifact_id)",
+    canonicalA.artifact_id,
+    canonicalPropertyMut.artifact_id
+  );
+  assertNeq(
+    "Invariant 6c2 (authoritative property mutation changes artifact_hash)",
+    canonicalA.artifact_hash,
+    canonicalPropertyMut.artifact_hash
+  );
 
   console.log("OK: org bridge invariants verified");
   console.log(`workspace=${tempDir}`);
