@@ -20,6 +20,10 @@ EXTRACTED_FILE="${3:-$ROOT_DIR/prolog/omnicron-rule-source.extracted.logic}"
 RUN_LOG="${4:-$ROOT_DIR/prolog/omnicron-rule-source.run.log}"
 CANDIDATE_FILE="${EXTRACTED_FILE%.logic}.candidates.logic"
 VALIDATION_LOG="${RUN_LOG%.log}.validation.log"
+BRIDGE_DIR="$ROOT_DIR/polyform/org/scripts"
+BRIDGE_STRUCTURAL="/tmp/omnicron-rule-source.structural.ndjson"
+BRIDGE_RESOLVED="/tmp/omnicron-rule-source.resolved.ndjson"
+BRIDGE_CANONICAL="/tmp/omnicron-rule-source.canonical.ndjson"
 
 if [[ ! -f "$SRC_FILE" ]]; then
   echo "ERROR: source file not found: $SRC_FILE" >&2
@@ -31,44 +35,111 @@ if [[ ! -x "$POLYLOG_BIN" ]]; then
   make -C "$ROOT_DIR" polylog >/dev/null
 fi
 
-# Phase 1: extract only top-level candidate declaration lines:
-# - keep % comments
-# - keep lines that start at column 0 with lowercase predicate heads
-# - drop directives, prose, and indented rule-body fragments
-awk '
-  /^[[:space:]]*%/ { print; next }
-  /^[[:space:]]*$/ { next }
-  /^:-/ { next }
-  /^[a-z][a-zA-Z0-9_]*[[:space:]]*\(.*\)[[:space:]]*:-.*\.[[:space:]]*$/ { print; next }
-  /^[a-z][a-zA-Z0-9_]*[[:space:]]*\(.*\)[[:space:]]*\.[[:space:]]*$/ { print; next }
-' "$SRC_FILE" > "$CANDIDATE_FILE"
+extract_via_bridge_canonical() {
+  local tmp_dir org_input
+  local q="$BRIDGE_DIR/org_query_to_structural_ndjson.mjs"
+  local r="$BRIDGE_DIR/org_structural_to_resolved_ndjson.mjs"
+  local c="$BRIDGE_DIR/org_resolved_to_canonical_ndjson.mjs"
+  local m="$BRIDGE_DIR/org_canonical_to_replay_input.mjs"
 
-if [[ ! -s "$CANDIDATE_FILE" ]]; then
-  echo "ERROR: no declaration candidates extracted from $SRC_FILE" >&2
-  exit 2
-fi
-
-# Phase 2: keep only lines that polylog can assert in isolation.
-rm -f "$EXTRACTED_FILE" "$VALIDATION_LOG"
-while IFS= read -r line; do
-  if [[ -z "$line" ]]; then
-    continue
+  if ! command -v node >/dev/null 2>&1; then
+    return 1
   fi
-  if [[ "$line" =~ ^% ]]; then
-    printf '%s\n' "$line" >> "$EXTRACTED_FILE"
-    continue
+  if [[ ! -f "$q" || ! -f "$r" || ! -f "$c" || ! -f "$m" ]]; then
+    return 1
   fi
 
-  probe="$(printf ':p\n%s\n:q\n' "$line" | "$POLYLOG_BIN" 2>&1 || true)"
-  printf '%s\n' "$probe" >> "$VALIDATION_LOG"
-  if grep -qE 'Fact asserted\.|Clause asserted\.' <<<"$probe"; then
-    printf '%s\n' "$line" >> "$EXTRACTED_FILE"
-  fi
-done < "$CANDIDATE_FILE"
+  tmp_dir="$(mktemp -d /tmp/org-bridge-replay-XXXXXX)"
+  org_input="$tmp_dir/bridge_input.org"
+  cp "$SRC_FILE" "$org_input"
 
-if [[ ! -s "$EXTRACTED_FILE" ]]; then
-  echo "ERROR: no parser-safe declarations extracted from $SRC_FILE" >&2
-  exit 3
+  if ! node "$q" "$org_input" "$BRIDGE_STRUCTURAL" >/dev/null 2>&1; then
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  if [[ ! -s "$BRIDGE_STRUCTURAL" ]]; then
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+
+  if ! node "$r" "$BRIDGE_STRUCTURAL" "$BRIDGE_RESOLVED" >/dev/null 2>&1; then
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  if ! node "$c" "$BRIDGE_RESOLVED" "$BRIDGE_CANONICAL" >/dev/null 2>&1; then
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+  if [[ ! -s "$BRIDGE_CANONICAL" ]]; then
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+
+  if ! node "$m" "$BRIDGE_CANONICAL" "$EXTRACTED_FILE" "$CANDIDATE_FILE" >"$VALIDATION_LOG" 2>&1; then
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+
+  rm -rf "$tmp_dir"
+  return 0
+}
+
+filter_parser_safe_from_candidates() {
+  local input_candidates="$1"
+  rm -f "$EXTRACTED_FILE" "$VALIDATION_LOG"
+  while IFS= read -r line; do
+    if [[ -z "$line" ]]; then
+      continue
+    fi
+    if [[ "$line" =~ ^% ]]; then
+      printf '%s\n' "$line" >> "$EXTRACTED_FILE"
+      continue
+    fi
+
+    probe="$(printf ':p\n%s\n:q\n' "$line" | "$POLYLOG_BIN" 2>&1 || true)"
+    printf '%s\n' "$probe" >> "$VALIDATION_LOG"
+    if grep -qE 'Fact asserted\.|Clause asserted\.' <<<"$probe"; then
+      printf '%s\n' "$line" >> "$EXTRACTED_FILE"
+    fi
+  done < "$input_candidates"
+
+  if [[ ! -s "$EXTRACTED_FILE" ]]; then
+    echo "ERROR: no parser-safe declarations extracted from $SRC_FILE" >&2
+    exit 3
+  fi
+}
+
+extract_via_legacy_filter() {
+  # Phase 1: extract only top-level candidate declaration lines:
+  # - keep % comments
+  # - keep lines that start at column 0 with lowercase predicate heads
+  # - drop directives, prose, and indented rule-body fragments
+  awk '
+    /^[[:space:]]*%/ { print; next }
+    /^[[:space:]]*$/ { next }
+    /^:-/ { next }
+    /^[a-z][a-zA-Z0-9_]*[[:space:]]*\(.*\)[[:space:]]*:-.*\.[[:space:]]*$/ { print; next }
+    /^[a-z][a-zA-Z0-9_]*[[:space:]]*\(.*\)[[:space:]]*\.[[:space:]]*$/ { print; next }
+  ' "$SRC_FILE" > "$CANDIDATE_FILE"
+
+  if [[ ! -s "$CANDIDATE_FILE" ]]; then
+    echo "ERROR: no declaration candidates extracted from $SRC_FILE" >&2
+    exit 2
+  fi
+
+  # Phase 2: keep only lines that polylog can assert in isolation.
+  filter_parser_safe_from_candidates "$CANDIDATE_FILE"
+}
+
+if extract_via_bridge_canonical; then
+  filter_parser_safe_from_candidates "$CANDIDATE_FILE"
+  echo "INFO: extraction mode -> bridge canonical artifacts"
+  echo "INFO: structural bridge output -> $BRIDGE_STRUCTURAL"
+  echo "INFO: resolved bridge output -> $BRIDGE_RESOLVED"
+  echo "INFO: canonical bridge output -> $BRIDGE_CANONICAL"
+else
+  echo "INFO: extraction mode -> legacy parser-safe filter (bridge unavailable or no captures)"
+  extract_via_legacy_filter
 fi
 
 echo "INFO: candidate declarations -> $CANDIDATE_FILE"

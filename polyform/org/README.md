@@ -199,6 +199,10 @@ node scripts/org_query_to_structural_ndjson.mjs \
 Note: capture extraction works best when input path has `.org` extension; for
 fixture `.tst` files, copy/symlink to `.org` first.
 
+If no explicit Org source blocks are captured, the adapter emits one synthetic
+`logic` block from candidate top-level predicate lines. This keeps bridge-first
+runtime wiring active for legacy prose-heavy `.org` sources.
+
 ### Reducer script (structural -> resolved NDJSON)
 
 Generate `resolved_org_block` NDJSON from structural records:
@@ -237,6 +241,19 @@ node scripts/org_resolved_to_canonical_ndjson.mjs \
 
 Hard law: canonical artifacts are derived from resolved blocks only (no hidden
 Org semantics downstream).
+
+### Replay materialization (canonical -> runtime input)
+
+Materialize replay-safe logic input from canonical artifacts:
+
+```bash
+node scripts/org_canonical_to_replay_input.mjs \
+  /tmp/org_canonical.ndjson \
+  /tmp/replay.logic \
+  /tmp/replay.candidates.logic
+```
+
+This is the bridge-to-runtime handoff surface used by the replay harness.
 
 ### Invariant verification matrix
 

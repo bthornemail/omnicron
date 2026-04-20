@@ -47,6 +47,21 @@ execution in the custom interpreter:
 - Candidate extraction: `prolog/omnicron-rule-source.extracted.candidates.logic`
 - Parser-safe extraction: `prolog/omnicron-rule-source.extracted.logic`
 - Execution log: `prolog/omnicron-rule-source.run.log`
+- Fact-level bridge replay check: `make verify-bridge-replay`
+
+Bridge-first replay wiring:
+
+- `prolog/run_rule_source.sh` now attempts canonical bridge extraction first:
+  - `/tmp/omnicron-rule-source.structural.ndjson`
+  - `/tmp/omnicron-rule-source.resolved.ndjson`
+  - `/tmp/omnicron-rule-source.canonical.ndjson`
+- Runtime replay input is materialized from canonical artifacts via:
+  - `polyform/org/scripts/org_canonical_to_replay_input.mjs`
+- For legacy prose-heavy `.org` files with no explicit source blocks, the
+  structural adapter emits a synthetic candidate logic block so bridge-first
+  replay remains active.
+- If bridge tooling is unavailable, harness falls back to the legacy
+  parser-safe line filter.
 
 This process is intentionally conservative: it keeps only top-level declarations
 that `polylog` can assert today.

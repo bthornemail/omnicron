@@ -59,6 +59,25 @@ function lineOffsetsFromSource(source) {
   return { lines, offsets };
 }
 
+function extractCandidateDeclarations(source) {
+  const out = [];
+  const ls = source.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+  const ruleRe = /^[a-z][a-zA-Z0-9_]*[ \t]*\(.*\)[ \t]*:-.*\.[ \t]*$/;
+  const factRe = /^[a-z][a-zA-Z0-9_]*[ \t]*\(.*\)[ \t]*\.[ \t]*$/;
+  for (const l of ls) {
+    if (/^[ \t]*%/.test(l)) {
+      out.push(l);
+      continue;
+    }
+    if (/^[ \t]*$/.test(l)) continue;
+    if (/^:-/.test(l)) continue;
+    if (ruleRe.test(l) || factRe.test(l)) {
+      out.push(l);
+    }
+  }
+  return out.length > 0 ? `${out.join("\n")}\n` : "";
+}
+
 const inputPath = process.argv[2];
 const outputPath = process.argv[3] ?? null;
 
@@ -237,6 +256,44 @@ for (let idx = 0; idx < sortedRows.length; idx += 1) {
     line_span: { start: lineStart, end: lineEnd },
     structural_fingerprint: fp
   });
+}
+
+if (records.length === 0) {
+  const syntheticBody = extractCandidateDeclarations(source);
+  if (syntheticBody.length > 0) {
+    const byteEnd = Buffer.byteLength(syntheticBody, "utf8");
+    const lineEnd = countNewlines(syntheticBody) + 1;
+    const fp = sha256Hex(
+      [
+        absoluteInput,
+        "synthetic_candidate_block",
+        "logic",
+        "1",
+        "0",
+        String(byteEnd)
+      ].join("|")
+    );
+    records.push({
+      type: "org_structural_record",
+      schema_version: "1.0.0",
+      file_path: absoluteInput,
+      document_id: sha256Hex(absoluteInput),
+      headline_path: ["SYNTHETIC CANDIDATE BLOCK"],
+      headline_level: 0,
+      tags: ["synthetic", "bridge"],
+      properties_local: properties,
+      directives_local: directives,
+      block_kind: "src",
+      block_language: "logic",
+      block_name: "synthetic_candidate_block",
+      block_body: syntheticBody,
+      local_order: 0,
+      payload_hash: sha256Hex(normalizeBodyForIdentity(syntheticBody)),
+      byte_span: { start: 0, end: byteEnd },
+      line_span: { start: 1, end: lineEnd },
+      structural_fingerprint: fp
+    });
+  }
 }
 
 const out = records.map((r) => JSON.stringify(r)).join("\n") + (records.length ? "\n" : "");

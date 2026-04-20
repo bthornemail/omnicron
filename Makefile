@@ -19,7 +19,7 @@ SRC := logic-interp.c
 POLYLOG := polylog
 POLYLOG_SRC := prolog/polylog.c
 
-.PHONY: all clean test test-polylog test-polylog-bootstrap test-rule-source bitboards graph-bitboards deterministic
+.PHONY: all clean test test-polylog test-polylog-bootstrap test-rule-source verify-bridge-replay bitboards graph-bitboards deterministic
 
 all: $(TARGET)
 
@@ -52,6 +52,10 @@ test-polylog-bootstrap: $(POLYLOG)
 test-rule-source: $(POLYLOG)
 	./prolog/run_rule_source.sh
 
+verify-bridge-replay: $(POLYLOG)
+	chmod +x ./prolog/verify_bridge_fact_equivalence.sh
+	./prolog/verify_bridge_fact_equivalence.sh
+
 bitboards: $(POLYLOG) test-rule-source
 	chmod +x ./prolog/export_polyform_bitboards.sh
 	./prolog/export_polyform_bitboards.sh
@@ -61,7 +65,9 @@ graph-bitboards: $(POLYLOG) test-rule-source
 	./prolog/export_control_graph_bitboards.sh
 
 deterministic: $(POLYLOG)
-	chmod +x ./prolog/run_rule_source.sh ./prolog/export_polyform_bitboards.sh ./prolog/export_control_graph_bitboards.sh ./prolog/deterministic_replay.sh
+	chmod +x ./prolog/run_rule_source.sh ./prolog/verify_bridge_fact_equivalence.sh ./prolog/export_polyform_bitboards.sh ./prolog/export_control_graph_bitboards.sh ./prolog/deterministic_replay.sh
+	$(MAKE) verify-bridge-replay
+	cd ./polyform/org && npm run verify-bridge && npm run verify-bridge-golden
 	./prolog/deterministic_replay.sh
 
 clean:
