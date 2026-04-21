@@ -1,0 +1,1 @@
+{"type":"polyform_geometry","object_id":"rules_code16k_polygon","geometry_mode":"polygon","primitive":"polygon","component_index":0,"points":[[0,0],[16,0],[16,16],[0,16]],"bounds":{"min_x":0,"min_y":0,"max_x":16,"max_y":16}}

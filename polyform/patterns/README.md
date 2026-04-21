@@ -1,13 +1,18 @@
-# Polyform Patterns
+# Polyform Patterns (Derived)
 
-This folder stores non-authoritative pattern witnesses used for projection and
-human inspection.
+This folder is derivation-only.
 
-Authority boundary:
+Rules:
 
-- Authoritative coreform source: `polyform/bitboards/coreform_chain.logic`
-- Derived witnesses: `pattern_manifest.ndjson` + referenced assets in this folder
+- No imported reference diagrams are authoritative here.
+- Pattern bitboards are generated from `.logic` facts.
+- Canonical generator:
+  - `node polyform/scripts/polyform_toolbox.mjs derive-patterns <logic_file> <prefix>`
 
-These files do not define canonical truth and do not participate in authority
-hash derivation.
+Current derived artifacts include:
 
+- `<prefix>.aztec.bitboard`
+- `<prefix>.maxi.bitboard`
+- `<prefix>.beecode.bitboard`
+- `<prefix>.code16k.bitboard`
+- `<prefix>.manifest.ndjson`

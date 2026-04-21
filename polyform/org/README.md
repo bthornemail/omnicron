@@ -331,6 +331,13 @@ Normative authority split:
 - viewers are non-authoritative projection surfaces
 - interaction must not mutate canonical authority
 
+Backend parity policy:
+
+- OpenGL/WebGL must consume packet geometry without semantic reinterpretation
+- backend differences are limited to presentation mechanics (pan/zoom/input)
+- viewers must not synthesize missing geometry or invent authority
+- optional labels/overlays remain non-authoritative projection hints
+
 Native OpenGL backend (GLFW + OpenGL 3.3 core):
 
 ```bash
@@ -396,6 +403,15 @@ make verify-coreform-chain
 This validates single-root linked-chain authority, mandatory stage order,
 deterministic address bindings, and deterministic `.logic -> canonical ->
 render_packet -> svg` derivation.
+
+Render contract verifier:
+
+```bash
+make verify-render-contract
+```
+
+This validates packet-hash determinism, schema integrity, provenance linkage,
+and deterministic `render_packet -> svg` projection behavior.
 
 ### Local validation
 

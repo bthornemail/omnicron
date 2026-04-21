@@ -1,0 +1,66 @@
+{
+  "schema_version": "2.0.0",
+  "class_enum": ["authority", "derived", "temporary", "external"],
+  "policy": {
+    "authority_rule": "Ontology/law/canonical replay is authority; all projections and transports are derived witnesses.",
+    "barcode_policy": "Aztec/Maxi/BeeTag/Code16k are transport witnesses, not authority."
+  },
+  "canonical_stage_files": [
+    "prolog/omnitron_declarations.lx",
+    "prolog/constitutional_stack.pl",
+    "prolog/bootstrap_datalog.pl",
+    "prolog/bootstrap_ingest.logic",
+    "prolog/omnicron-rule-source.org",
+    "prolog/run_rule_source.sh",
+    "polyform/bitboards/rules_selected.logic",
+    "polyform/bitboards/coreform_chain.logic",
+    "polyform/org/scripts/canonical_identity.mjs",
+    "polyform/bitboards/bitboard_to_canonical_ndjson.mjs",
+    "polyform/bitboards/coreform_logic_to_canonical_ndjson.mjs",
+    "polyform/org/scripts/org_query_to_structural_ndjson.mjs",
+    "polyform/org/scripts/org_structural_to_resolved_ndjson.mjs",
+    "polyform/org/scripts/org_resolved_to_canonical_ndjson.mjs",
+    "polyform/org/scripts/org_canonical_to_replay_input.mjs"
+  ],
+  "entries": [
+    { "path": "prolog/omnitron_declarations.lx", "class": "authority" },
+    { "path": "prolog/constitutional_stack.pl", "class": "authority" },
+    { "path": "prolog/bootstrap_datalog.pl", "class": "authority" },
+    { "path": "prolog/bootstrap_ingest.logic", "class": "authority" },
+    { "path": "prolog/omnicron-rule-source.org", "class": "authority" },
+    { "path": "prolog/omnicron-rule-source.extracted.logic", "class": "authority" },
+    { "path": "prolog/omnicron-rule-source.extracted.candidates.logic", "class": "authority" },
+    { "path": "prolog/run_rule_source.sh", "class": "derived" },
+    { "path": "polyform/bitboards/rules_selected.logic", "class": "authority" },
+    { "path": "polyform/bitboards/coreform_chain.logic", "class": "authority" },
+    { "path": "pair-machine.c", "class": "authority" },
+    { "path": "logic-interp.c", "class": "authority" },
+    { "path": "polyform/org/scripts/canonical_identity.mjs", "class": "authority" },
+
+    { "path": "polyform/org/scripts/org_query_to_structural_ndjson.mjs", "class": "derived" },
+    { "path": "polyform/org/scripts/org_structural_to_resolved_ndjson.mjs", "class": "derived" },
+    { "path": "polyform/org/scripts/org_resolved_to_canonical_ndjson.mjs", "class": "derived" },
+    { "path": "polyform/org/scripts/org_canonical_to_render_packet_ndjson.mjs", "class": "derived" },
+    { "path": "polyform/org/scripts/org_render_packet_to_svg.mjs", "class": "derived" },
+    { "path": "polyform/org/scripts/org_canonical_to_replay_input.mjs", "class": "derived" },
+    { "path": "polyform/scripts/polyform_toolbox.mjs", "class": "derived" },
+    { "path": "polyform/bitboards/bitboard_to_canonical_ndjson.mjs", "class": "derived" },
+    { "path": "polyform/bitboards/coreform_logic_to_canonical_ndjson.mjs", "class": "derived" },
+    { "path": "polyform/bitboards/rules_golden.bitboard", "class": "derived" },
+    { "path": "polyform/bitboards/rules_negative.bitboard", "class": "derived" },
+    { "path": "polyform/bitboards/control_graph_golden.bitboard", "class": "derived" },
+    { "path": "polyform/bitboards/control_graph_negative.bitboard", "class": "derived" },
+    { "path": "polyform/bitboards/control_graph_overlay_aegean.bitboard", "class": "derived" },
+    { "path": "prolog/ontology_graph.ndjson", "class": "derived" },
+    { "path": "prolog/ontology_graph.pgm", "class": "derived" },
+    { "path": "prolog/canonicality_attestation.ndjson", "class": "derived" },
+
+    { "path": "prolog/omnicron-rule-source.run.log", "class": "temporary" },
+    { "path": "prolog/omnicron-rule-source.run.validation.log", "class": "temporary" },
+
+    { "path": "temp-docs/Aztec.US5591956A.pdf", "class": "external" },
+    { "path": "temp-docs/BeeTag.pone.0136487.pdf", "class": "external" },
+    { "path": "temp-docs/USS-16K.pdf", "class": "external" },
+    { "path": "temp-docs/MaxiCode.US4998010.pdf", "class": "external" }
+  ]
+}

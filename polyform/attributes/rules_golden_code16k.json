@@ -1,0 +1,32 @@
+{
+  "type": "polyform_attribute",
+  "schema_version": "1.0.0",
+  "object_id": "rules_golden_code16k",
+  "carrier_family": "code16k",
+  "code16k_mode": "polyform",
+  "authority": {
+    "source_kind": "bitboard",
+    "source_file": "/root/omnicron/polyform/bitboards/rules_golden.bitboard",
+    "source_sha256": "e5ee2aaa6373dfb8793a81ee2b9f21c6d132852e43658b186f7bd33c5269c87d"
+  },
+  "dimensions": {
+    "width": 16,
+    "height": 16
+  },
+  "counts": {
+    "active_cells": 254,
+    "geometry_records": 254
+  },
+  "hashes": {
+    "bitboard_sha256": "e5ee2aaa6373dfb8793a81ee2b9f21c6d132852e43658b186f7bd33c5269c87d",
+    "geometry_sha256": "e0850f0d59adbd8dc0349ddf2569f8b3d32c8cf7f8a19e8d09f77924bf34c25b"
+  },
+  "provenance": {
+    "derived_from": "polyform_toolbox_v1",
+    "lexical_substrates": [
+      "ascii",
+      "braille",
+      "aegean"
+    ]
+  }
+}

@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 
-import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { sha256Hex, deriveArtifactId, deriveArtifactHash } from "./canonical_identity.mjs";
 
 function usage() {
   console.error(
     "Usage: node scripts/org_resolved_to_canonical_ndjson.mjs <input.ndjson> [output.ndjson]"
   );
-}
-
-function sha256Hex(input) {
-  return createHash("sha256").update(input).digest("hex");
 }
 
 function chooseArtifactKind(resolved) {
@@ -69,29 +65,27 @@ for (const line of lines) {
   const contentBytes = Buffer.byteLength(canonicalPayload, "utf8");
   const artifactKind = chooseArtifactKind(rec);
   const payloadKind = choosePayloadKind(rec);
-  const artifactId = sha256Hex(
-    [
-      rec.step_identity || "",
-      rec.address_seed || "",
-      rec.virtual_address || "",
-      rec.balanced_address || "",
-      rec.source_file || "",
-      artifactKind
-    ].join("|")
-  );
-  const artifactHash = sha256Hex(
-    [
-      artifactId,
-      contentSha256,
-      payloadKind,
-      rec.receipt_anchor || "",
-      rec.semantic_fingerprint || ""
-    ].join("|")
-  );
+  const artifactId = deriveArtifactId({
+    stepIdentity: rec.step_identity || "",
+    addressSeed: rec.address_seed || "",
+    virtualAddress: rec.virtual_address || "",
+    balancedAddress: rec.balanced_address || "",
+    sourcePath: rec.source_file || "",
+    artifactKind
+  });
+  const artifactHash = deriveArtifactHash({
+    artifactId,
+    contentSha256,
+    payloadKind,
+    receiptAnchor: rec.receipt_anchor || "",
+    semanticFingerprint: rec.semantic_fingerprint || ""
+  });
 
   const canonical = {
     type: "canonical_artifact",
     schema_version: "1.0.0",
+    source_module: "polyform/org/scripts/canonical_identity.mjs",
+    authority_status: "authority",
     artifact_id: artifactId,
     artifact_hash: artifactHash,
     artifact_kind: artifactKind,

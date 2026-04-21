@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 
-import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  sha256Hex,
+  deriveAddressSeed,
+  deriveReceiptAnchor,
+  deriveArtifactId,
+  deriveArtifactHash
+} from "../org/scripts/canonical_identity.mjs";
 
 const REQUIRED_STAGES = ["truth_table", "karnaugh", "gate_net", "carry_lookahead"];
-
-function sha256Hex(input) {
-  return createHash("sha256").update(input).digest("hex");
-}
 
 function usage() {
   console.error(
@@ -156,30 +158,34 @@ function parseCoreformLogic(filePath) {
     ].join("|")
   );
   const stepIdentity = sha256Hex(`${root}|${semanticFingerprint}|${contentSha}`);
-  const addressSeed = sha256Hex(`seed|${stepIdentity}|coreform_chain_v1`);
+  const addressSeed = deriveAddressSeed(stepIdentity, "coreform_chain_v1");
   const virtualAddressRoot = ordered[0].virtual_address;
   const balancedAddressRoot = ordered[0].balanced_address;
-  const receiptAnchor = sha256Hex(`receipt|${stepIdentity}|${addressSeed}`);
+  const receiptAnchor = deriveReceiptAnchor(stepIdentity, addressSeed);
 
   const artifactKind = "prolog_fact_set";
   const payloadKind = "logic_text";
-  const artifactId = sha256Hex(
-    [
-      stepIdentity,
-      addressSeed,
-      virtualAddressRoot,
-      balancedAddressRoot,
-      path.resolve(filePath),
-      artifactKind
-    ].join("|")
-  );
-  const artifactHash = sha256Hex(
-    [artifactId, contentSha, payloadKind, receiptAnchor, semanticFingerprint].join("|")
-  );
+  const artifactId = deriveArtifactId({
+    stepIdentity,
+    addressSeed,
+    virtualAddress: virtualAddressRoot,
+    balancedAddress: balancedAddressRoot,
+    sourcePath: path.resolve(filePath),
+    artifactKind
+  });
+  const artifactHash = deriveArtifactHash({
+    artifactId,
+    contentSha256: contentSha,
+    payloadKind,
+    receiptAnchor,
+    semanticFingerprint
+  });
 
   return {
     type: "canonical_artifact",
     schema_version: "1.0.0",
+    source_module: "polyform/org/scripts/canonical_identity.mjs",
+    authority_status: "authority",
     artifact_id: artifactId,
     artifact_hash: artifactHash,
     artifact_kind: artifactKind,

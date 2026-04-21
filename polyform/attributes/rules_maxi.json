@@ -1,0 +1,32 @@
+{
+  "type": "polyform_attribute",
+  "schema_version": "1.0.0",
+  "object_id": "rules_maxi",
+  "carrier_family": "maxi",
+  "code16k_mode": "barcode",
+  "authority": {
+    "source_kind": "bitboard",
+    "source_file": "/root/omnicron/polyform/bitboards/rules_selected.logic",
+    "source_sha256": "6f8dc3380487073c0695090913b9f81fa2c2f6fa3aebdaa641241e6711857be5"
+  },
+  "dimensions": {
+    "width": 16,
+    "height": 16
+  },
+  "counts": {
+    "active_cells": 256,
+    "geometry_records": 16
+  },
+  "hashes": {
+    "bitboard_sha256": "6f8dc3380487073c0695090913b9f81fa2c2f6fa3aebdaa641241e6711857be5",
+    "geometry_sha256": "b375ec6ec0eb58bfd9a7178ebd51d2cb8090908a62ce5a54b8164302596410dc"
+  },
+  "provenance": {
+    "derived_from": "polyform_toolbox_v1",
+    "lexical_substrates": [
+      "ascii",
+      "braille",
+      "aegean"
+    ]
+  }
+}

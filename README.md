@@ -81,6 +81,32 @@ xxd /dev/shm/omicron_mirror
 python3 view_mirror.py
 ```
 
+## Canonicality Attestation
+
+One-shot proof command:
+
+```bash
+make rebuild-all
+```
+
+Machine-readable attestation output:
+
+- `prolog/canonicality_attestation.ndjson`
+- schema: `prolog/canonicality_attestation.schema.json`
+
+Canonicality verdict rule:
+
+```text
+canonicality = pass(rebuild-all) && deterministic_outputs && provenance_complete
+```
+
+CI merge gate:
+
+- GitHub Actions workflow: `canonicality-rebuild-all`
+- Required status check name: `rebuild-all`
+- Required status check name: `verify-render-contract`
+- CI publishes `prolog/canonicality_attestation.ndjson` as a build artifact.
+
 ## Architecture
 
 1. **Layer NULL**: Algebraic sanity (operator symmetry)

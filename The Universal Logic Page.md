@@ -92,17 +92,68 @@ These are the machine body.
 
 There are only three constitutional symbol substrates:
 
-### ASCII
+### ASCII (1977/1986)
 
-Control, transport, ordering, separators.
+> Control, transport, ordering, separators.
+
+
+0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
+0x	NUL	SOH	STX	ETX	EOT	ENQ	ACK	BEL BS HT LF VT FF CR SO  SI 
+1x	DLE	DC1	DC2	DC3	DC4	NAK	SYN	ETB	CAN EM SUB ESC FS GS RS US 
+2x	 SP 	!	"	#	$	%	&	'	(	)	*	+	,	-	.	/
+3x	0	1	2	3	4	5	6	7	8	9	:	;	<	=	>	?
+4x	@	A	B	C	D	E	F	G	H	I	J	K	L	M	N	O
+5x	P	Q	R	S	T	U	V	W	X	Y	Z	[	\	]	^	_
+6x	`	a	b	c	d	e	f	g	h	i	j	k	l	m	n	o
+7x	p	q	r	s	t	u	v	w	x	y	z	{	|	}	~	DEL
+> Changed or added in 1963 version
+> Changed in both 1963 version and 1965 draft
+
+
 
 ### Braille
 
 Dense state surface, occupancy witness, local bit visibility.
 
-### Aegean
+> Official Unicode Consortium code chart (PDF)
+
+ 	0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
+U+280x	⠀	⠁	⠂	⠃	⠄	⠅	⠆	⠇	⠈	⠉	⠊	⠋	⠌	⠍	⠎	⠏
+U+281x	⠐	⠑	⠒	⠓	⠔	⠕	⠖	⠗	⠘	⠙	⠚	⠛	⠜	⠝	⠞	⠟
+U+282x	⠠	⠡	⠢	⠣	⠤	⠥	⠦	⠧	⠨	⠩	⠪	⠫	⠬	⠭	⠮	⠯
+U+283x	⠰	⠱	⠲	⠳	⠴	⠵	⠶	⠷	⠸	⠹	⠺	⠻	⠼	⠽	⠾	⠿
+> (end of 6-dot cell patterns)
+
+U+284x	⡀	⡁	⡂	⡃	⡄	⡅	⡆	⡇	⡈	⡉	⡊	⡋	⡌	⡍	⡎	⡏
+U+285x	⡐	⡑	⡒	⡓	⡔	⡕	⡖	⡗	⡘	⡙	⡚	⡛	⡜	⡝	⡞	⡟
+U+286x	⡠	⡡	⡢	⡣	⡤	⡥	⡦	⡧	⡨	⡩	⡪	⡫	⡬	⡭	⡮	⡯
+U+287x	⡰	⡱	⡲	⡳	⡴	⡵	⡶	⡷	⡸	⡹	⡺	⡻	⡼	⡽	⡾	⡿
+U+288x	⢀	⢁	⢂	⢃	⢄	⢅	⢆	⢇	⢈	⢉	⢊	⢋	⢌	⢍	⢎	⢏
+U+289x	⢐	⢑	⢒	⢓	⢔	⢕	⢖	⢗	⢘	⢙	⢚	⢛	⢜	⢝	⢞	⢟
+U+28Ax	⢠	⢡	⢢	⢣	⢤	⢥	⢦	⢧	⢨	⢩	⢪	⢫	⢬	⢭	⢮	⢯
+U+28Bx	⢰	⢱	⢲	⢳	⢴	⢵	⢶	⢷	⢸	⢹	⢺	⢻	⢼	⢽	⢾	⢿
+U+28Cx	⣀	⣁	⣂	⣃	⣄	⣅	⣆	⣇	⣈	⣉	⣊	⣋	⣌	⣍	⣎	⣏
+U+28Dx	⣐	⣑	⣒	⣓	⣔	⣕	⣖	⣗	⣘	⣙	⣚	⣛	⣜	⣝	⣞	⣟
+U+28Ex	⣠	⣡	⣢	⣣	⣤	⣥	⣦	⣧	⣨	⣩	⣪	⣫	⣬	⣭	⣮	⣯
+U+28Fx	⣰	⣱	⣲	⣳	⣴	⣵	⣶	⣷	⣸	⣹	⣺	⣻	⣼	⣽	⣾	⣿
+> Notes
+> 1.^ As of Unicode version 17.0
+
+### Aegean Numbers
 
 Virtual address witness, ordinal symbolic indexing.
+
+> Official Unicode Consortium code chart (PDF)
+
+ 	0	1	2	3	4	5	6	7	8	9	A	B	C	D	E	F
+U+1010x	𐄀	𐄁	𐄂					𐄇	𐄈	𐄉	𐄊	𐄋	𐄌	𐄍	𐄎	𐄏
+U+1011x	𐄐	𐄑	𐄒	𐄓	𐄔	𐄕	𐄖	𐄗	𐄘	𐄙	𐄚	𐄛	𐄜	𐄝	𐄞	𐄟
+U+1012x	𐄠	𐄡	𐄢	𐄣	𐄤	𐄥	𐄦	𐄧	𐄨	𐄩	𐄪	𐄫	𐄬	𐄭	𐄮	𐄯
+U+1013x	𐄰	𐄱	𐄲	𐄳				
+> Notes
+> 1.^ As of Unicode version 17.0
+> 2.^ Grey areas indicate non-assigned code points
+
 
 Everything else is syntactic sugar or downstream projection.
 
@@ -207,3 +258,103 @@ across four binary streams,
 with many possible witness surfaces.
 
 Everything else is sugar.
+
+---
+
+## 11. Disk Chain Naming Law
+
+Canonical 4-layer disk-chain naming is:
+
+```text
+[FS] <-- [GS] <-- [RS] <-- [US]
+```
+
+Rules:
+
+- `FS` is the base image.
+- `GS` and `RS` are overlay deltas over their backing images.
+- `US` is the active/live write target.
+- Live QEMU always points to the rightmost layer (`US`).
+- Each file is a delta from its backing file, not a full point-in-time payload by itself.
+
+Naming law:
+
+```text
+A disk-chain filename names a structural layer, not a complete point-in-time state.
+The realized state at any layer is the cumulative resolution of that layer and its backing chain.
+```
+
+### Time-State Semantics
+
+- Snapshot at `GS` creation is contained in: `FS`
+- Snapshot at `RS` creation is contained in: `FS + GS`
+- Snapshot at `US` creation is contained in: `FS + GS + RS`
+- Live state is contained in: `FS + GS + RS + US`
+
+Naming warning:
+
+```text
+Creation filename does not equal full state at creation time.
+```
+
+Also:
+
+```text
+FS alone is both a layer and its own realized state.
+GS, RS, and US are deltas, not standalone full states unless flattened.
+```
+
+### Canonical QMP Sequence
+
+Node/file mapping:
+
+- `node-FS -> fs.qcow2`
+- `node-GS -> gs.qcow2`
+- `node-RS -> rs.qcow2`
+- `node-US -> us.qcow2`
+
+Canonical overlay chain creation:
+
+```text
+(QEMU) blockdev-snapshot-sync node-name=node-FS snapshot-file=gs.qcow2 snapshot-node-name=node-GS format=qcow2
+(QEMU) blockdev-snapshot-sync node-name=node-GS snapshot-file=rs.qcow2 snapshot-node-name=node-RS format=qcow2
+(QEMU) blockdev-snapshot-sync node-name=node-RS snapshot-file=us.qcow2 snapshot-node-name=node-US format=qcow2
+```
+
+### Alias Table (Explanatory Only)
+
+| Canonical Key | Alias Label |
+|---|---|
+| `FS` | ~ Position (foundational/base position layer) |
+| `GS` | ~ Relation (first relational delta layer) |
+| `RS` | ~ Group (grouped/rewrite layer) |
+| `US` | ~ Order (active update/order layer) |
+
+Aliases are explanatory labels for human reading only.
+Canonical keys remain `FS/GS/RS/US`.
+
+### Documentation Review Checklist
+
+Every disk-chain write-up must satisfy:
+
+1. Uses `FS/GS/RS/US` as primary stage keys.
+2. Includes cumulative-state equations (`FS + ...`) for points in time.
+3. States delta semantics (overlay file is a delta over backing file).
+4. Does not treat filename creation time as full-state containment.
+
+Negative example (invalid):
+
+```text
+"State at RS creation is in rs.qcow2."
+```
+
+Why invalid: that statement ignores cumulative backing layers (`FS + GS`).
+
+### Relation Symbols
+
+Use these relation symbols consistently across doctrine, contracts, and examples:
+
+- `=` means identity/equality.
+- `~` means correspondence/equivalence under mapping (not identity).
+- `->` means derivation/transition/forward construction.
+- `<-` means backing dependency in disk chains.

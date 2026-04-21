@@ -3,6 +3,8 @@
 
 This document maps the constitutional numbers to the OMNICRON system implementation.
 
+Canonical chain references in constitutional proofs and attestations SHALL use `FS`, `GS`, `RS`, and `US`. Aliases such as Position, Relation, Group, and Order MAY appear in commentary, but are non-authoritative.
+
 ---
 
 ## Possibility Order

@@ -62,3 +62,39 @@ The payload follows immediately after the header.
 ```text
 bytes -> replay -> frame_derivation -> artifact_emission -> display
 ```
+
+## Canonicality Attestation
+
+Canonicality definition:
+
+```text
+canonical_to_kernel := rebuildable end-to-end with no manual edits and deterministic outputs
+```
+
+Verifier contract:
+
+```text
+canonicality = pass(rebuild-all) && deterministic_outputs && provenance_complete
+```
+
+Render contract extension:
+
+```text
+render_contract_ok = render_packet_hash_ok && render_packet_schema_ok && render_packet_provenance_ok
+```
+
+Provenance gate:
+
+- every canonical artifact used by render/replay must declare authoritative
+  lineage (`bitboard_authority`, `coreform_logic`, or `sequence_root`)
+- projection layers must not invent authority
+- Canonical chain references SHALL use `FS`, `GS`, `RS`, and `US`
+- aliases such as Position, Relation, Group, and Order MAY appear in
+  commentary, but are non-authoritative
+
+Backend parity policy:
+
+- `polyform` is authority
+- `render_packet` is transport witness
+- `OpenGL/WebGL/SVG` are projection surfaces
+- `framebuffer/readback` are witness outputs and never authority

@@ -1,0 +1,32 @@
+{
+  "type": "polyform_attribute",
+  "schema_version": "1.0.0",
+  "object_id": "rules_code16k_polyform",
+  "carrier_family": "code16k",
+  "code16k_mode": "polyform",
+  "authority": {
+    "source_kind": "bitboard",
+    "source_file": "/root/omnicron/polyform/bitboards/rules_selected.logic",
+    "source_sha256": "6f8dc3380487073c0695090913b9f81fa2c2f6fa3aebdaa641241e6711857be5"
+  },
+  "dimensions": {
+    "width": 16,
+    "height": 16
+  },
+  "counts": {
+    "active_cells": 256,
+    "geometry_records": 256
+  },
+  "hashes": {
+    "bitboard_sha256": "6f8dc3380487073c0695090913b9f81fa2c2f6fa3aebdaa641241e6711857be5",
+    "geometry_sha256": "e54e1f6e40b4b19dc40dc77a1ab44e6c5e87376338add2a29ccd2077a7f72c20"
+  },
+  "provenance": {
+    "derived_from": "polyform_toolbox_v1",
+    "lexical_substrates": [
+      "ascii",
+      "braille",
+      "aegean"
+    ]
+  }
+}

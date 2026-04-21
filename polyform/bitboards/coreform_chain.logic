@@ -57,8 +57,7 @@ balanced_address(coreform_001_n1, 'ba:left:-1024').
 balanced_address(coreform_001_n2, 'ba:right:+1024').
 balanced_address(coreform_001_n3, 'ba:right:+2048').
 
-% Projection witness mappings (non-authoritative, reference-only)
-pattern_witness(coreform_001_n1, 'polyform/patterns/Karnaugh_map_torus.svg').
-pattern_witness(coreform_001_n2, 'polyform/patterns/Logic gate.md').
-pattern_witness(coreform_001_n3, 'polyform/patterns/Four_bit_adder_with_carry_lookahead.svg').
-
+% Projection witness mappings (non-authoritative, derived from rules_selected.logic)
+pattern_witness(coreform_001_n1, 'polyform/patterns/rules.beecode.bitboard').
+pattern_witness(coreform_001_n2, 'polyform/patterns/rules.maxi.bitboard').
+pattern_witness(coreform_001_n3, 'polyform/patterns/rules.code16k.bitboard').

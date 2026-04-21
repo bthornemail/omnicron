@@ -25,6 +25,48 @@ interface. It defines:
 `prolog/omnitron_declarations.lx` is the active Lisp-like declaration surface.
 This is the current "what survives" layer while designs evolve.
 
+Synced ontology graph artifacts:
+
+- Generator: `prolog/generate_ontology_graph.mjs`
+- Machine graph: `prolog/ontology_graph.ndjson`
+- Legend: `prolog/ontology_legend.ndjson`
+- Diagram source: `prolog/ontology_graph.dot`
+- Raster witness: `prolog/ontology_graph.pgm` (lossless P5)
+
+These are generated from live facts in `polyform/bitboards/rules_selected.logic`,
+specifically:
+
+- `substrate_stage_order/2` for substrate chain ordering
+- `duodecimal_main_class/2` for DDC/duodecimal class membership
+
+Lexicon integration is explicitly status-annotated in the graph:
+
+- `omnitron_ddc_lexicon.h` -> `declared_partial`
+- lexicon runtime implementation -> `not_integrated`
+
+Runtime algebra sync:
+
+- `pair-machine.c` is scanned for runtime algebra/data nodes:
+  - `PairWord`, `Value`, `poly`, `vars`, `terms`, `term`, `coef`, `mons`
+  - `make_term`, `make_poly`, `normalize_terms`, `poly_normalize`,
+    `poly_add`, `poly_mul`, `poly_deriv`, `poly_eval`
+- Graph node/edge metadata now includes:
+  - `node_kind`, `edge_kind`
+  - `authority_status`
+  - `source_file`, `source_fact`
+
+Canonical hardening:
+
+- Node IDs are frozen under contract: `kind__slug`
+  (e.g., `stage__raw_binary_group_ordering`, `class__05`,
+  `operation__poly_add`, `artifact__ontology_graph_ndjson`)
+- Edge vocabulary is frozen:
+  `orders`, `classifies`, `implements`, `declares`, `emits`, `projects_to`
+- Verifier:
+  - `make verify-ontology-graph`
+  - fails if required runtime algebra nodes disappear, are renamed, or lose
+    `authoritative` status
+
 ## Current Working Mode
 
 For now, the team is working in Lisp-like logic declarations first.

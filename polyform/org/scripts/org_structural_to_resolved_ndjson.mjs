@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 
-import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  sha256Hex,
+  deriveAddressSeed,
+  deriveVirtualAddress,
+  deriveBalancedAddress,
+  deriveReceiptAnchor
+} from "./canonical_identity.mjs";
 
 function usage() {
   console.error(
     "Usage: node scripts/org_structural_to_resolved_ndjson.mjs <input.ndjson> [output.ndjson]"
   );
-}
-
-function sha256Hex(input) {
-  return createHash("sha256").update(input).digest("hex");
 }
 
 function normalizePayload(payload) {
@@ -60,34 +62,13 @@ function defaultExtensionFromLanguage(lang) {
   return l || "txt";
 }
 
-function deriveAddressSeed(stepIdentity, rec) {
+function deriveAddressSeedFromRecord(stepIdentity, rec) {
   const frameLaw = chooseMapValue(rec.directives_local, [
     "OMNITRON_MODE",
     "OMNICRON_MODE",
     "OMNITRON_PROFILE"
   ]) || "default_frame_law";
-  return sha256Hex(`seed|${stepIdentity}|${frameLaw}`);
-}
-
-function deriveVirtualAddress(addressSeed) {
-  const lane = Number.parseInt(addressSeed.slice(0, 2), 16) % 16;
-  const channel = Number.parseInt(addressSeed.slice(2, 4), 16) % 16;
-  const slot = Number.parseInt(addressSeed.slice(4, 8), 16) % 60;
-  const page = Number.parseInt(addressSeed.slice(8, 16), 16) >>> 0;
-  return `va:${page.toString(16).padStart(8, "0")}:${lane}.${channel}.${slot}`;
-}
-
-function deriveBalancedAddress(addressSeed) {
-  const raw = Number.parseInt(addressSeed.slice(16, 24), 16) % 8192;
-  const signed = raw - 4096;
-  const chiralityBit = Number.parseInt(addressSeed.slice(24, 26), 16) & 0x1;
-  const chirality = chiralityBit === 0 ? "left" : "right";
-  const sign = signed >= 0 ? "+" : "";
-  return `ba:${chirality}:${sign}${signed}`;
-}
-
-function deriveReceiptAnchor(stepIdentity, addressSeed) {
-  return sha256Hex(`receipt|${stepIdentity}|${addressSeed}`);
+  return deriveAddressSeed(stepIdentity, frameLaw);
 }
 
 function resolveSourceDirectory(rec) {
@@ -175,7 +156,7 @@ for (const line of lines) {
   const sourceFile = resolveSourceFile(rec, sourceDirectory);
   const canonicalPayload = normalizePayload(rec.block_body || "");
   const stepIdentity = deriveStepIdentity(rec, sourceFile, sourceDirectory);
-  const addressSeed = deriveAddressSeed(stepIdentity, rec);
+  const addressSeed = deriveAddressSeedFromRecord(stepIdentity, rec);
   const virtualAddress = deriveVirtualAddress(addressSeed);
   const balancedAddress = deriveBalancedAddress(addressSeed);
   const receiptAnchor = deriveReceiptAnchor(stepIdentity, addressSeed);

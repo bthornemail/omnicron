@@ -97,6 +97,9 @@ Authority constraints:
 5. Rendering failures or backend divergence MUST NOT alter canonical truth.
 6. Coreform authority is `.logic` composer terms; NDJSON/render packets remain
    witness/projection surfaces only.
+7. Canonical artifacts used by render/replay MUST include provenance lineage to
+   an authoritative root (`bitboard_authority`, `coreform_logic`, or
+   `sequence_root`).
 
 ## Golden Fixture
 
