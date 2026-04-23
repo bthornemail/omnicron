@@ -71,6 +71,16 @@ function main() {
   const a = readOneJsonLine(canonicalA);
   const b = readOneJsonLine(canonicalB);
   assertEq("Derivation: deterministic canonical", a, b);
+  assertEq(
+    "Derivation: stage profile count",
+    (a.projection_hints?.stage_profiles || []).length,
+    4
+  );
+  assertEq(
+    "Derivation: lexical anchors present",
+    ((a.projection_hints?.lexical_anchors || []).length > 0),
+    true
+  );
 
   // Serialization-only noise does not alter canonical truth
   const noisyLogicPath = path.join(tmpDir, "coreform_noise.logic");

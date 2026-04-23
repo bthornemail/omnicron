@@ -1,0 +1,60 @@
+#+TITLE: Omnicron Root Entry
+#+AUTHOR: Repository Constitutional Entry
+#+STARTUP: overview
+
+* Root Entry
+
+This is the authoritative root entry contract for the repository.
+It defines the first navigation path into the canonical runtime and pipeline
+without adding new semantics.
+
+* Runtime Roots
+
+- Pair machine authority root: =pair-machine.c=
+- Interpreter authority root: =logic-interp.c=
+
+These two roots anchor the low-level runtime surface used by the broader logic,
+replay, and projection stack.
+
+* Authority Chain
+
+The canonical direction is:
+
+#+begin_example
+law
+-> pair/interp runtime roots
+-> Prolog source authority
+-> polyform derivation
+-> projection witnesses
+#+end_example
+
+Concrete chain map:
+
+- Law/design root: =docs/reference/root/The Universal Logic Page.md=
+- Runtime roots: =pair-machine.c=, =logic-interp.c=
+- Prolog authority sources:
+  - =logic/sources/omnitron_declarations.lx=
+  - =logic/sources/constitutional_stack.pl=
+  - =logic/sources/omnicron-rule-source.org=
+- Polyform authority roots:
+  - =polyform/bitboards/rules_selected.logic=
+  - =polyform/bitboards/coreform_chain.logic=
+- Derived projections:
+  - =logic/generated/*.ndjson=
+  - =logic/generated/ontology_graph.pgm=
+  - =polyform/objects/*.png=
+
+* Canonical Commands
+
+- =make test-pair-machine=
+- =make test=
+- =make verify-doc-layout=
+- =make verify-classification-manifest=
+- =make verify-locks=
+- =make rebuild-all=
+
+* Authoritative Inputs
+
+- =logic/sources/omnicron-rule-source.org=
+- =logic/sources/constitutional_stack.pl=
+- =docs/reference/root/The Universal Logic Page.md=

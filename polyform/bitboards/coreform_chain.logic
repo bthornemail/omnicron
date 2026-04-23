@@ -61,3 +61,25 @@ balanced_address(coreform_001_n3, 'ba:right:+2048').
 pattern_witness(coreform_001_n1, 'polyform/patterns/rules.beecode.bitboard').
 pattern_witness(coreform_001_n2, 'polyform/patterns/rules.maxi.bitboard').
 pattern_witness(coreform_001_n3, 'polyform/patterns/rules.code16k.bitboard').
+
+% Optional stage profiling (rides canonical path; not a second authority lane)
+stage_channel(coreform_001_n0, fs).
+stage_channel(coreform_001_n1, gs).
+stage_channel(coreform_001_n2, rs).
+stage_channel(coreform_001_n3, us).
+
+channel_semantics(fs, full_sum_xor_lane).
+channel_semantics(gs, generate_and_lane).
+channel_semantics(rs, route_or_lane).
+channel_semantics(us, shift_lookahead_lane).
+
+stage_view(coreform_001_n0, truth_map).
+stage_view(coreform_001_n1, karnaugh_torus).
+stage_view(coreform_001_n2, gate_diagram).
+stage_view(coreform_001_n3, carry_lookahead_diagram).
+
+% Optional lexical anchors for profiling/introspection surfaces
+wordnet_anchor(sum, 'wn:synset-sum-noun-1', fs).
+wordnet_anchor(generate, 'wn:synset-generate-verb-1', gs).
+wordnet_anchor(route, 'wn:synset-route-noun-1', rs).
+wordnet_anchor(carry, 'wn:synset-carry-verb-1', us).

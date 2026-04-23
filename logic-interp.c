@@ -22,7 +22,7 @@
  *
  * Relationship to the rest of the repo:
  * - bare metal executes kernel state and witnesses
- * - prolog/constitutional_stack.pl models a higher logical layer
+ * - logic/sources/constitutional_stack.pl models a higher logical layer
  * - this file is a host-side prototype for exploring an ASCII-only
  *   multi-syntax surface in ordinary userspace
  */
@@ -50,7 +50,7 @@
 
 typedef enum {
     NODE_NIL,
-    NODE_INT,
+    NODE_NUMERIC,
     NODE_ATOM,
     NODE_VAR,
     NODE_STRING,
@@ -60,12 +60,27 @@ typedef enum {
     NODE_QUERY
 } NodeType;
 
+typedef enum {
+    NUM_INT,
+    NUM_BCD,
+    NUM_RATIO,
+    NUM_FACTORADIC,
+    NUM_FLOAT
+} NumericKind;
+
 typedef struct Node Node;
 
 struct Node {
     NodeType type;
     union {
-        long integer;
+        struct {
+            NumericKind kind;
+            long integer;
+            long numer;
+            long denom;
+            double floating;
+            char *text;
+        } numeric;
         char *text;
         struct {
             Node *car;
@@ -211,9 +226,124 @@ static Node *node_nil(void) {
 }
 
 static Node *node_int(long value) {
-    Node *n = node_new(NODE_INT);
-    n->as.integer = value;
+    Node *n = node_new(NODE_NUMERIC);
+    n->as.numeric.kind = NUM_INT;
+    n->as.numeric.integer = value;
     return n;
+}
+
+static long gcd_long(long a, long b) {
+    if (a < 0) a = -a;
+    if (b < 0) b = -b;
+    while (b != 0) {
+        long t = a % b;
+        a = b;
+        b = t;
+    }
+    return a == 0 ? 1 : a;
+}
+
+static bool is_ascii_digits(const char *s) {
+    if (!s || !*s) {
+        return false;
+    }
+    for (const char *p = s; *p; ++p) {
+        if (!isdigit((unsigned char)*p)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool is_factoradic_chars(const char *s) {
+    if (!s || !*s) {
+        return false;
+    }
+    for (const char *p = s; *p; ++p) {
+        if (!isdigit((unsigned char)*p) && *p != ' ' && *p != ',' && *p != ':') {
+            return false;
+        }
+    }
+    return true;
+}
+
+static Node *node_bcd(const char *digits) {
+    if (!is_ascii_digits(digits)) {
+        fprintf(stderr, "BCD payload must be ASCII digits only\n");
+        exit(1);
+    }
+    Node *n = node_new(NODE_NUMERIC);
+    n->as.numeric.kind = NUM_BCD;
+    n->as.numeric.text = xstrdup(digits);
+    return n;
+}
+
+static Node *node_ratio(long numer, long denom) {
+    if (denom == 0) {
+        fprintf(stderr, "ratio denominator must not be zero\n");
+        exit(1);
+    }
+    if (denom < 0) {
+        numer = -numer;
+        denom = -denom;
+    }
+    long g = gcd_long(numer, denom);
+    Node *n = node_new(NODE_NUMERIC);
+    n->as.numeric.kind = NUM_RATIO;
+    n->as.numeric.numer = numer / g;
+    n->as.numeric.denom = denom / g;
+    return n;
+}
+
+static Node *node_factoradic(const char *digits) {
+    if (!is_factoradic_chars(digits)) {
+        fprintf(stderr, "factoradic payload must be ASCII digits/space/comma/colon\n");
+        exit(1);
+    }
+    Node *n = node_new(NODE_NUMERIC);
+    n->as.numeric.kind = NUM_FACTORADIC;
+    n->as.numeric.text = xstrdup(digits);
+    return n;
+}
+
+static Node *node_float(double value) {
+    Node *n = node_new(NODE_NUMERIC);
+    n->as.numeric.kind = NUM_FLOAT;
+    n->as.numeric.floating = value;
+    return n;
+}
+
+static bool node_is_int(Node *n) {
+    return n && n->type == NODE_NUMERIC && n->as.numeric.kind == NUM_INT;
+}
+
+static long node_int_value(Node *n) {
+    return n->as.numeric.integer;
+}
+
+static bool node_numeric_to_ratio(Node *n, long *numer, long *denom) {
+    if (!n || n->type != NODE_NUMERIC) {
+        return false;
+    }
+    if (n->as.numeric.kind == NUM_INT) {
+        *numer = n->as.numeric.integer;
+        *denom = 1;
+        return true;
+    }
+    if (n->as.numeric.kind == NUM_RATIO) {
+        *numer = n->as.numeric.numer;
+        *denom = n->as.numeric.denom;
+        return true;
+    }
+    return false;
+}
+
+static Node *numeric_from_ratio(long numer, long denom) {
+    Node *r = node_ratio(numer, denom);
+    if (r->as.numeric.denom == 1) {
+        return node_int(r->as.numeric.numer);
+    }
+    return r;
 }
 
 static Node *node_atom(const char *text) {
@@ -881,6 +1011,8 @@ static Node *apply_lambda(Node *fn, Node *args, Env *env) {
 
 static Node *eval_builtin(Node *op, Node *args, Env *env) {
     const char *name = op->as.text;
+    long lhs_n = 0, lhs_d = 1;
+    long rhs_n = 0, rhs_d = 1;
     if (strcmp(name, "quote") == 0) {
         return list_nth(args, 0);
     }
@@ -909,37 +1041,91 @@ static Node *eval_builtin(Node *op, Node *args, Env *env) {
         return result;
     }
     if (strcmp(name, "+") == 0) {
-        long sum = 0;
+        long numer = 0;
+        long denom = 1;
         for (Node *scan = args; !is_nil(scan) && scan->type == NODE_CONS; scan = scan->as.cons.cdr) {
             Node *v = eval(scan->as.cons.car, env);
-            if (v->type != NODE_INT) {
-                fprintf(stderr, "+ only supports integers in this prototype\n");
+            if (!node_numeric_to_ratio(v, &rhs_n, &rhs_d)) {
+                fprintf(stderr, "+ only supports INT/RATIO exact numerics\n");
                 exit(1);
             }
-            sum += v->as.integer;
+            numer = numer * rhs_d + rhs_n * denom;
+            denom *= rhs_d;
         }
-        return node_int(sum);
+        return numeric_from_ratio(numer, denom);
     }
     if (strcmp(name, "-") == 0) {
         Node *a = eval(list_nth(args, 0), env);
         Node *b = eval(list_nth(args, 1), env);
-        if (a->type != NODE_INT || b->type != NODE_INT) {
-            fprintf(stderr, "- only supports integers in this prototype\n");
+        if (!node_numeric_to_ratio(a, &lhs_n, &lhs_d) || !node_numeric_to_ratio(b, &rhs_n, &rhs_d)) {
+            fprintf(stderr, "- only supports INT/RATIO exact numerics\n");
             exit(1);
         }
-        return node_int(a->as.integer - b->as.integer);
+        return numeric_from_ratio(lhs_n * rhs_d - rhs_n * lhs_d, lhs_d * rhs_d);
     }
     if (strcmp(name, "*") == 0) {
-        long product = 1;
+        long numer = 1;
+        long denom = 1;
         for (Node *scan = args; !is_nil(scan) && scan->type == NODE_CONS; scan = scan->as.cons.cdr) {
             Node *v = eval(scan->as.cons.car, env);
-            if (v->type != NODE_INT) {
-                fprintf(stderr, "* only supports integers in this prototype\n");
+            if (!node_numeric_to_ratio(v, &rhs_n, &rhs_d)) {
+                fprintf(stderr, "* only supports INT/RATIO exact numerics\n");
                 exit(1);
             }
-            product *= v->as.integer;
+            numer *= rhs_n;
+            denom *= rhs_d;
         }
-        return node_int(product);
+        return numeric_from_ratio(numer, denom);
+    }
+    if (strcmp(name, "esc") == 0) {
+        Node *tag = eval(list_nth(args, 0), env);
+        Node *a0 = eval(list_nth(args, 1), env);
+        Node *a1 = eval(list_nth(args, 2), env);
+        const char *mode = NULL;
+        if (tag->type == NODE_ATOM || tag->type == NODE_VAR || tag->type == NODE_STRING) {
+            mode = tag->as.text;
+        }
+        if (!mode) {
+            fprintf(stderr, "esc expects a textual numeric mode tag\n");
+            exit(1);
+        }
+        if (strcmp(mode, "int") == 0) {
+            if (!node_is_int(a0)) {
+                fprintf(stderr, "esc int expects integer payload\n");
+                exit(1);
+            }
+            return node_int(node_int_value(a0));
+        }
+        if (strcmp(mode, "bcd") == 0) {
+            if (a0->type == NODE_STRING || a0->type == NODE_ATOM || a0->type == NODE_VAR) {
+                return node_bcd(a0->as.text);
+            }
+            fprintf(stderr, "esc bcd expects ASCII digit string payload\n");
+            exit(1);
+        }
+        if (strcmp(mode, "ratio") == 0) {
+            if (!node_is_int(a0) || !node_is_int(a1)) {
+                fprintf(stderr, "esc ratio expects two integer payload terms\n");
+                exit(1);
+            }
+            return node_ratio(node_int_value(a0), node_int_value(a1));
+        }
+        if (strcmp(mode, "factoradic") == 0) {
+            if (a0->type == NODE_STRING || a0->type == NODE_ATOM || a0->type == NODE_VAR) {
+                return node_factoradic(a0->as.text);
+            }
+            fprintf(stderr, "esc factoradic expects ASCII digit sequence string\n");
+            exit(1);
+        }
+        if (strcmp(mode, "float") == 0) {
+            if (node_is_int(a0)) {
+                return node_float((double)node_int_value(a0));
+            }
+            fprintf(stderr, "esc float expects integer payload in this prototype\n");
+            exit(1);
+        }
+        fprintf(stderr, "unknown esc numeric mode: %s\n", mode);
+        exit(1);
     }
     if (strcmp(name, "list") == 0) {
         return eval_each(args, env);
@@ -967,7 +1153,8 @@ static Node *eval_builtin(Node *op, Node *args, Env *env) {
     if (strcmp(name, "eq?") == 0 || strcmp(name, "eq") == 0) {
         Node *a = eval(list_nth(args, 0), env);
         Node *b = eval(list_nth(args, 1), env);
-        if (a->type == NODE_INT && b->type == NODE_INT && a->as.integer == b->as.integer) {
+        if (node_numeric_to_ratio(a, &lhs_n, &lhs_d) && node_numeric_to_ratio(b, &rhs_n, &rhs_d) &&
+            lhs_n * rhs_d == rhs_n * lhs_d) {
             return node_atom("t");
         }
         if ((a->type == NODE_ATOM || a->type == NODE_VAR) &&
@@ -986,7 +1173,7 @@ static Node *eval(Node *expr, Env *env) {
     }
     switch (expr->type) {
     case NODE_NIL:
-    case NODE_INT:
+    case NODE_NUMERIC:
     case NODE_STRING:
     case NODE_LAMBDA:
     case NODE_PREDICATE:
@@ -1085,8 +1272,24 @@ static bool unify(Node *a, Node *b, SubstSet *subs) {
     switch (a->type) {
     case NODE_NIL:
         return true;
-    case NODE_INT:
-        return a->as.integer == b->as.integer;
+    case NODE_NUMERIC: {
+        long an = 0, ad = 0, bn = 0, bd = 0;
+        if (node_numeric_to_ratio(a, &an, &ad) && node_numeric_to_ratio(b, &bn, &bd)) {
+            return an * bd == bn * ad;
+        }
+        if (a->as.numeric.kind != b->as.numeric.kind) {
+            return false;
+        }
+        switch (a->as.numeric.kind) {
+        case NUM_BCD:
+        case NUM_FACTORADIC:
+            return strcmp(a->as.numeric.text, b->as.numeric.text) == 0;
+        case NUM_FLOAT:
+            return a->as.numeric.floating == b->as.numeric.floating;
+        default:
+            return false;
+        }
+    }
     case NODE_ATOM:
     case NODE_STRING:
         return strcmp(a->as.text, b->as.text) == 0;
@@ -1126,8 +1329,8 @@ static bool solve_builtin_goal(Node *goal, SubstSet *subs) {
     }
     if (strcmp(goal->as.predicate.name, "write") == 0) {
         Node *arg = apply_subst(list_nth(goal->as.predicate.args, 0), subs);
-        if (arg->type == NODE_INT) {
-            printf("%ld", arg->as.integer);
+        if (arg->type == NODE_NUMERIC && arg->as.numeric.kind == NUM_INT) {
+            printf("%ld", arg->as.numeric.integer);
         } else if (arg->type == NODE_ATOM || arg->type == NODE_VAR || arg->type == NODE_STRING) {
             printf("%s", arg->as.text);
         } else {
@@ -1224,8 +1427,24 @@ static void print_node(Node *node) {
     case NODE_NIL:
         printf("()");
         break;
-    case NODE_INT:
-        printf("%ld", node->as.integer);
+    case NODE_NUMERIC:
+        switch (node->as.numeric.kind) {
+        case NUM_INT:
+            printf("%ld", node->as.numeric.integer);
+            break;
+        case NUM_BCD:
+            printf("bcd:%s", node->as.numeric.text);
+            break;
+        case NUM_RATIO:
+            printf("ratio:%ld/%ld", node->as.numeric.numer, node->as.numeric.denom);
+            break;
+        case NUM_FACTORADIC:
+            printf("factoradic:%s", node->as.numeric.text);
+            break;
+        case NUM_FLOAT:
+            printf("float:%g", node->as.numeric.floating);
+            break;
+        }
         break;
     case NODE_ATOM:
     case NODE_VAR:
@@ -1324,6 +1543,7 @@ static void print_ascii_help(void) {
     printf("ASCII structural bytes: ESC=%d FS=%d GS=%d RS=%d US=%d\n",
            ASCII_ESC, ASCII_FS, ASCII_GS, ASCII_RS, ASCII_US);
     printf("This interpreter accepts ASCII text input only.\n");
+    printf("Exact numerics via ESC forms: int, bcd, ratio, factoradic, float.\n");
 }
 
 static void repl(void) {
@@ -1372,6 +1592,9 @@ static void repl(void) {
             if (strncmp(line, ":h", 2) == 0) {
                 printf("Examples:\n");
                 printf("  :s   (+ 1 2 3)\n");
+                printf("  :s   (+ (esc ratio 1 3) (esc ratio 2 3))\n");
+                printf("  :s   (esc bcd \"123456\")\n");
+                printf("  :s   (esc factoradic \"0 0 3 2 0 6\")\n");
                 printf("  :m   list[1; 2; 3]\n");
                 printf("  :f   lambda(x)->(+ x 1)\n");
                 printf("  :p   parent(john, mary).\n");

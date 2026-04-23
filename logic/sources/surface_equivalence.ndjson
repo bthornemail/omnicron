@@ -1,0 +1,8 @@
+{"id":"object_parent","surface":"prolog","source":"parent(john,mary).","wordnet_anchor":"wn:synset-parent-noun-1","lexical_tags":["kinship","relation"]}
+{"id":"object_parent","surface":"datalog","source":"parent(john,mary).","wordnet_anchor":"wn:synset-parent-noun-1","lexical_tags":["kinship","relation"]}
+{"id":"object_parent","surface":"s_expr","source":"(parent john mary)","wordnet_anchor":"wn:synset-parent-noun-1","lexical_tags":["kinship","relation"]}
+{"id":"object_parent","surface":"m_expr","source":"parent[john; mary]","wordnet_anchor":"wn:synset-parent-noun-1","lexical_tags":["kinship","relation"]}
+{"id":"object_parent","surface":"f_expr","source":"parent(john, mary)","wordnet_anchor":"wn:synset-parent-noun-1","lexical_tags":["kinship","relation"]}
+{"id":"object_rule","surface":"prolog","source":"ancestor(X,Y) :- parent(X,Y)."}
+{"id":"object_rule","surface":"s_expr","source":"(rule (ancestor X Y) (parent X Y))"}
+{"id":"object_rule","surface":"m_expr","source":"rule[ancestor[X;Y]; parent[X;Y]]"}

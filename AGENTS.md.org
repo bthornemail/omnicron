@@ -17,6 +17,10 @@ This document is intended to answer four questions quickly:
 - What is contradicted or missing?
 - What should happen next?
 
+Canonical repo entrypoint:
+
+- [index.org](/root/omnicron/index.org)
+
 * Session Metadata
 
 - Session ID: =ses_25b6b9022ffewSEipuPxAjIao9=
@@ -111,13 +115,13 @@ confirmed good baseline.
 
 ** Present in repository
 
-- [README.md](/root/omnicron/README.md)
-- [CONSTITUTION.md](/root/omnicron/CONSTITUTION.md)
-- [ASCII_CONSTITUTIONAL_MACHINE.md](/root/omnicron/ASCII_CONSTITUTIONAL_MACHINE.md)
-- [riscv-baremetal/ATOMIC_KERNEL_SPEC.md](/root/omnicron/riscv-baremetal/ATOMIC_KERNEL_SPEC.md)
+- [README.repo.md](/root/omnicron/docs/reference/root/README.repo.md)
+- [CONSTITUTION.md](/root/omnicron/docs/reference/root/CONSTITUTION.md)
+- [ASCII_CONSTITUTIONAL_MACHINE.md](/root/omnicron/docs/reference/root/ASCII_CONSTITUTIONAL_MACHINE.md)
+- [ATOMIC_KERNEL_SPEC.md](/root/omnicron/docs/reference/riscv/ATOMIC_KERNEL_SPEC.md)
 - [riscv-baremetal/atomic_kernel.c](/root/omnicron/riscv-baremetal/atomic_kernel.c)
 - [riscv-baremetal/interpolator.c](/root/omnicron/riscv-baremetal/interpolator.c)
-- [prolog/constitutional_stack.pl](/root/omnicron/prolog/constitutional_stack.pl)
+- [logic/sources/constitutional_stack.pl](/root/omnicron/logic/sources/constitutional_stack.pl)
 
 ** Present in the original session record
 

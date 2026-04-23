@@ -52,10 +52,13 @@ function main() {
   if (derived.length === 0) fail("no derived entries found");
 
   const requiredAuthority = [
-    "prolog/omnitron_declarations.lx",
-    "prolog/constitutional_stack.pl",
-    "prolog/bootstrap_datalog.pl",
-    "prolog/omnicron-rule-source.org",
+    "index.org",
+    "logic/sources/omnitron_declarations.lx",
+    "logic/sources/constitutional_stack.pl",
+    "logic/sources/bootstrap_datalog.pl",
+    "logic/sources/omnicron-rule-source.org",
+    "logic/sources/surface_equivalence.ndjson",
+    "authority/locks_manifest.logic",
     "polyform/org/scripts/canonical_identity.mjs"
   ];
   for (const rel of requiredAuthority) {

@@ -31,6 +31,33 @@ function parseFact(line, prefix) {
   return line.slice(prefix.length, -2).trim();
 }
 
+function splitArgs(raw) {
+  const out = [];
+  let cur = "";
+  let inQuote = false;
+  let depth = 0;
+  for (let i = 0; i < raw.length; i += 1) {
+    const ch = raw[i];
+    if (ch === "'") {
+      inQuote = !inQuote;
+      cur += ch;
+      continue;
+    }
+    if (!inQuote) {
+      if (ch === "(") depth += 1;
+      if (ch === ")") depth -= 1;
+      if (ch === "," && depth === 0) {
+        out.push(cur.trim());
+        cur = "";
+        continue;
+      }
+    }
+    cur += ch;
+  }
+  if (cur.trim().length > 0) out.push(cur.trim());
+  return out;
+}
+
 function parseCoreformLogic(filePath) {
   const text = fs.readFileSync(filePath, "utf8");
   const lines = text
@@ -48,6 +75,11 @@ function parseCoreformLogic(filePath) {
   const derives = [];
   const virtualAddress = new Map();
   const balancedAddress = new Map();
+  const patternWitness = new Map();
+  const stageChannel = new Map();
+  const stageView = new Map();
+  const channelSemantics = new Map();
+  const wordnetAnchors = [];
 
   for (const line of lines) {
     const rootInner = parseFact(line, "coreform_root(");
@@ -109,6 +141,55 @@ function parseCoreformLogic(filePath) {
       }
       continue;
     }
+
+    const pwInner = parseFact(line, "pattern_witness(");
+    if (pwInner !== null) {
+      const [nodeIdRaw, witnessRaw] = splitArgs(pwInner);
+      if (nodeIdRaw && witnessRaw) {
+        patternWitness.set(parseQuotedOrAtom(nodeIdRaw), parseQuotedOrAtom(witnessRaw));
+      }
+      continue;
+    }
+
+    const scInner = parseFact(line, "stage_channel(");
+    if (scInner !== null) {
+      const [nodeIdRaw, channelRaw] = splitArgs(scInner);
+      if (nodeIdRaw && channelRaw) {
+        stageChannel.set(parseQuotedOrAtom(nodeIdRaw), parseQuotedOrAtom(channelRaw));
+      }
+      continue;
+    }
+
+    const svInner = parseFact(line, "stage_view(");
+    if (svInner !== null) {
+      const [nodeIdRaw, viewRaw] = splitArgs(svInner);
+      if (nodeIdRaw && viewRaw) {
+        stageView.set(parseQuotedOrAtom(nodeIdRaw), parseQuotedOrAtom(viewRaw));
+      }
+      continue;
+    }
+
+    const csInner = parseFact(line, "channel_semantics(");
+    if (csInner !== null) {
+      const [channelRaw, semanticsRaw] = splitArgs(csInner);
+      if (channelRaw && semanticsRaw) {
+        channelSemantics.set(parseQuotedOrAtom(channelRaw), parseQuotedOrAtom(semanticsRaw));
+      }
+      continue;
+    }
+
+    const wnInner = parseFact(line, "wordnet_anchor(");
+    if (wnInner !== null) {
+      const [tokenRaw, synsetRaw, channelRaw] = splitArgs(wnInner);
+      if (tokenRaw && synsetRaw && channelRaw) {
+        wordnetAnchors.push({
+          token: parseQuotedOrAtom(tokenRaw),
+          synset: parseQuotedOrAtom(synsetRaw),
+          channel: parseQuotedOrAtom(channelRaw)
+        });
+      }
+      continue;
+    }
   }
 
   if (!root) {
@@ -124,6 +205,9 @@ function parseCoreformLogic(filePath) {
       stage: stageByNode.get(nodeId) || "",
       virtual_address: virtualAddress.get(nodeId) || "",
       balanced_address: balancedAddress.get(nodeId) || "",
+      stage_channel: stageChannel.get(nodeId) || "",
+      stage_view: stageView.get(nodeId) || "",
+      pattern_witness: patternWitness.get(nodeId) || "",
       derives_from: derives.filter((d) => d.node === nodeId).map((d) => d.from)
     }));
 
@@ -203,7 +287,16 @@ function parseCoreformLogic(filePath) {
       authority_source: "polyform/bitboards .logic",
       chain_root: root,
       chain_stages: REQUIRED_STAGES,
-      stage_count: ordered.length
+      stage_count: ordered.length,
+      stage_profiles: ordered.map((n) => ({
+        node_id: n.node_id,
+        stage: n.stage,
+        channel: n.stage_channel || null,
+        channel_semantics: n.stage_channel ? (channelSemantics.get(n.stage_channel) || null) : null,
+        view: n.stage_view || null,
+        pattern_witness: n.pattern_witness || null
+      })),
+      lexical_anchors: wordnetAnchors
     },
     provenance: {
       derived_from: "coreform_logic",

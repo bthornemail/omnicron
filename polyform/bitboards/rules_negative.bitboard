@@ -1,5 +1,5 @@
 # POLYFORM NEGATIVE BITBOARD
-# Generated from: /root/omnicron/prolog/omnicron-rule-source.extracted.logic
+# Generated from: /root/omnicron/logic/generated/omnicron-rule-source.extracted.logic
 # Rule count (source): 1129
 # Width bits: 256
 WORD_0=0x00000000

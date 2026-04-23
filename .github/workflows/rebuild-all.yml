@@ -50,6 +50,6 @@ jobs:
         with:
           name: canonicality-attestation-${{ github.run_id }}
           path: |
-            prolog/canonicality_attestation.ndjson
-            prolog/canonicality_attestation.schema.json
+            logic/generated/canonicality_attestation.ndjson
+            logic/contracts/canonicality_attestation.schema.json
           if-no-files-found: warn

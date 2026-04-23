@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
  * CONSTITUTIONAL PAIR MACHINE (corrected minimal core)
@@ -75,13 +77,18 @@ enum {
     SYM_TERMS = 15,
     SYM_TERM = 16,
     SYM_COEF = 17,
-    SYM_MONS = 18
+    SYM_MONS = 18,
+    SYM_ADD = 19,
+    SYM_MUL = 20,
+    SYM_INC = 21,
+    SYM_SQUARE = 22
 };
 
 static const char *symbol_names[] = {
     "quote", "if", "define", "car", "cdr", "cons",
     "x", "y", "w", "h", "c", "t", "id",
-    "poly", "vars", "terms", "term", "coef", "mons"
+    "poly", "vars", "terms", "term", "coef", "mons",
+    "add", "mul", "inc", "square"
 };
 
 /* Static cons-cell memory: each cell is (car . cdr). */
@@ -550,6 +557,265 @@ static void print_value(Value v) {
     printf("<?>");
 }
 
+/* -------------------- Meta-compiler scaffold (reader/macro/codegen/bootstrap) -------------------- */
+
+typedef struct Reader {
+    const char *s;
+    size_t i;
+} Reader;
+
+static void rd_skip_ws(Reader *r) {
+    while (r->s[r->i] == ' ' || r->s[r->i] == '\t' || r->s[r->i] == '\n' || r->s[r->i] == '\r') {
+        r->i++;
+    }
+}
+
+static bool rd_accept(Reader *r, char c) {
+    rd_skip_ws(r);
+    if (r->s[r->i] == c) {
+        r->i++;
+        return true;
+    }
+    return false;
+}
+
+static int symbol_from_token(const char *tok) {
+    for (int i = 0; i < (int)(sizeof(symbol_names) / sizeof(symbol_names[0])); i++) {
+        if (strcmp(tok, symbol_names[i]) == 0) return i;
+    }
+    return -1;
+}
+
+static Value parse_expr(Reader *r);
+
+static Value parse_list_or_pair(Reader *r) {
+    rd_skip_ws(r);
+    if (rd_accept(r, ')')) return SPEC_NIL;
+
+    Value first = parse_expr(r);
+    rd_skip_ws(r);
+    if (rd_accept(r, '.')) {
+        Value tail = parse_expr(r);
+        if (!rd_accept(r, ')')) {
+            die("reader: missing ')' after dotted pair");
+            return SPEC_NIL;
+        }
+        return alloc_cell(first, tail);
+    }
+
+    Value rest = parse_list_or_pair(r);
+    return alloc_cell(first, rest);
+}
+
+static Value parse_atom(Reader *r) {
+    char tok[128];
+    size_t n = 0;
+    rd_skip_ws(r);
+    while (r->s[r->i] != '\0') {
+        char c = r->s[r->i];
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '(' || c == ')' || c == '.') break;
+        if (n + 1 < sizeof(tok)) tok[n++] = c;
+        r->i++;
+    }
+    tok[n] = '\0';
+    if (n == 0) return SPEC_NIL;
+
+    if (strcmp(tok, "nil") == 0) return SPEC_NIL;
+    if (strcmp(tok, "t") == 0) return SPEC_TRUE;
+
+    bool all_digits = true;
+    for (size_t i = 0; i < n; i++) {
+        if (tok[i] < '0' || tok[i] > '9') {
+            all_digits = false;
+            break;
+        }
+    }
+    if (all_digits) return MAKE_INT((uint16_t)strtoul(tok, NULL, 10));
+
+    int sid = symbol_from_token(tok);
+    if (sid >= 0) return MAKE_SYM((uint16_t)sid);
+    return MAKE_SYM(SYM_ID); /* unknown symbol fallback */
+}
+
+static Value parse_expr(Reader *r) {
+    rd_skip_ws(r);
+    if (rd_accept(r, '(')) {
+        return parse_list_or_pair(r);
+    }
+    return parse_atom(r);
+}
+
+static Value read_from_string(const char *src) {
+    Reader r = { src, 0 };
+    return parse_expr(&r);
+}
+
+static Value macro_expand(Value expr) {
+    if (!IS_REF(expr)) return expr;
+
+    Value head = cell_car(expr);
+    Value tail = cell_cdr(expr);
+
+    /* (inc x) => (add x 1) */
+    if (head == MAKE_SYM(SYM_INC) && IS_REF(tail) && IS_NIL(cell_cdr(tail))) {
+        Value x = macro_expand(cell_car(tail));
+        return list3(MAKE_SYM(SYM_ADD), x, MAKE_INT(1));
+    }
+
+    /* (square x) => (mul x x) */
+    if (head == MAKE_SYM(SYM_SQUARE) && IS_REF(tail) && IS_NIL(cell_cdr(tail))) {
+        Value x = macro_expand(cell_car(tail));
+        return list3(MAKE_SYM(SYM_MUL), x, x);
+    }
+
+    Value out_head = macro_expand(head);
+    Value out_tail = macro_expand(tail);
+    return alloc_cell(out_head, out_tail);
+}
+
+typedef struct Bytecode {
+    uint16_t code[2048];
+    size_t len;
+} Bytecode;
+
+enum {
+    BC_PUSH_INT = 1,
+    BC_PUSH_SYM = 2,
+    BC_PUSH_NIL = 3,
+    BC_CONS = 4,
+    BC_CAR = 5,
+    BC_CDR = 6,
+    BC_ADD = 7,
+    BC_MUL = 8,
+    BC_RET = 255
+};
+
+static void bc_emit(Bytecode *bc, uint16_t w) {
+    if (bc->len < (sizeof(bc->code) / sizeof(bc->code[0]))) {
+        bc->code[bc->len++] = w;
+    }
+}
+
+static void compile_data(Value v, Bytecode *bc);
+
+static bool is_unary(Value args) {
+    return IS_REF(args) && IS_NIL(cell_cdr(args));
+}
+
+static bool is_binary(Value args) {
+    return IS_REF(args) && IS_REF(cell_cdr(args)) && IS_NIL(cell_cdr(cell_cdr(args)));
+}
+
+static void compile_expr_bc(Value expr, Bytecode *bc) {
+    if (IS_INT(expr)) {
+        bc_emit(bc, BC_PUSH_INT);
+        bc_emit(bc, INT_VAL(expr));
+        return;
+    }
+    if (IS_SYM(expr)) {
+        bc_emit(bc, BC_PUSH_SYM);
+        bc_emit(bc, SYM_ID(expr));
+        return;
+    }
+    if (IS_NIL(expr)) {
+        bc_emit(bc, BC_PUSH_NIL);
+        return;
+    }
+    if (!IS_REF(expr)) {
+        bc_emit(bc, BC_PUSH_NIL);
+        return;
+    }
+
+    Value op = cell_car(expr);
+    Value args = cell_cdr(expr);
+    if (op == MAKE_SYM(SYM_CONS) && is_binary(args)) {
+        compile_expr_bc(cell_car(args), bc);
+        compile_expr_bc(cell_car(cell_cdr(args)), bc);
+        bc_emit(bc, BC_CONS);
+        return;
+    }
+    if (op == MAKE_SYM(SYM_CAR) && is_unary(args)) {
+        compile_expr_bc(cell_car(args), bc);
+        bc_emit(bc, BC_CAR);
+        return;
+    }
+    if (op == MAKE_SYM(SYM_CDR) && is_unary(args)) {
+        compile_expr_bc(cell_car(args), bc);
+        bc_emit(bc, BC_CDR);
+        return;
+    }
+    if (op == MAKE_SYM(SYM_ADD) && is_binary(args)) {
+        compile_expr_bc(cell_car(args), bc);
+        compile_expr_bc(cell_car(cell_cdr(args)), bc);
+        bc_emit(bc, BC_ADD);
+        return;
+    }
+    if (op == MAKE_SYM(SYM_MUL) && is_binary(args)) {
+        compile_expr_bc(cell_car(args), bc);
+        compile_expr_bc(cell_car(cell_cdr(args)), bc);
+        bc_emit(bc, BC_MUL);
+        return;
+    }
+    if (op == MAKE_SYM(SYM_QUOTE) && is_unary(args)) {
+        compile_data(cell_car(args), bc);
+        return;
+    }
+
+    compile_data(expr, bc);
+}
+
+static void compile_data(Value v, Bytecode *bc) {
+    if (!IS_REF(v)) {
+        compile_expr_bc(v, bc);
+        return;
+    }
+    compile_data(cell_car(v), bc);
+    compile_data(cell_cdr(v), bc);
+    bc_emit(bc, BC_CONS);
+}
+
+static uint32_t bc_checksum(const Bytecode *bc) {
+    uint32_t h = 2166136261u;
+    for (size_t i = 0; i < bc->len; i++) {
+        uint16_t w = bc->code[i];
+        h ^= (uint8_t)(w & 0xFFu);
+        h *= 16777619u;
+        h ^= (uint8_t)((w >> 8) & 0xFFu);
+        h *= 16777619u;
+    }
+    return h;
+}
+
+static void print_bytecode(const Bytecode *bc) {
+    printf("[");
+    for (size_t i = 0; i < bc->len; i++) {
+        if (i) printf(" ");
+        printf("%u", (unsigned)bc->code[i]);
+    }
+    printf("]");
+}
+
+static int selftest_metacompiler_bootstrap(void) {
+    const char *src = "(cons (square x) (inc 4))";
+    Value ast1 = read_from_string(src);
+    Value ex1 = macro_expand(ast1);
+    Bytecode bc1 = { {0}, 0 };
+    compile_expr_bc(ex1, &bc1);
+    bc_emit(&bc1, BC_RET);
+
+    Value ast2 = read_from_string(src);
+    Value ex2 = macro_expand(ast2);
+    Bytecode bc2 = { {0}, 0 };
+    compile_expr_bc(ex2, &bc2);
+    bc_emit(&bc2, BC_RET);
+
+    if (bc1.len != bc2.len) return 0;
+    for (size_t i = 0; i < bc1.len; i++) {
+        if (bc1.code[i] != bc2.code[i]) return 0;
+    }
+    return 1;
+}
+
 static int selftest_kernel_against_atomic_delta(void) {
     /*
      * Cross-check with the same 16-bit law used by riscv-baremetal/atomic_kernel.c:
@@ -669,6 +935,26 @@ int main(void) {
     printf("poly (P * 1) => ");
     print_poly(Pmul1);
     printf("\n");
+
+    /* Meta-compiler scaffold demo */
+    Value dotted = read_from_string("(x . y)");
+    printf("reader dotted (x . y) => ");
+    print_value(dotted);
+    printf("\n");
+
+    Value meta_src = read_from_string("(cons (square x) (inc 4))");
+    Value meta_expanded = macro_expand(meta_src);
+    Bytecode bc = { {0}, 0 };
+    compile_expr_bc(meta_expanded, &bc);
+    bc_emit(&bc, BC_RET);
+    printf("meta expanded => ");
+    print_value(meta_expanded);
+    printf("\n");
+    printf("meta bytecode => ");
+    print_bytecode(&bc);
+    printf("\n");
+    printf("meta checksum => 0x%08X\n", (unsigned)bc_checksum(&bc));
+    printf("meta bootstrap check => %s\n", selftest_metacompiler_bootstrap() ? "PASS" : "FAIL");
 
     return 0;
 }

@@ -1,0 +1,23 @@
+% Declarative lease/lock layer (authoritative)
+% States: open | leased | resolved
+
+file_state("pair-machine.c", leased).
+file_holder("pair-machine.c", "codex").
+file_resolved("pair-machine.c", false).
+file_hash("pair-machine.c", "sha256:7dd8517e0f6f028542502682c53e7ac3f537fe4f2fd4847e9f43431f456f3f95").
+file_clock("pair-machine.c", "2026-04-21T15:20:00Z").
+file_intent("pair-machine.c", "pair_runtime_core").
+
+file_state("logic-interp.c", leased).
+file_holder("logic-interp.c", "codex").
+file_resolved("logic-interp.c", false).
+file_hash("logic-interp.c", "sha256:442f3403f6395cdf92949ad01d07cae7f51ae5f84fd8ec8d0310da090864680b").
+file_clock("logic-interp.c", "2026-04-21T15:20:00Z").
+file_intent("logic-interp.c", "interpreter_core").
+
+file_state("logic/sources/polylog.c", leased).
+file_holder("logic/sources/polylog.c", "codex").
+file_resolved("logic/sources/polylog.c", false).
+file_hash("logic/sources/polylog.c", "sha256:54cb27eb7f69c830d9789490a7a809f71e023d89d34f4c715ca4cf1230b5f7f8").
+file_clock("logic/sources/polylog.c", "2026-04-21T15:20:00Z").
+file_intent("logic/sources/polylog.c", "parser_runtime_bridge").
