@@ -37,7 +37,9 @@ function main() {
     { id: "s11", name: "coreform_chain_verifier", cmd: "make verify-coreform-chain" },
     { id: "s12", name: "polyform_toolbox_verifier", cmd: "make verify-polyform-toolbox" },
     { id: "s13", name: "render_contract_verifier", cmd: "make verify-render-contract" },
-    { id: "s14", name: "ontology_graph_verifier", cmd: "make verify-ontology-graph" }
+    { id: "s14", name: "preheader_congruence_verifier", cmd: "make verify-preheader-congruence" },
+    { id: "s15", name: "endian_compatibility_verifier", cmd: "make verify-endian-compatibility" },
+    { id: "s16", name: "ontology_graph_verifier", cmd: "make verify-ontology-graph" }
   ];
 
   for (const s of stageDefs) {
@@ -52,7 +54,7 @@ function main() {
 
   const s15 = runCmd("./logic/tools/deterministic_replay.sh", rootDir);
   stages.push({
-    id: "s15",
+    id: "s17",
     name: "deterministic_hash_lock",
     status: s15.ok ? "pass" : "fail",
     detail: s15.ok ? "ok" : s15.out.slice(-800)

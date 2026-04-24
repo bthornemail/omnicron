@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://omnicron.local/schemas/preheader_congruence.schema.json",
+  "title": "Pre-header Congruence Vector",
+  "description": "Normative fail-fast contract for unary pre-header congruence and structural activation boundary.",
+  "type": "object",
+  "required": [
+    "id",
+    "stream",
+    "expected"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "header_commitment": {
+      "type": "array",
+      "description": "Expected header8 prefix commitment [0x00,0x1B,0x1C,0x1D,0x1E,0x1F].",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      }
+    },
+    "stream": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          {
+            "type": "object",
+            "required": [
+              "byte"
+            ],
+            "properties": {
+              "byte": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255
+              },
+              "interpret_as": {
+                "type": "string"
+              },
+              "expected_header8": {
+                "type": "array",
+                "minItems": 8,
+                "maxItems": 8,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 255
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "expected": {
+      "type": "object",
+      "required": [
+        "pass"
+      ],
+      "properties": {
+        "pass": {
+          "type": "boolean"
+        },
+        "error_code": {
+          "type": "string"
+        },
+        "phase_transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "index",
+              "from",
+              "to"
+            ],
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "from": {
+                "type": "string",
+                "enum": [
+                  "UNARY",
+                  "STRUCTURAL"
+                ]
+              },
+              "to": {
+                "type": "string",
+                "enum": [
+                  "UNARY",
+                  "STRUCTURAL"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

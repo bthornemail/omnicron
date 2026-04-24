@@ -564,6 +564,92 @@ typedef struct Reader {
     size_t i;
 } Reader;
 
+/*
+ * --------------------------------------------------------------------
+ * PRE-HEADER CONTRACT (FAIL-FAST, IN-C DIALECT GATE)
+ * --------------------------------------------------------------------
+ *
+ * Canonical control prefix:
+ *   [0]=0x00 [1]=0x1B [2]=0x1C [3]=0x1D [4]=0x1E [5]=0x1F
+ *
+ * Unary phase:
+ *   bytes <= 0x2F are unary control units.
+ *   structural tokens are forbidden in unary phase:
+ *     SP(0x20), '('(0x28), ')'(0x29), '.'(0x2E)
+ *
+ * Structural phase activation:
+ *   first byte > 0x2F activates structural phase.
+ *   this activation byte is a phase marker and not parsed as an s-expression
+ *   token in this bootstrap reader; parsing begins at the following byte.
+ */
+typedef enum BootErrCode {
+    BOOT_OK = 0,
+    BOOT_E_STREAM_TOO_SHORT = 1,
+    BOOT_E_HEADER_INCONGRUENT = 2,
+    BOOT_E_UNARY_STRUCTURAL_TOKEN = 3,
+    BOOT_E_NO_STRUCTURAL_TRANSITION = 4
+} BootErrCode;
+
+typedef struct BootCheck {
+    BootErrCode code;
+    size_t error_index;
+    size_t payload_start;
+} BootCheck;
+
+static const uint8_t canonical_header6[6] = {0x00u, 0x1Bu, 0x1Cu, 0x1Du, 0x1Eu, 0x1Fu};
+
+static bool is_unary_structural_token(uint8_t b) {
+    return (b == 0x20u || b == 0x28u || b == 0x29u || b == 0x2Eu);
+}
+
+static const char *boot_err_name(BootErrCode c) {
+    switch (c) {
+        case BOOT_OK: return "OK";
+        case BOOT_E_STREAM_TOO_SHORT: return "E_STREAM_TOO_SHORT";
+        case BOOT_E_HEADER_INCONGRUENT: return "E_HEADER_INCONGRUENT";
+        case BOOT_E_UNARY_STRUCTURAL_TOKEN: return "E_UNARY_STRUCTURAL_TOKEN";
+        case BOOT_E_NO_STRUCTURAL_TRANSITION: return "E_NO_STRUCTURAL_TRANSITION";
+        default: return "E_UNKNOWN";
+    }
+}
+
+static BootCheck verify_preheader_contract(const uint8_t *bytes, size_t n) {
+    BootCheck out = { BOOT_OK, 0u, 0u };
+    if (n < 7u) {
+        out.code = BOOT_E_STREAM_TOO_SHORT;
+        return out;
+    }
+
+    for (size_t i = 0; i < 6u; i++) {
+        if (bytes[i] != canonical_header6[i]) {
+            out.code = BOOT_E_HEADER_INCONGRUENT;
+            out.error_index = i;
+            return out;
+        }
+    }
+
+    bool structural = false;
+    for (size_t i = 0; i < n; i++) {
+        uint8_t b = bytes[i];
+        if (!structural) {
+            if (is_unary_structural_token(b)) {
+                out.code = BOOT_E_UNARY_STRUCTURAL_TOKEN;
+                out.error_index = i;
+                return out;
+            }
+            if (b > 0x2Fu) {
+                structural = true;
+                out.payload_start = i + 1u;
+                return out;
+            }
+        }
+    }
+
+    out.code = BOOT_E_NO_STRUCTURAL_TRANSITION;
+    out.error_index = n;
+    return out;
+}
+
 static void rd_skip_ws(Reader *r) {
     while (r->s[r->i] == ' ' || r->s[r->i] == '\t' || r->s[r->i] == '\n' || r->s[r->i] == '\r') {
         r->i++;
@@ -648,6 +734,18 @@ static Value parse_expr(Reader *r) {
 static Value read_from_string(const char *src) {
     Reader r = { src, 0 };
     return parse_expr(&r);
+}
+
+static Value read_from_boot_stream(const uint8_t *stream, size_t n) {
+    BootCheck chk = verify_preheader_contract(stream, n);
+    if (chk.code != BOOT_OK) {
+        char msg[128];
+        snprintf(msg, sizeof(msg), "boot contract violation %s at index %u",
+                 boot_err_name(chk.code), (unsigned)chk.error_index);
+        die(msg);
+        return SPEC_NIL;
+    }
+    return read_from_string((const char *)(stream + chk.payload_start));
 }
 
 static Value macro_expand(Value expr) {
@@ -936,8 +1034,13 @@ int main(void) {
     print_poly(Pmul1);
     printf("\n");
 
-    /* Meta-compiler scaffold demo */
-    Value dotted = read_from_string("(x . y)");
+    /* Meta-compiler scaffold demo (strict pre-header bootstrap path) */
+    const uint8_t boot_dotted_stream[] = {
+        0x00u, 0x1Bu, 0x1Cu, 0x1Du, 0x1Eu, 0x1Fu,
+        0x40u, /* phase marker: first byte > 0x2F */
+        '(', 'x', ' ', '.', ' ', 'y', ')', 0
+    };
+    Value dotted = read_from_boot_stream(boot_dotted_stream, sizeof(boot_dotted_stream));
     printf("reader dotted (x . y) => ");
     print_value(dotted);
     printf("\n");

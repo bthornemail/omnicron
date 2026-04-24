@@ -742,6 +742,9 @@ static Node *parse_sexpr(Lexer *lx) {
     case TOK_ATOM:
         advance(lx);
         return node_atom(t->text);
+    case TOK_LAMBDA:
+        advance(lx);
+        return node_atom("lambda");
     case TOK_VAR:
         advance(lx);
         return node_var(t->text);

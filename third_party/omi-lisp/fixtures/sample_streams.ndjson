@@ -1,0 +1,2 @@
+{"id":"omi-reference-dot-pair","description":"Reference stream for post-boundary dot pair and mixed planes.","header_commitment":[0,27,28,29,30,31],"stream":[0,27,28,29,30,31,64,40,65,46,66,41,128,192],"expected_emits":["CONTROL.UNARY(0x00)","CONTROL.UNARY(0x1B)","CONTROL.UNARY(0x1C)","CONTROL.UNARY(0x1D)","CONTROL.UNARY(0x1E)","CONTROL.UNARY(0x1F)","TOKEN.ASCII(0x40)","STRUCT.LIST-OPEN(depth=1)","TOKEN.ASCII(0x41)","STRUCT.DOT(left=0x41)","STRUCT.PAIR(left=0x41,right=0x42)","STRUCT.LIST-CLOSE(depth=1)","TOKEN.BRAILLE(0x80)","TOKEN.AEGEAN(0xC0)"]}
+

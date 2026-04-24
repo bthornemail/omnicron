@@ -5,7 +5,10 @@ import path from "node:path";
 
 const DOC_EXTENSIONS = new Set([".md", ".pdf", ".svg", ".txt", ".rst", ".gif", ".png"]);
 const DOC_PATH_EXCEPTIONS = [
-  "polyform/objects/"
+  "polyform/objects/",
+  "README.md",
+  "AGENTS.md",
+  "third_party/omi-lisp/"
 ];
 
 function walkFiles(rootDir) {

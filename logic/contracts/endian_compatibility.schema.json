@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "omnicron://contracts/endian_compatibility.schema.json",
+  "title": "Endian Compatibility Vector",
+  "type": "object",
+  "required": ["id", "width_bits", "value_hex", "order", "expected_bytes"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "width_bits": {
+      "type": "integer",
+      "enum": [8, 16, 32, 64]
+    },
+    "value_hex": {
+      "type": "string",
+      "pattern": "^0x[0-9A-Fa-f]+$"
+    },
+    "order": {
+      "type": "string",
+      "enum": ["BE", "LE"]
+    },
+    "expected_bytes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      }
+    },
+    "expected_swap_hex": {
+      "type": "string",
+      "pattern": "^0x[0-9A-Fa-f]+$"
+    },
+    "expect_cross_decode_unequal": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

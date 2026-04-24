@@ -1,0 +1,4 @@
+{"id":"ged_none","mask":0,"expected":{"pass":true,"must_emit":["STRUCT.SPACE","TOKEN.ASCII(0x30)","TOKEN.ASCII(0x3A)","TOKEN.ASCII(0x3F)"],"transition_index":32}}
+{"id":"ged_mem_only","mask":1,"expected":{"pass":true,"must_emit":["STRUCT.SPACE","STRUCT.LIST-OPEN(depth=1)","TOKEN.ASCII(0x31)"],"transition_index":32}}
+{"id":"ged_nvdimm_cpu","mask":12,"expected":{"pass":true,"must_emit":["STRUCT.SPACE","STRUCT.DOT-DANGLING","TOKEN.ASCII(0x2F)","TOKEN.ASCII(0x32)"],"transition_index":32}}
+{"id":"ged_reserved_fail","mask":16,"expected":{"pass":false,"error_code":"E_GED_RESERVED_BITS"}}

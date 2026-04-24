@@ -1,0 +1,11 @@
+{"type":"multi_emulator_smoke","id":"substrate_gates","status":"PASS","detail":"preheader+endian+ged all pass"}
+{"type":"multi_emulator_smoke","id":"qemu_binaries","status":"PASS","detail":"riscv64+x86_64+aarch64 present"}
+{"type":"multi_emulator_smoke","id":"qemu_riscv64_runtime","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_x86_64_init","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_aarch64_init","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_riscv32_init","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_arm_init","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_microblaze_init","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_esp32s3_init","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_ppc64_init","status":"PASS","detail":"startup smoke ok"}
+{"type":"multi_emulator_smoke","id":"qemu_mips_init","status":"PASS","detail":"startup smoke ok"}

@@ -1,4 +1,7 @@
-# Dev Docs Index
+# Front-End Migration Index
+
+This index tracks historical document moves and classification status for the
+front-end/reference side of `dev-docs`.
 
 Canonical map (`old_path -> new_path`) with category and status.
 

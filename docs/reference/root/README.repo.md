@@ -125,7 +125,40 @@ CI merge gate:
 - GitHub Actions workflow: `canonicality-rebuild-all`
 - Required status check name: `rebuild-all`
 - Required status check name: `verify-render-contract`
+- Required status check name: `verify-preheader-congruence`
 - CI publishes `logic/canonicality_attestation.ndjson` as a build artifact.
+
+## Declarative Portable Dev (Guix)
+
+This repository now provides a declarative Guix environment for portable
+QEMU-based development.
+
+Declarations:
+
+- `guix/channels.scm`
+- `guix/manifest-core.scm`
+- `guix/manifest-editors.scm` (optional Electron/Atom/Pulsar layer)
+
+Instantiate:
+
+```bash
+guix pull -C guix/channels.scm
+guix shell -m guix/manifest-core.scm
+```
+
+With optional editor layer:
+
+```bash
+guix shell -m guix/manifest-core.scm -m guix/manifest-editors.scm
+```
+
+Build helpers:
+
+```bash
+make guix-pull
+make guix-shell-core
+make guix-shell-dev
+```
 
 ## Architecture
 
@@ -136,6 +169,33 @@ CI merge gate:
 5. **Layer 3**: Closure (CHR reduction)
 6. **Layer 4**: Receipts (Prolog lowering)
 7. **Layer 5**: Surfaces (Stars/Braille/Hexagram)
+
+## Bootstrap Semantics (Unary First)
+
+This repository distinguishes two different mechanisms:
+
+- **Pre-header**: pre-Lisp bootstrap semantics.
+- **HEADER8**: runtime typecaster for LUT injection/query after boot.
+
+Normative parsing rule:
+
+1. During pre-header, the first three ASCII rows (`0x00..0x2F`) are consumed as unary control units.
+2. During this unary phase, `SP` (`0x20`) and `.` (`0x2E`) MUST NOT be interpreted as structural delimiters.
+3. After the pre-header boundary is consumed, structural syntax may activate (`SP`, `.`, parentheses, etc.).
+
+This preserves the intended multi-layer construction: unary control axis first, symbolic syntax second.
+
+Fail-fast requirement:
+
+- If stream/header congruence fails, execution must stop at the first violation.
+- No fallback interpretation path is allowed.
+
+Implementation references:
+
+- `docs/reference/root/MERGE_STRATEGY_OMI_LISP.md`
+- `docs/reference/logic/BYTE_TO_DOT_RUNTIME.md`
+- `logic/contracts/preheader_congruence.schema.json`
+- `logic/verify/verify_preheader_congruence.mjs`
 
 ## The 6 Laws
 

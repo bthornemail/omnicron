@@ -1,29 +1,35 @@
-# Dev Docs Policy
+# Dev Documentation System
 
-`dev-docs/` is mutable research space.
-Canonical project documentation lives under `docs/`.
+This directory is your working documentation lab.  
+Canonical, stable docs live in `docs/`.
 
-Classification rule:
+## Structure
 
-- `code` stays in place:
-  - files executed or parsed by build/runtime (`.c`, `.h`, `.mjs`, `.js`, `.pl`, `.logic`, runtime-loaded `.lisp`)
-  - `.org` files used as pipeline inputs (for example `logic/omnicron-rule-source.org`)
-- `docs` should be copied/promoted to `docs/` when canonicalized:
-  - `.md`, `.pdf`, `.svg`, `.txt`, `.rst`
-  - non-executable design notes, references, specifications
+`dev-docs` is split into two major views:
 
-Domain folders:
+- `front-end/`: conceptual, mathematical, reference, visual, and archive material.
+- `back-end/`: executable/runtime-oriented material, organized by OSI-style layers.
 
-- `barcodes/`
-- `polyforms/`
-- `logic/`
-- `math/`
-- `hardware/`
-- `reference/`
-- `archive/`
+## How to use this split
 
-Enforcement:
+- Put evolving research notes, experiments, and rough design in `dev-docs/`.
+- Promote mature docs to `docs/reference/` when they become project truth.
+- Keep executable sources in code directories (`logic/`, `riscv-baremetal/`, etc.), not in docs.
 
-- `make verify-doc-layout` must pass.
-- `docs/reference/` must exist and remain the canonical documentation root.
-- `temp-docs/` is deprecated and must not contain active documentation.
+## Start Here
+
+1. Read [DOC_WRITING_PLAYBOOK.md](/root/omnicron/dev-docs/DOC_WRITING_PLAYBOOK.md).
+2. Keep front-end narratives in [front-end/README.md](/root/omnicron/dev-docs/front-end/README.md).
+3. Keep runtime/build/system docs in [back-end/README.md](/root/omnicron/dev-docs/back-end/README.md).
+4. Use [DOC_TEMPLATE.md](/root/omnicron/dev-docs/back-end/00-shared/DOC_TEMPLATE.md) for new technical docs.
+
+## Documentation goal
+
+Your docs should make a new contributor able to answer:
+
+- What is the system?
+- What are the hard invariants?
+- How does one byte move through the runtime?
+- How do I run and verify it?
+- What fails fast, and why?
+

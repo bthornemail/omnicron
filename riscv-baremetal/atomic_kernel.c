@@ -376,40 +376,10 @@ static volatile long sbi_call(long a0, long a1, long a2, long a3, long a4, long 
     return r0;
 }
 
-static void emit_c(long c) { sbi_call(1, c, 0, 0, 0, 0); }
-static void emit_nl(void) { emit_c(13); emit_c(10); }
-
-// Print 4 hex digits (minimal, no division)
-static void emit_h4(uint32_t v) {
-    uint32_t d;
-    v &= 0xFFFF;
-    d = (v >> 12) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 8) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 4) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = v & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-}
-
-// Print 8 hex digits (inline, no division)
-static void emit_h8(uint32_t v) {
-    emit_c(48); emit_c(120); // "0x"
-    // Manual extraction
-    uint32_t d;
-    d = (v >> 28) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 24) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 20) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 16) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 12) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 8) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = (v >> 4) & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-    d = v & 0xF; emit_c(d < 10 ? 48+d : 55+d);
-}
-
 // Debug output to kernel .data section (accessible from GDB)
 static uint32_t g_debug0, g_debug1, g_debug2, g_debug3;
 
 static void report_state(omicron_t *o, atomic_kernel_t *k, uint32_t tick) {
-    // Instead of printing, stash a few fields in globals so a debugger can read
-    // them without needing a rich console path.
     if (tick < 5 || tick == 420 || tick == 5040) {
         g_debug0 = tick;
         g_debug1 = k->state;

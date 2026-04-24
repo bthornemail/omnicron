@@ -1,0 +1,7 @@
+{"id":"u16_bom_utf16be","width_bits":16,"value_hex":"0xFEFF","order":"BE","expected_bytes":[254,255],"expected_swap_hex":"0xFFFE","expect_cross_decode_unequal":true}
+{"id":"u16_bom_utf16le","width_bits":16,"value_hex":"0xFFFE","order":"LE","expected_bytes":[254,255],"expected_swap_hex":"0xFEFF","expect_cross_decode_unequal":true}
+{"id":"u16_control_window_marker_be","width_bits":16,"value_hex":"0x1C1D","order":"BE","expected_bytes":[28,29],"expected_swap_hex":"0x1D1C","expect_cross_decode_unequal":true}
+{"id":"u32_state_word_be","width_bits":32,"value_hex":"0x12345678","order":"BE","expected_bytes":[18,52,86,120],"expected_swap_hex":"0x78563412","expect_cross_decode_unequal":true}
+{"id":"u32_state_word_le","width_bits":32,"value_hex":"0x12345678","order":"LE","expected_bytes":[120,86,52,18],"expected_swap_hex":"0x78563412","expect_cross_decode_unequal":true}
+{"id":"u64_runtime_lane_be","width_bits":64,"value_hex":"0x0123456789ABCDEF","order":"BE","expected_bytes":[1,35,69,103,137,171,205,239],"expected_swap_hex":"0xEFCDAB8967452301","expect_cross_decode_unequal":true}
+{"id":"u64_runtime_lane_le","width_bits":64,"value_hex":"0x0123456789ABCDEF","order":"LE","expected_bytes":[239,205,171,137,103,69,35,1],"expected_swap_hex":"0xEFCDAB8967452301","expect_cross_decode_unequal":true}

@@ -17,8 +17,20 @@
 
 QEMU=qemu-system-riscv64
 BIOS=/usr/share/qemu/opensbi-riscv64-generic-fw_dynamic.bin
-KERNEL=/root/omnicron/riscv-baremetal/my_kernel.flat
 MEM_PATH=/dev/shm/omicron_mirror
+RUNTIME_DIR=/root/omnicron/riscv-baremetal
+
+# Prefer canonical flat image, but support existing alternates in this repo.
+if [[ -f "$RUNTIME_DIR/my_kernel.flat" ]]; then
+  KERNEL="$RUNTIME_DIR/my_kernel.flat"
+elif [[ -f "$RUNTIME_DIR/my_kernel.flat2" ]]; then
+  KERNEL="$RUNTIME_DIR/my_kernel.flat2"
+elif [[ -f "$RUNTIME_DIR/my_kernel.bin" ]]; then
+  KERNEL="$RUNTIME_DIR/my_kernel.bin"
+else
+  echo "ERROR: no kernel artifact found in $RUNTIME_DIR (expected my_kernel.flat|my_kernel.flat2|my_kernel.bin)" >&2
+  exit 2
+fi
 
 # Clean up from previous runs
 # Remove old socket paths and mirror files so QEMU can recreate them cleanly.

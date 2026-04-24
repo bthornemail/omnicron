@@ -21,7 +21,7 @@ PAIR_SRC := pair-machine.c
 POLYLOG := polylog
 POLYLOG_SRC := logic/sources/polylog.c
 
-.PHONY: all clean test test-pair-machine test-polylog test-polylog-bootstrap test-rule-source test-wordnet-synset-graph verify-bridge-replay verify-coreform-chain verify-bitboard-authority verify-render-contract verify-ontology-graph verify-classification-manifest verify-doc-layout verify-locks verify-surface-equivalence derive-surface-projections report-devdocs-refs checkout checkin resolve-lock reopen-lock lock-status ontology-graph ontology-graph-raster polyform-toolbox derive-polyform-patterns verify-polyform-toolbox rebuild-all bitboards graph-bitboards deterministic
+.PHONY: all clean test test-pair-machine test-polylog test-polylog-bootstrap test-rule-source test-wordnet-synset-graph test-omi-lisp-surface verify-ascii-substrate-lexer verify-ged-ascii-substrate verify-preheader-congruence verify-endian-compatibility verify-multi-emulator-smoke verify-multi-emulator-smoke-strict poc-mixedbase-render poc-mixedbase-header8-render remote-node-check remote-node-check-full verify-bridge-replay verify-coreform-chain verify-bitboard-authority verify-render-contract verify-ontology-graph verify-classification-manifest verify-doc-layout verify-locks verify-surface-equivalence derive-surface-projections report-devdocs-refs checkout checkin resolve-lock reopen-lock lock-status ontology-graph ontology-graph-raster polyform-toolbox derive-polyform-patterns verify-polyform-toolbox rebuild-all bitboards graph-bitboards deterministic guix-pull guix-shell-core guix-shell-dev
 VIEWER_BIN := omnicron_viewer
 VIEWER_SRC := viewer/omnicron_viewer.c
 
@@ -86,6 +86,54 @@ test-wordnet-synset-graph: $(POLYLOG)
 	node ./logic/tools/wordnet_prolog_to_synset_graph.mjs logic/sources/wordnet_synset_test.pl logic/generated/wordnet_synset_graph.ndjson
 	grep -q '"type":"wordnet_synset_graph"' logic/generated/wordnet_synset_graph.ndjson
 	grep -q '"relation":"hypernym"' logic/generated/wordnet_synset_graph.ndjson
+
+test-omi-lisp-surface: $(TARGET)
+	chmod +x ./logic/verify/verify_omi_lisp_surface.sh
+	./logic/verify/verify_omi_lisp_surface.sh
+
+verify-ascii-substrate-lexer:
+	chmod +x ./logic/verify/verify_ascii_substrate_lexer.mjs
+	node ./logic/verify/verify_ascii_substrate_lexer.mjs
+
+verify-ged-ascii-substrate:
+	chmod +x ./logic/verify/verify_ged_ascii_substrate.mjs ./logic/runtime/ged_ascii_substrate.mjs
+	node ./logic/verify/verify_ged_ascii_substrate.mjs
+
+verify-preheader-congruence:
+	chmod +x ./logic/verify/verify_preheader_congruence.mjs ./logic/runtime/header8_runtime.mjs ./logic/runtime/dot_rewrite.mjs
+	node ./logic/verify/verify_preheader_congruence.mjs
+
+verify-endian-compatibility:
+	chmod +x ./logic/verify/verify_endian_compatibility.mjs
+	node ./logic/verify/verify_endian_compatibility.mjs
+
+verify-multi-emulator-smoke:
+	chmod +x ./logic/verify/verify_multi_emulator_smoke.sh
+	./logic/verify/verify_multi_emulator_smoke.sh
+
+verify-multi-emulator-smoke-strict:
+	chmod +x ./logic/verify/verify_multi_emulator_smoke.sh
+	./logic/verify/verify_multi_emulator_smoke.sh --strict
+
+poc-mixedbase-render:
+	chmod +x ./polyform/org/scripts/mixedbase_stream_to_render_packet_ndjson.mjs ./polyform/org/scripts/org_render_packet_to_svg.mjs
+	node ./polyform/org/scripts/mixedbase_stream_to_render_packet_ndjson.mjs ./dev-docs/back-end/99-build/mixedbase_stream_sample.txt /tmp/mixedbase.render_packet.ndjson
+	node ./polyform/org/scripts/org_render_packet_to_svg.mjs /tmp/mixedbase.render_packet.ndjson /tmp/mixedbase.svg
+	@echo "OK: /tmp/mixedbase.render_packet.ndjson and /tmp/mixedbase.svg"
+
+poc-mixedbase-header8-render:
+	chmod +x ./polyform/org/scripts/mixedbase_header8_stream_to_render_packet_ndjson.mjs ./polyform/org/scripts/mixedbase_stream_to_render_packet_ndjson.mjs ./polyform/org/scripts/org_render_packet_to_svg.mjs
+	node ./polyform/org/scripts/mixedbase_header8_stream_to_render_packet_ndjson.mjs ./dev-docs/back-end/99-build/mixedbase_stream_sample.txt /tmp/mixedbase_header8.render_packet.ndjson /tmp/mixedbase_header8.witness.ndjson
+	node ./polyform/org/scripts/org_render_packet_to_svg.mjs /tmp/mixedbase_header8.render_packet.ndjson /tmp/mixedbase_header8.svg
+	@echo "OK: /tmp/mixedbase_header8.render_packet.ndjson /tmp/mixedbase_header8.witness.ndjson /tmp/mixedbase_header8.svg"
+
+remote-node-check:
+	chmod +x ./logic/tools/remote_node_check.sh
+	./logic/tools/remote_node_check.sh quick
+
+remote-node-check-full:
+	chmod +x ./logic/tools/remote_node_check.sh
+	./logic/tools/remote_node_check.sh full
 
 $(VIEWER_BIN): $(VIEWER_SRC)
 	@if ! command -v pkg-config >/dev/null 2>&1; then \
@@ -198,7 +246,7 @@ verify-polyform-toolbox: polyform-toolbox
 	node ./polyform/scripts/polyform_toolbox.mjs verify rules_golden_code16k
 
 rebuild-all:
-	chmod +x ./logic/verify/verify_riscv_artifacts.sh ./logic/tools/rebuild_all_attestation.mjs ./logic/verify/verify_render_contract.mjs ./logic/tools/generate_ontology_graph.mjs ./logic/tools/ontology_graph_to_pgm.mjs ./logic/verify/verify_ontology_graph.mjs ./authority/verify_classification_manifest.mjs ./authority/report_devdocs_refs.mjs ./dev-docs/verify_doc_layout.mjs ./logic/verify/verify_locks.mjs ./logic/verify/verify_surface_equivalence.mjs ./logic/tools/surface_equivalence_to_projection_profile.mjs ./logic/tools/lockctl.mjs ./polyform/bitboards/verify_bitboard_authority.mjs ./polyform/bitboards/bitboard_to_canonical_ndjson.mjs ./polyform/bitboards/verify_coreform_chain.mjs ./polyform/bitboards/coreform_logic_to_canonical_ndjson.mjs ./polyform/org/scripts/canonical_identity.mjs ./polyform/org/scripts/org_canonical_to_render_packet_ndjson.mjs ./polyform/org/scripts/org_render_packet_to_svg.mjs ./polyform/scripts/polyform_toolbox.mjs ./logic/verify/verify_bridge_fact_equivalence.sh ./logic/tools/deterministic_replay.sh
+	chmod +x ./logic/verify/verify_riscv_artifacts.sh ./logic/tools/rebuild_all_attestation.mjs ./logic/verify/verify_render_contract.mjs ./logic/tools/generate_ontology_graph.mjs ./logic/tools/ontology_graph_to_pgm.mjs ./logic/verify/verify_ontology_graph.mjs ./authority/verify_classification_manifest.mjs ./authority/report_devdocs_refs.mjs ./dev-docs/verify_doc_layout.mjs ./logic/verify/verify_locks.mjs ./logic/verify/verify_surface_equivalence.mjs ./logic/tools/surface_equivalence_to_projection_profile.mjs ./logic/tools/lockctl.mjs ./polyform/bitboards/verify_bitboard_authority.mjs ./polyform/bitboards/bitboard_to_canonical_ndjson.mjs ./polyform/bitboards/verify_coreform_chain.mjs ./polyform/bitboards/coreform_logic_to_canonical_ndjson.mjs ./polyform/org/scripts/canonical_identity.mjs ./polyform/org/scripts/org_canonical_to_render_packet_ndjson.mjs ./polyform/org/scripts/org_render_packet_to_svg.mjs ./polyform/scripts/polyform_toolbox.mjs ./logic/verify/verify_bridge_fact_equivalence.sh ./logic/tools/deterministic_replay.sh ./logic/verify/verify_preheader_congruence.mjs ./logic/runtime/header8_runtime.mjs ./logic/runtime/dot_rewrite.mjs ./logic/verify/verify_endian_compatibility.mjs
 	node ./logic/tools/rebuild_all_attestation.mjs
 
 bitboards: $(POLYLOG) test-rule-source
@@ -216,6 +264,15 @@ deterministic: $(POLYLOG)
 	$(MAKE) verify-bitboard-authority
 	cd ./polyform/org && npm run verify-bridge && npm run verify-bridge-golden
 	./logic/tools/deterministic_replay.sh
+
+guix-pull:
+	guix pull -C guix/channels.scm
+
+guix-shell-core:
+	guix shell -m guix/manifest-core.scm
+
+guix-shell-dev:
+	guix shell -m guix/manifest-core.scm -m guix/manifest-editors.scm
 
 clean:
 	rm -f $(TARGET) $(PAIR_TARGET) $(POLYLOG) $(VIEWER_BIN) /tmp/logic-interp.sexpr.out /tmp/logic-interp.ratio.out /tmp/logic-interp.bcd.out /tmp/logic-interp.factoradic.out /tmp/logic-interp.prolog.out /tmp/pair-machine.out /tmp/polylog.fact.out /tmp/polylog.rule.out /tmp/polylog.bootstrap.out /tmp/polylog.wordnet.out logic/generated/lock_state.ndjson logic/generated/surface_equivalence_receipts.ndjson logic/generated/surface_equivalence_summary.ndjson logic/generated/surface_projection_profile.ndjson logic/generated/devdocs_reference_warnings.ndjson logic/generated/wordnet_synset_graph.ndjson

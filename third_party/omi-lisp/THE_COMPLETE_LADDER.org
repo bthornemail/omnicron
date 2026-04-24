@@ -1,0 +1,374 @@
+# THE COMPLETE LADDER - FROM SEED TO AEGEAN
+
+## TABLE OF CONTENTS
+
+1. THE STREAM
+2. THE CONTROL CODES
+3. VIRTUAL ADDRESSING OF LUT
+4. RECURSIVE BUILDING
+5. AEGEAN - EXPONENT
+6. BRAILLE - SIGNIFICAND
+7. OCTUPLE PRECISION
+8. THE FULL LADDER
+
+---
+
+# CHAPTER 1: THE STREAM
+
+## COMPUTERS WORK BY STREAM
+
+A computer is a stream processor.
+
+```
+BYTE IN → PROCESS → BYTE OUT → NEXT BYTE IN → ...
+```
+
+That's all. One byte at a time, flowing through.
+
+NOT structured. NOT paired. Just sequential bytes.
+
+---
+
+# CHAPTER 2: THE CONTROL CODES
+
+## JUST BYTES
+
+The 32 control codes (0x00-0x1F) are NOT special. They are NOT "control characters". They are NOT "events".
+
+They are just BYTES in the stream.
+
+```
+BYTE 0x00 (NUL)
+BYTE 0x01 (SOH)
+BYTE 0x02 (STX)
+...
+BYTE 0x1F (US)
+```
+
+32 bytes. Sequential. That is ALL.
+
+---
+
+## THE STREAM IS THE COMPUTER
+
+Input byte → process → output byte → next input
+
+That's all. Just bytes flowing.
+
+---
+
+# CHAPTER 3: VIRTUAL ADDRESSING OF LUT
+
+## BUILDING ADDRESSES
+
+We BUILD virtual addresses from the stream.
+
+The 32 control codes become VIRTUAL ADDRESSES in the LUT.
+
+```
+CONTROL CODE = ADDRESS
+0x00 = ADDRESS 0
+0x01 = ADDRESS 1
+0x02 = ADDRESS 2
+...
+0x1F = ADDRESS 31
+```
+
+Each control code IS an address.
+
+---
+
+## THE LUT IS BUILT
+
+We take the stream of bytes, and we use them as INDEXES into the LUT.
+
+```
+BYTE IN → ADDRESS (control code) → LUT[ADDRESS] → BYTE OUT
+```
+
+The control code selects which entry in the LUT to read/write.
+
+---
+
+## THE DELTA LOOKUP
+
+delta(x) = rotl(x,1) XOR rotl(x,3) XOR rotr(x,2) XOR C
+
+This is the lookup function:
+
+1. Take current byte (as address)
+2. Apply delta (the lookup logic)
+3. Get next byte (next address)
+
+The stream flows through the LUT.
+
+---
+
+# CHAPTER 4: RECURSIVE BUILDING
+
+## LIKE PASCAL'S PYRAMID
+
+Pascal's Pyramid: each number is sum of two numbers above it.
+
+```
+         1
+        1 1
+       1 2 1
+      1 3 3 1
+     1 4 6 4 1
+```
+
+Row N has N+1 numbers.
+
+Our LUT builds the same way - RECURSIVELY.
+
+---
+
+## THE DOUBLING
+
+```
+2 → 4 → 8 → 16 → 32 → 64 → 128 → 256 → ...
+```
+
+Each step doubles the symbol space.
+
+---
+
+## THE PROGRESSION
+
+STEP 1: (NUL SOH) - first pair
+STEP 2: (NUL SOH STX ETX) - 4 symbols
+STEP 3: (NUL SOH STX ETX EOT ENQ ACK BEL) - 8 symbols
+STEP 4: (REFERENCES) - 16 symbols
+STEP 5: (POINTERS) - 32 symbols
+STEP 6: (NON-PRINTING) - transpose
+STEP 7: (PRINTING) - transpose
+STEP 8: (ASCII)
+STEP 9: (UNICODE)
+STEP 10: (BRAILLE)
+STEP 11: (AEGEAN)
+
+Each step BUILDS on the previous step, like Pascal's Pyramid.
+
+---
+
+# CHAPTER 5: AEGEAN - EXPONENT
+
+## REFERENCE DIALECTIC
+
+AEGEAN numerals encode HOW BIG = the exponent.
+
+Position: U+10100 to U+1013F (64 numerals).
+
+---
+
+## BIOJECTIVE BASE-9
+
+AEGEAN uses bijective base-9 (no zero):
+
+```
+U+10100 = 1
+U+10101 = 2
+U+10102 = 3
+...
+U+1013F = 64
+```
+
+No zero. 1 through 64.
+
+This is the HEADER / EXPONENT.
+
+---
+
+## EXPONENT
+
+In scientific notation:
+
+```
+value = significand × 10^exponent
+```
+
+AEGEAN provides the exponent (how many digits).
+
+---
+
+# CHAPTER 6: BRAILLE - SIGNIFICAND
+
+## POINTER DIALECTIC
+
+BRAILLE patterns encode WHAT IT IS = the significand.
+
+Position: U+2800 to U+28FF (256 patterns).
+
+---
+
+## BCD ENCODING
+
+BRAILLE is like BCD (Binary Coded Decimal):
+
+```
+Dot 1 = 1
+Dot 2 = 2
+Dot 3 = 4
+Dot 4 = 8
+```
+
+4 dots can represent 0-9 (just like BCD nibble).
+
+---
+
+## PACKED DECIMAL
+
+Two BRAILLE patterns can be packed into one byte, just like packed BCD:
+
+```
+High nibble = first digit (0-9)
+Low nibble = second digit (0-9)
+```
+
+---
+
+## SIGNIFICAND
+
+In scientific notation:
+
+```
+value = significand × 10^exponent
+```
+
+BRAILLE provides the significand (the digits themselves).
+
+---
+
+# CHAPTER 7: OCTUPLE PRECISION
+
+## FOUR PLANES (MODES)
+
+Each byte can be interpreted in one of FOUR planes:
+
+### 1. ASCII PLANE (0x00-0x7F)
+Standard printable/control characters.
+
+### 2. BRAILLE PLANE (0x80-0xBF)
+Significand encoding. BCD patterns. Dense payload.
+
+### 3. AEGEAN PLANE (0xC0-0xFF)
+Exponent encoding. Bijective base-9. Header/governance.
+
+### 4. OMICRON PLANE
+Control plane. Delta law operations. The meta-circular layer.
+
+## TWO TRACKS
+
+Two parallel tracks in the stream:
+
+### AEGEAN track (exponent)
+```
+U+10100 ... U+1013F
+```
+64 numerals for exponent power.
+
+### BRAILLE track (significand)
+```
+U+2800 ... U+28FF
+```
+256 patterns for decimal digits.
+
+---
+
+## NO PAIRING
+
+No dot. No structure.
+
+Just two parallel positions in the byte stream:
+
+```
+...BRAILLE[0]...BRAILLE[255]...AEGEAN[0]...AEGEAN[63]...
+```
+
+Both tracks exist in the symbol space. No pairing.
+
+---
+
+## LIKE SCIENTIFIC NOTATION
+
+```
+3.14 × 10^2
+```
+
+- Significand (3.14) = BRAILLE (pointer)
+- Exponent (2) = AEGEAN (reference)
+
+Together: BRAILLE + AEGEAN = OCTUPLE PRECISION ENCODING.
+
+---
+
+# CHAPTER 8: THE FULL LADDER
+
+## THE LADDER
+
+```
+(!NULL
+  ((NULL . ESC)
+   (CONTROL . SIGNAL)
+   . (REFERENCES . POINTERS)
+   . (NON-PRINTING . PRINTING)
+   . (ASCII . UNICODE)
+   . (UNICODE . BRAILLE))
+  . AEGEAN)
+```
+
+---
+
+## SUMMARY
+
+1. Stream of bytes flows through
+2. 32 control codes = virtual addresses
+3. LUT is built recursively (Pascal's Pyramid)
+4. AEGEAN = exponent (reference, how big)
+5. BRAILLE = significand (pointer, what it is)
+6. Together = decimal encoding (not binary)
+
+---
+
+# APPENDIX: BCD OPERATIONS
+
+## ADDITION
+
+BCD needs adjustment (add 6 when > 9):
+
+```
+9 + 8 = 17
+1001 + 1000 = 10001 (invalid in BCD)
++ 0110 (add 6) = 00010111 = 17 (valid)
+```
+
+## SUBTRACTION
+
+Uses ten's complement:
+
+```
+357 - 432
+357 = 0000 0011 0101 0111
+-432 = ten's complement of 432 + 1
+```
+
+---
+
+# APPENDIX: COMPARISON TO BINARY
+
+## Binary (existing computers)
+- Base-2 (two states: 0, 1)
+- Fast but inaccurate for decimals
+- IEEE 754 floating-point approximations
+
+## Our system (omi-lisp)
+- Base-10 (BCD significand)
+- Accurate decimal arithmetic
+- AEGEAN exponent for scaling
+
+The omi-lisp system replaces binary with decimal encoding, using BCD (BRAILLE) for significand and bijective base-9 (AEGEAN) for exponent.
+
+This is LIKE fixed-point arithmetic with explicit decimal point stored separately.
+
+---

@@ -1,0 +1,5 @@
+{"id":"valid-unary-window-only","description":"Unary-only stream through 0x00..0x2F must pass when no structural interpretation is requested.","header_commitment":[0,27,28,29,30,31],"stream":[0,1,2,3,15,16,31,32,46],"expected":{"pass":true,"phase_transitions":[]}}
+{"id":"fail-structural-dot-interpretation-in-unary","description":"Dot interpretation in unary phase must fail immediately.","header_commitment":[0,27,28,29,30,31],"stream":[0,{"byte":46,"interpret_as":"STRUCT.DOT"},64],"expected":{"pass":false,"error_code":"E_UNARY_STRUCTURAL_INTERPRETATION"}}
+{"id":"fail-header-commitment-mismatch","description":"Header commitment mismatch must fail-fast before stream execution.","header_commitment":[0,27,28,29,30,0],"stream":[0,27,28,29,30,31,64],"expected":{"pass":false,"error_code":"E_HEADER_COMMITMENT_MISMATCH"}}
+{"id":"pass-post-boundary-structural-dot","description":"After boundary activation, structural dot parsing is allowed and should pass.","header_commitment":[0,27,28,29,30,31],"stream":[0,27,28,29,30,31,64,40,65,46,66,41,32],"expected":{"pass":true,"phase_transitions":[{"index":6,"from":"UNARY","to":"STRUCTURAL"}]}}
+
