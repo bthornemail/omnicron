@@ -75,9 +75,9 @@
     { "path": "logic/generated/omnicron-rule-source.run.log", "class": "temporary" },
     { "path": "logic/generated/omnicron-rule-source.run.validation.log", "class": "temporary" },
 
-    { "path": "dev-docs/barcodes/Aztec.US5591956A.pdf", "class": "external" },
-    { "path": "dev-docs/barcodes/BeeTag.pone.0136487.pdf", "class": "external" },
-    { "path": "dev-docs/barcodes/USS-16K.pdf", "class": "external" },
-    { "path": "dev-docs/barcodes/MaxiCode.US4998010.pdf", "class": "external" }
+    { "path": "dev-docs/front-end/barcodes/Aztec.US5591956A.pdf", "class": "external" },
+    { "path": "dev-docs/front-end/barcodes/BeeTag.pone.0136487.pdf", "class": "external" },
+    { "path": "dev-docs/front-end/barcodes/USS-16K.pdf", "class": "external" },
+    { "path": "dev-docs/front-end/barcodes/MaxiCode.US4998010.pdf", "class": "external" }
   ]
 }

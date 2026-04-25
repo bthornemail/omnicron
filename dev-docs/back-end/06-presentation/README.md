@@ -20,6 +20,7 @@ Your encoding IS the presentation layer:
 
 - `osi-model-why.md` - why OSI is structured
 - `how-it-connects.md` - HOW EVERYTHING WORKS ⬅ READ THIS FIRST
+- `../../../docs/reference/logic/OMI_LISP_BOOT_TO_PRESENTATION.md` - boot substrate to rendering declaration path
 - `qemu-internals.md` - detailed QEMU internals
 - `jit-tracing.md` - trace TCG execution
 

@@ -34,6 +34,77 @@ Remaining text is interpreted as Braille cells (`U+2800..U+28FF`).
 Each Braille symbol expands to a **2x4 subcell block** (8-dot map), producing a
 denser geometry stream than the base 16x16 bitboard surfaces.
 
+## Binary256 software-adaptation model
+
+This mixed-base stream can also be read as a software carrier inspired by the
+IEEE 754 `binary256` interchange layout.
+
+The goal is not to claim native hardware octuple precision. The goal is to
+provide a symbolic, replayable software envelope for a 256-bit numeric or
+geometric payload.
+
+IEEE-style field analogy:
+
+| Field | IEEE binary256 role | Mixed-base role |
+|---|---:|---|
+| sign | 1 bit | `HEADER8`/BOM chirality or one committed sign bit |
+| exponent | 19 bits | Aegean header/exponent plane |
+| significand | 236 stored bits, 237 precision with implicit lead bit | Braille dense payload plane |
+| spare/check bits | format-dependent in this model | frame congruence, cohort, ECC, or render checksum |
+
+Two useful encodings follow from this.
+
+### Mode A: exact 256-bit Braille payload
+
+```text
+32 Braille cells x 8 bits = 256 bits
+```
+
+In this mode, the 32 Braille cells carry the complete 256-bit word. Aegean and
+`HEADER8` are sideband frame metadata:
+
+```text
+HEADER8 frame + Aegean exponent/header + 32-cell Braille payload
+```
+
+This is best when the renderer needs an exact 256-bit payload and the stream
+still needs external chirality, exponent, or provenance markers.
+
+### Mode B: fielded symbolic binary256 envelope
+
+In this mode, the sign/exponent/significand fields are split across symbolic
+planes:
+
+```text
+HEADER8/BOM sign context
+  + Aegean exponent/header bits
+  + Braille significand bits
+```
+
+A practical field budget is:
+
+| Carrier | Capacity | Use |
+|---|---:|---|
+| `HEADER8`/BOM | at least 1 committed bit | sign/chirality/context |
+| 3 Aegean base-64 codepoints | 18 bits | exponent high payload |
+| 1 committed frame bit | 1 bit | completes 19-bit exponent |
+| 30 Braille cells | 240 bits | 236 stored significand bits + 4 spare bits |
+
+This mode gives enough space for the binary256 field structure while leaving
+four Braille bits for cohort selection, error checking, or render-plane
+congruence.
+
+The important distinction is:
+
+- **Braille** gives dense byte-like payload capacity.
+- **Aegean** gives readable header/exponent/governance structure.
+- **HEADER8/BOM** gives runtime sign/chirality/type context.
+
+That makes the stream a software substitute for unavailable native octuple
+hardware support: arithmetic and comparison can be implemented with dot-notation
+lists and LUT rewrites, while rendering can project the same framed value into
+polyforms, barcodes, SVG, WebGL, or device surfaces.
+
 ## Run
 
 Generate render packet NDJSON:
@@ -94,3 +165,5 @@ It proves the pipeline can:
 - increase effective geometric resolution from symbolic streams
 - treat endianness/chirality as active rendering control
 - keep authority/projection separation intact (projection remains downstream)
+- carry binary256-scale payloads as symbolic software frames without requiring
+  native octuple-precision hardware

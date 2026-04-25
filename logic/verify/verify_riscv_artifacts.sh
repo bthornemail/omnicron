@@ -9,13 +9,23 @@ SRC_KERNEL="$RDIR/atomic_kernel.c"
 SRC_LINKER="$RDIR/linker.ld"
 ART_BIN="$RDIR/my_kernel.bin"
 ART_FLAT="$RDIR/my_kernel.flat"
+ART_FLAT_ALT="$RDIR/my_kernel.flat2"
 
-for p in "$SRC_STARTUP" "$SRC_KERNEL" "$SRC_LINKER" "$ART_BIN" "$ART_FLAT"; do
+for p in "$SRC_STARTUP" "$SRC_KERNEL" "$SRC_LINKER" "$ART_BIN"; do
   if [[ ! -f "$p" ]]; then
     echo "ERROR: missing required file: $p" >&2
     exit 2
   fi
 done
+
+if [[ ! -f "$ART_FLAT" ]]; then
+  if [[ -f "$ART_FLAT_ALT" ]]; then
+    ART_FLAT="$ART_FLAT_ALT"
+  else
+    echo "ERROR: missing required flat kernel artifact: $RDIR/my_kernel.flat or $RDIR/my_kernel.flat2" >&2
+    exit 2
+  fi
+fi
 
 grep -q 'rotl(x, 1) \^ rotl(x, 3) \^ rotr(x, 2) \^ C' "$SRC_KERNEL" || {
   echo "ERROR: atomic kernel delta law not found in source." >&2

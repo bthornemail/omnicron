@@ -16,6 +16,7 @@ This file provides quick operational guidance for contributors and coding agents
 - Endian compatibility gate: `make verify-endian-compatibility`
 - Mixed-base render PoC: `make poc-mixedbase-render`
 - Header8-gated mixed-base render PoC: `make poc-mixedbase-header8-render`
+- Federated logic packet replay: `make verify-logic-packet-replay`
 - Remote decentralized gate (quick): `make remote-node-check`
 - Remote decentralized gate (full): `make remote-node-check-full`
 
@@ -24,6 +25,9 @@ This file provides quick operational guidance for contributors and coding agents
 - Pull channels: `guix pull -C guix/channels.scm`
 - Core shell: `guix shell -m guix/manifest-core.scm`
 - Core + editor shell: `guix shell -m guix/manifest-core.scm -m guix/manifest-editors.scm`
+- Core + rendering shell: `guix shell -m guix/manifest-core.scm -m guix/manifest-rendering.scm`
+- Full shell: `guix shell -m guix/manifest-core.scm -m guix/manifest-rendering.scm -m guix/manifest-editors.scm`
+- Rendering environment gate: `make verify-rendering-env`
 
 ## Bootstrap Parsing Rule (Required)
 

@@ -53,10 +53,76 @@ Requirements:
 - explicit constant `C`
 - width mask after each step
 
-### 2.3 Register Semantics
+### 2.3 Reduction Question
+
+The governing design question is:
+
+```text
+What structure can be removed while the same canonical unfold, replay, and
+projection still results?
+```
+
+This is the quotient question of the system. A symbol, rendering, table, or
+notation is foundational only if removing it changes canonical unfold/replay/
+projection. Otherwise it is a projection convenience or derived witness.
+
+The minimal design that currently survives this reduction is:
+
+```text
+pair/dot structure
++ delta law
++ bounded width
++ explicit frame metadata
++ projection witnesses
+```
+
+Everything else should be tested as removable unless a verifier proves that it
+is required for the same canonical output.
+
+### 2.4 Register Semantics
 
 - Register width is explicit and bounded per stage (`8/16/32/64/128/256/512`).
 - State transitions are deterministic for fixed `(x, C, w)`.
+
+### 2.5 Period-8 Witness
+
+The design contains one deliberate step law:
+
+```text
+rotl(x,1) XOR rotl(x,3) XOR rotr(x,2) XOR C
+```
+
+The choices inside the law are exactly:
+
+- rotations instead of shifts, so no bits are dropped
+- XOR, which is reversible as a local operation
+- an explicit constant, so the zero fixed point can be broken
+- a width mask, so the state remains bounded
+
+For the current 16-bit witness path, the observed period-8 behavior gives the
+following derived reference:
+
+```text
+period 8 -> smallest prime with decimal repetend period 8 is 73
+1/73     -> 0.01369863 repeating
+B        -> [0, 1, 3, 6, 9, 8, 6, 3]
+W        -> sum(B) = 36
+offset   -> divmod(position, 36)
+```
+
+`73` is not chosen as a constant. It is a derived witness attached to the
+period-8 orbit.
+
+The nearby sexagesimal boundary is useful as a contrast:
+
+```text
+1/59 -> long repetend period in decimal
+1/60 -> sexagesimal boundary; decimal reduces to 1/(2^2 * 3 * 5)
+```
+
+That contrast is part of why frame boundaries matter. Neighboring denominators
+can have very different replay behavior depending on the frame in which the
+quotient is read.
 
 ---
 

@@ -126,6 +126,27 @@ Header8-gated mixed-base render PoC (unary pre-header consumed first):
 make poc-mixedbase-header8-render
 ```
 
+Boot-to-presentation integration reference:
+
+- [docs/reference/logic/OMI_LISP_BOOT_TO_PRESENTATION.md](/root/omnicron/docs/reference/logic/OMI_LISP_BOOT_TO_PRESENTATION.md)
+
+## Federated Logic Delivery Packet
+
+Generate and verify the first reconstructive packet:
+
+```bash
+make logic-packet-v0
+make verify-logic-packet-replay
+```
+
+This creates a small packet that rebuilds an artifact from a seed, LUT entries,
+rewrite steps, and a pre-header witness instead of sending the finished artifact
+as the source of authority.
+
+Reference:
+
+- [docs/reference/logic/FEDERATED_LOGIC_DELIVERY.md](/root/omnicron/docs/reference/logic/FEDERATED_LOGIC_DELIVERY.md)
+
 ## Declarative Guix Dev Environment
 
 Use the new declarations under `guix/`:
@@ -141,6 +162,15 @@ Optional editor layer:
 guix shell -m guix/manifest-core.scm -m guix/manifest-editors.scm
 ```
 
+Rendering / logic-CAD layer with OpenGL, OpenGL ES/WebGL-adjacent tooling, and
+polyform projection support:
+
+```bash
+guix shell -m guix/manifest-core.scm -m guix/manifest-rendering.scm
+make verify-rendering-env
+```
+
 Reference guide:
 
 - [dev-docs/back-end/99-build/guix-declarative-dev-environment.md](/root/omnicron/dev-docs/back-end/99-build/guix-declarative-dev-environment.md)
+- [docs/reference/polyform/LOGIC_CAD_RENDERING_ENV.md](/root/omnicron/docs/reference/polyform/LOGIC_CAD_RENDERING_ENV.md)
