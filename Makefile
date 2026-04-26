@@ -107,6 +107,14 @@ verify-endian-compatibility:
 	chmod +x ./logic/verify/verify_endian_compatibility.mjs
 	node ./logic/verify/verify_endian_compatibility.mjs
 
+verify-header-ladder:
+	chmod +x ./logic/verify/verify_header_ladder_runtime.mjs ./logic/runtime/header_ladder_runtime.mjs ./logic/runtime/dot_rewrite.mjs
+	node ./logic/verify/verify_header_ladder_runtime.mjs
+
+verify-multi-width-equivalence:
+	chmod +x ./logic/tools/make_multi_width_packet.mjs ./logic/runtime/header_ladder_runtime.mjs
+	node ./logic/tools/make_multi_width_packet.mjs
+
 verify-multi-emulator-smoke:
 	chmod +x ./logic/verify/verify_multi_emulator_smoke.sh
 	./logic/verify/verify_multi_emulator_smoke.sh
