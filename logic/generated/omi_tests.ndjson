@@ -1,0 +1,27 @@
+{"type":"test","id":"preheader-control-range","status":"PASS","expected":{"phase":"UNARY","steps":3},"actual":{"phase":"UNARY","steps":3}}
+{"type":"test","id":"preheader-boundary-sp","status":"PASS","expected":{"phase":"UNARY","transitions":0},"actual":{"phase":"UNARY","transitions":0}}
+{"type":"test","id":"preheader-boundary-0x2f","status":"PASS","expected":{"phase":"UNARY"},"actual":{"phase":"UNARY"}}
+{"type":"test","id":"preheader-0x30-structural","status":"PASS","expected":{"phase":"STRUCTURAL"},"actual":{"phase":"STRUCTURAL"}}
+{"type":"test","id":"struct-space","status":"PASS","expected":{"phase":"UNARY"},"actual":{"phase":"UNARY"}}
+{"type":"test","id":"struct-list-open","status":"PASS","expected":{"phase":"UNARY"},"actual":{"phase":"UNARY"}}
+{"type":"test","id":"struct-list-close","status":"PASS","expected":{"phase":"UNARY"},"actual":{"phase":"UNARY"}}
+{"type":"test","id":"struct-dot","status":"PASS","expected":{"phase":"UNARY"},"actual":{"phase":"UNARY"}}
+{"type":"test","id":"cons-make-pair","status":"PASS","expected":{"consp":true,"car":"a","cdr":"b"},"actual":{"consp":true,"car":"a","cdr":"b"}}
+{"type":"test","id":"cons-nil","status":"PASS","expected":{"nilp":true},"actual":{"nilp":true}}
+{"type":"test","id":"cons-list-construction","status":"PASS","expected":{"consp":true,"len":3},"actual":{"consp":true,"len":3}}
+{"type":"test","id":"cons-car","status":"PASS","expected":{"car":"rose"},"actual":{"car":"rose"}}
+{"type":"test","id":"cons-cdr","status":"PASS","expected":{"cdr":"violet"},"actual":{"cdr":"violet"}}
+{"type":"test","id":"cons-equal","status":"PASS","expected":{"equal":true},"actual":{"equal":true}}
+{"type":"test","id":"datalog-add-fact","status":"PASS","expected":{"facts":"parent(alice, bob)."},"actual":{"facts":"parent(alice, bob)."}}
+{"type":"test","id":"datalog-query","status":"PASS","expected":{"count":2},"actual":{"count":2}}
+{"type":"test","id":"datalog-parse","status":"PASS","expected":{"type":"FACT","relation":"parent"},"actual":{"type":"FACT","relation":"parent"}}
+{"type":"test","id":"derived-cons-facts","status":"PASS","expected":{"cons":true,"car":true},"actual":{"cons":true,"car":true}}
+{"type":"test","id":"band-control","status":"PASS","expected":{"band":"control","dialect":"ascii"},"actual":{"band":"control","dialect":"ascii"}}
+{"type":"test","id":"band-uppercase","status":"PASS","expected":{"band":"uppercase","dialect":"ascii"},"actual":{"band":"uppercase","dialect":"ascii"}}
+{"type":"test","id":"band-lowercase","status":"PASS","expected":{"band":"lowercase","dialect":"ascii"},"actual":{"band":"lowercase","dialect":"ascii"}}
+{"type":"test","id":"band-aegean","status":"PASS","expected":{"band":"unknown","dialect":"aegean"},"actual":{"band":"unknown","dialect":"aegean"}}
+{"type":"test","id":"band-braille","status":"PASS","expected":{"band":"unknown","dialect":"braille"},"actual":{"band":"unknown","dialect":"braille"}}
+{"type":"test","id":"width-header8-state","status":"PASS","expected":{"state":6},"actual":{"state":6}}
+{"type":"test","id":"width-header16-state","status":"PASS","expected":{"state":6},"actual":{"state":6}}
+{"type":"test","id":"width-header32-state","status":"PASS","expected":{"state":6},"actual":{"state":6}}
+{"type":"test","id":"width-header256-state","status":"PASS","expected":{"state":6},"actual":{"state":6}}

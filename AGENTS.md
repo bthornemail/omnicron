@@ -2,6 +2,49 @@
 
 This file provides quick operational guidance for contributors and coding agents.
 
+## Carrier Architecture Doctrine
+
+The Omi-Lisp system is a **carrier architecture** — meaning is canonical, glyph planes are transport surfaces.
+
+### Three Carrier Layers
+
+| Layer   | Range              | Role                              | Authority         |
+| ------- | ------------------ | --------------------------------- | ------------------ |
+| ASCII   | `0x00..0x7F`      | Bootstrap, syntax, control         | Law / Boot        |
+| Aegean  | `U+10100..U+1013F`| Precision, exponent, numeric     | Measure / Magnitude|
+| Braille | `U+2800..U+28FF`  | Dense payload, witness carrier   | Topology / Witness|
+
+### Unified Packet Format
+
+```text
+[ASCII header][Aegean precision][Braille payload]
+     ↓              ↓                  ↓
+   control        measure           witness
+```
+
+### Carrier Independence Principle
+
+> Meaning is canonical.
+> Glyph planes are transport surfaces.
+> No carrier is sovereign over truth.
+
+- ASCII is not the truth — it is the boot surface, the law that starts the system
+- Aegean is the measure layer — precision, exponent, magnitude
+- Braille is the topology layer — dense structures, witnesses, fingerprints
+
+### Geometry Witnesses
+
+- **Braille cells** → encode adjacency, occupancy, graph structure
+- **Aegean tiles** → encode metric class, exponent, magnitude
+- **ASCII controls** → encode transitions, boundaries, mode shifts
+
+### Self-Hosted Omi-Lisp Source
+
+Omi-Lisp programs can be authored across all three planes:
+- ASCII tokens = syntax, control
+- Aegean numeric literals = precision
+- Braille structural constants = topology
+
 ## Canonical Runtime/Test Entry
 
 - Build host tools: `make`

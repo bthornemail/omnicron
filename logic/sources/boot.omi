@@ -1,0 +1,64 @@
+; OMI-LISP BOOTSTRAP (boot.omi)
+; 
+; This file encodes the Omi-Lisp bootstrap using the ASCII lookup table.
+; Each form is a 7-bit ASCII sequence that maps to primitives.
+;
+; ASCII LUT (1977/1986):
+;   0x00-0x1F = control (pre-header unary)
+;   0x20-0x2F = structural (. , : - ? ( ) SP)
+;   0x30-0x39 = digits 0-9
+;   0x3A-0x3F = symbols : ; < = > ?
+;   0x40-0x5F = uppercase @ A-Z
+;   0x60-0x7F = lowercase ` a-z
+;
+; Pre-header rule: 0x00-0x2F tokens are unary control only.
+; Structural syntax only after boundary at 0x30 (digit row).
+
+; Core forms represented as ASCII sequences:
+
+; (quote x)  ->  q x
+; (car x)    ->  a x  
+; (cdr x)    ->  d x
+; (cons a b) ->  c a b
+; (list . xs)->  l xs...
+; (equal a b)->  e a b
+; (length x)->  L x
+; (if p t e) ->  i p t e
+
+; Simple program examples:
+
+; (quote rose)
+qrose
+
+; (car (rose violet))
+a(r v)
+
+; (cdr (rose violet))
+d(r v)
+
+; (cons rose violet)
+c r v
+
+; (list a b c)
+labc
+
+; (equal a a)
+ea
+
+; (length (a b c))
+Labc
+
+; (if (equal a b) a b)
+i eab ab
+
+; Lambda form:
+; (lambda (x) x)
+( l (x) x )
+
+; Let form:
+; (let ((x 1)) x)
+( l x: x )
+
+; Defun:
+; (defun foo (x) (cons x x))
+( defun foo (x) (c x x) )

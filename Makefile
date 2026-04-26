@@ -115,6 +115,110 @@ verify-multi-width-equivalence:
 	chmod +x ./logic/tools/make_multi_width_packet.mjs ./logic/runtime/header_ladder_runtime.mjs
 	node ./logic/tools/make_multi_width_packet.mjs
 
+verify-cons-diagram:
+	chmod +x ./logic/verify/verify_cons_diagram.mjs ./logic/runtime/cons_diagram.mjs ./logic/runtime/header_ladder_runtime.mjs
+	node ./logic/verify/verify_cons_diagram.mjs
+
+verify-omi-declarative:
+	chmod +x ./logic/verify/verify_omi_declarative.mjs ./logic/runtime/header_ladder_runtime.mjs ./logic/runtime/cons_diagram.mjs ./logic/runtime/datalog_engine.mjs
+	node ./logic/verify/verify_omi_declarative.mjs
+
+verify-omi-lisp-qemu:
+	chmod +x ./logic/verify/verify_omi_lisp_qemu.mjs ./logic/runtime/boot_omi.mjs
+	node ./logic/verify/verify_omi_lisp_qemu.mjs
+	@echo ""
+	@echo "=== OMI-LISP QEMU BOOT COMPLETE ==="
+
+verify-android-emulator:
+	chmod +x ./logic/verify/verify_android_emulator.mjs
+	ANDROID_HOME=/opt/android-sdk node ./logic/verify/verify_android_emulator.mjs
+	@echo ""
+	@echo "=== ANDROID EMULATOR VERIFICATION COMPLETE ==="
+
+verify-multi-platform:
+	chmod +x ./logic/verify/verify_multi_platform.mjs
+	ANDROID_HOME=/opt/android-sdk node ./logic/verify/verify_multi_platform.mjs
+	@echo ""
+	@echo "=== MULTI-PLATFORM VERIFICATION COMPLETE ==="
+
+verify-aegean-plane:
+	chmod +x ./logic/verify/verify_aegean_plane.mjs ./logic/runtime/aegean_plane.mjs
+	node ./logic/verify/verify_aegean_plane.mjs
+	@echo ""
+	@echo "=== AEGEAN PLANE VERIFICATION COMPLETE ==="
+
+verify-braille-plane:
+	chmod +x ./logic/verify/verify_braille_plane.mjs ./logic/runtime/braille_plane.mjs
+	node ./logic/verify/verify_braille_plane.mjs
+	@echo ""
+	@echo "=== BRAILLE PLANE VERIFICATION COMPLETE ==="
+
+verify-geometry-3d:
+	chmod +x ./logic/verify/verify_geometry_3d.mjs ./logic/runtime/geometry_3d.mjs
+	node ./logic/verify/verify_geometry_3d.mjs
+	@echo ""
+	@echo "=== 3D GEOMETRY VERIFICATION COMPLETE ==="
+
+verify-visual-renderer:
+	chmod +x ./logic/verify/verify_visual_renderer.mjs ./logic/runtime/visual_renderer.mjs
+	node ./logic/verify/verify_visual_renderer.mjs
+	@echo ""
+	@echo "=== VISUAL RENDERER VERIFICATION COMPLETE ==="
+
+verify-audio-synthesis:
+	chmod +x ./logic/runtime/audio_synthesis.mjs
+	node ./logic/runtime/audio_synthesis.mjs
+	@echo ""
+	@echo "=== AUDIO SYNTHESIS VERIFICATION COMPLETE ==="
+
+verify-network-protocol:
+	chmod +x ./logic/runtime/network_protocol.mjs
+	node ./logic/runtime/network_protocol.mjs
+	@echo ""
+	@echo "=== NETWORK PROTOCOL VERIFICATION COMPLETE ==="
+
+verify-multi-emulator:
+	chmod +x ./logic/verify/verify_multi_emulator.mjs
+	node ./logic/verify/verify_multi_emulator.mjs
+	@echo ""
+	@echo "=== MULTI-EMULATOR VERIFICATION COMPLETE ==="
+
+verify-android-sdk:
+	chmod +x ./logic/verify/verify_android_sdk.mjs
+	ANDROID_HOME=/opt/android-sdk node ./logic/verify/verify_android_sdk.mjs
+	@echo ""
+	@echo "=== ANDROID SDK/ADB VERIFICATION COMPLETE ==="
+
+verify-render-packet:
+	chmod +x ./logic/verify/verify_render_packet.mjs
+	node ./logic/verify/verify_render_packet.mjs
+	@echo ""
+	@echo "=== RENDER PACKET VERIFICATION COMPLETE ==="
+
+verify-gles-capability:
+	chmod +x ./logic/verify/verify_gles_capability.mjs
+	node ./logic/verify/verify_gles_capability.mjs
+	@echo ""
+	@echo "=== GLES CAPABILITY VERIFICATION COMPLETE ==="
+
+verify-polyform-toolbox:
+	chmod +x ./logic/verify/verify_polyform_subsystem.mjs ./logic/runtime/polyform_toolbox.mjs
+	node ./logic/verify/verify_polyform_subsystem.mjs
+	@echo ""
+	@echo "=== POLYFORM SUBSYSTEM VERIFICATION COMPLETE ==="
+
+verify-geometry-toolbox:
+	chmod +x ./logic/verify/verify_geometry_toolbox.mjs ./logic/runtime/geometry_toolbox.mjs
+	node ./logic/verify/verify_geometry_toolbox.mjs
+
+verify-datalog-engine:
+	chmod +x ./logic/verify/verify_datalog_engine.mjs ./logic/runtime/datalog_engine.mjs
+	node ./logic/verify/verify_datalog_engine.mjs
+
+verify-datalog-derived:
+	chmod +x ./logic/verify/verify_datalog_derived.mjs ./logic/runtime/datalog_engine.mjs
+	node ./logic/verify/verify_datalog_derived.mjs
+
 verify-multi-emulator-smoke:
 	chmod +x ./logic/verify/verify_multi_emulator_smoke.sh
 	./logic/verify/verify_multi_emulator_smoke.sh

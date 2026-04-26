@@ -12,11 +12,11 @@ export const HEADER_PREFIXES = {
              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
              0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f],
   header256: [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-              0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-              0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-              0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-              0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f]
+             0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+             0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+             0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+             0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+             0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f]
 };
 
 export const PREHEADER_UNARY_MAX = 0x2f;
@@ -28,6 +28,46 @@ export const HEADER_SIZES = {
   header32: 32,
   header256: 32
 };
+
+export const CHARACTER_BANDS = {
+  control: { start: 0x00, end: 0x1f, name: "control" },
+  structural: { start: 0x20, end: 0x2f, name: "structural" },
+  digit: { start: 0x30, end: 0x39, name: "digit" },
+  symbol: { start: 0x3a, end: 0x40, name: "symbol" },
+  uppercase: { start: 0x41, end: 0x5a, name: "uppercase" },
+  punctuation: { start: 0x5b, end: 0x60, name: "punctuation" },
+  lowercase: { start: 0x61, end: 0x7a, name: "lowercase" },
+  extend: { start: 0x7b, end: 0x7f, name: "extend" }
+};
+
+export const DIALECT_BANDS = {
+  ascii: { start: 0x00, end: 0x7f, name: "ascii" },
+  aegean: { start: 0x80, end: 0xbf, name: "aegean" },
+  braille: { start: 0xc0, end: 0xff, name: "braille" }
+};
+
+export function classifyBand(byte) {
+  for (const [name, band] of Object.entries(CHARACTER_BANDS)) {
+    if (byte >= band.start && byte <= band.end) return name;
+  }
+  return "unknown";
+}
+
+export function classifyDialect(byte) {
+  for (const [name, band] of Object.entries(DIALECT_BANDS)) {
+    if (byte >= band.start && byte <= band.end) return name;
+  }
+  return "unknown";
+}
+
+export function getBandInfo(byte) {
+  return {
+    band: classifyBand(byte),
+    dialect: classifyDialect(byte),
+    hex: `0x${byte.toString(16).toUpperCase()}`,
+    char: byte >= 0x20 && byte <= 0x7e ? String.fromCharCode(byte) : "."
+  };
+}
 
 function hexByte(n) {
   return `0x${(n & 0xff).toString(16).padStart(2, "0").toUpperCase()}`;
@@ -173,12 +213,16 @@ export function evaluateStream(stream, options = {}) {
       };
     }
 
+    const bandInfo = getBandInfo(b);
     const step = {
       index,
       precision,
       phase,
       width,
       input: b,
+      band: bandInfo.band,
+      dialect: bandInfo.dialect,
+      char: bandInfo.char,
       previous_state: prev,
       current_state: curr,
       header
@@ -200,4 +244,47 @@ export function getPrecisionInfo(precision) {
     prefix_length: prefix.length,
     total_bytes: prefix.length + 2
   };
+}
+
+export function describeHeader(precision, inputByte) {
+  const prefix = HEADER_PREFIXES[precision] || HEADER_PREFIXES.header8;
+  const bandInfo = getBandInfo(inputByte);
+  return {
+    precision,
+    width: HEADER_SIZES[precision],
+    prefix_bytes: prefix.length,
+    input: bandInfo
+  };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  console.log("=== Character Band Classification ===\n");
+
+  const testBytes = [0x00, 0x1f, 0x20, 0x2f, 0x30, 0x3f, 0x40, 0x5a, 0x61, 0x7a, 0x80, 0xc0, 0xff];
+
+  for (const b of testBytes) {
+    const info = getBandInfo(b);
+    console.log(`  ${info.hex} (${info.char}): band=${info.band}, dialect=${info.dialect}`);
+  }
+
+  console.log("\n=== Header Band Descriptions ===\n");
+
+  for (const precision of ["header8", "header16", "header32", "header256"]) {
+    const desc = describeHeader(precision, 0x41);
+    console.log(`  ${desc.precision}: width=${desc.width}, prefix=${desc.prefix_bytes}, input_band=${desc.input.band}`);
+  }
+
+  console.log("\n=== Character Bands ===\n");
+
+  for (const [name, band] of Object.entries(CHARACTER_BANDS)) {
+    console.log(`  ${name}: 0x${band.start.toString(16).toUpperCase()}-0x${band.end.toString(16).toUpperCase()}`);
+  }
+
+  console.log("\n=== Dialect Bands ===\n");
+
+  for (const [name, band] of Object.entries(DIALECT_BANDS)) {
+    console.log(`  ${name}: 0x${band.start.toString(16).toUpperCase()}-0x${band.end.toString(16).toUpperCase()}`);
+  }
+
+  console.log("\n=== All tests complete ===");
 }
